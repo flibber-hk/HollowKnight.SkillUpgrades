@@ -22,7 +22,7 @@ namespace SkillUpgrades
             instance = this;
             instance.Log("Initializing");
 
-
+            Skills.Skills.HookSkillUpgrades();
         }
 
         public override string GetVersion()
