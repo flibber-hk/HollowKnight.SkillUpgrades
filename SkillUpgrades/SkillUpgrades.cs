@@ -9,6 +9,13 @@ namespace SkillUpgrades
     public class SkillUpgrades : Mod
     {
         internal static SkillUpgrades instance;
+        public GlobalSettings globalSettings { get; set; } = new GlobalSettings();
+        public override ModSettings GlobalSettings
+        {
+            get => globalSettings = globalSettings ?? new GlobalSettings();
+            set => globalSettings = value is GlobalSettings gSettings ? gSettings : globalSettings;
+        }
+
 
         public override void Initialize()
         {
