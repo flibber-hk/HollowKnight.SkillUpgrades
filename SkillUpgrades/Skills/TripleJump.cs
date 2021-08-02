@@ -53,10 +53,8 @@ namespace SkillUpgrades.Skills
         private static System.Collections.IEnumerator RefreshWingsInAir()
         {
             yield return new WaitUntil(() => doubleJumpCount == 0 || !InputHandler.Instance.inputActions.jump.IsPressed);
-            SkillUpgrades.instance.Log("Land or release");
             if (doubleJumpCount != 0)
             {
-                SkillUpgrades.instance.Log("...refreshing double jump");
                 ReflectionHelper.SetAttr(HeroController.instance, "doubleJumped", false);
             }
         }
