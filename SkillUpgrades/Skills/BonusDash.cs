@@ -1,0 +1,202 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Modding;
+using UnityEngine;
+
+namespace SkillUpgrades.Skills
+{
+    internal static class BonusDash
+    {
+        private static int airDashCount;
+        internal static void RefreshAirDash()
+        {
+            airDashCount = 0;
+        }
+
+        internal static void Hook()
+        {
+            AddRefreshHooks();
+            On.HeroController.HeroDash += AllowExtraAirDash;
+        }
+
+        internal static void UnHook()
+        {
+            RemoveRefreshHooks();
+            On.HeroController.HeroDash -= AllowExtraAirDash;
+        }
+
+        private static void AllowExtraAirDash(On.HeroController.orig_HeroDash orig, HeroController self)
+        {
+            if (!SkillUpgrades.instance.globalSettings.BonusAirDashEnabled)
+            {
+                orig(self);
+                return;
+            }
+
+
+            bool shouldAirDash = !self.cState.onGround && !self.cState.inAcid;
+
+            orig(self);
+            if (shouldAirDash)
+            {
+                airDashCount++;
+
+                if (airDashCount < SkillUpgrades.instance.globalSettings.AirDashMax || SkillUpgrades.instance.globalSettings.AirDashMax == -1)
+                {
+                    GameManager.instance.StartCoroutine(RefreshDashInAir());
+                }
+            }
+        }
+
+        private static System.Collections.IEnumerator RefreshDashInAir()
+        {
+            yield return new WaitUntil(() => airDashCount == 0 || !InputHandler.Instance.inputActions.dash.IsPressed);
+            if (airDashCount != 0)
+            {
+                ReflectionHelper.SetAttr(HeroController.instance, "airDashed", false);
+            }
+        }
+
+        // Apparently, these are all the places where the game refreshes the player's air dash; we need to set the airDashCount to 0
+        #region Restore Air Dash
+        private static void AddRefreshHooks()
+        {
+            On.HeroController.BackOnGround += HeroController_BackOnGround;
+            On.HeroController.Bounce += HeroController_Bounce;
+            On.HeroController.BounceHigh += HeroController_BounceHigh;
+            On.HeroController.DoWallJump += HeroController_DoWallJump;
+            On.HeroController.EnterScene += HeroController_EnterScene;
+            On.HeroController.EnterSceneDreamGate += HeroController_EnterSceneDreamGate;
+            On.HeroController.ExitAcid += HeroController_ExitAcid;
+            On.HeroController.HazardRespawn += HeroController_HazardRespawn;
+            On.HeroController.ResetAirMoves += HeroController_ResetAirMoves;
+            On.HeroController.Respawn += HeroController_Respawn;
+            On.HeroController.ShroomBounce += HeroController_ShroomBounce;
+
+            On.HeroController.LookForInput += HeroController_LookForInput;
+            On.HeroController.Update += HeroController_Update;
+            On.HeroController.RegainControl += HeroController_RegainControl;
+        }
+
+        private static void RemoveRefreshHooks()
+        {
+            On.HeroController.BackOnGround -= HeroController_BackOnGround;
+            On.HeroController.Bounce -= HeroController_Bounce;
+            On.HeroController.BounceHigh -= HeroController_BounceHigh;
+            On.HeroController.DoWallJump -= HeroController_DoWallJump;
+            On.HeroController.EnterScene -= HeroController_EnterScene;
+            On.HeroController.EnterSceneDreamGate -= HeroController_EnterSceneDreamGate;
+            On.HeroController.ExitAcid -= HeroController_ExitAcid;
+            On.HeroController.HazardRespawn -= HeroController_HazardRespawn;
+            On.HeroController.ResetAirMoves -= HeroController_ResetAirMoves;
+            On.HeroController.Respawn -= HeroController_Respawn;
+            On.HeroController.ShroomBounce -= HeroController_ShroomBounce;
+
+            On.HeroController.LookForInput -= HeroController_LookForInput;
+            On.HeroController.Update -= HeroController_Update;
+            On.HeroController.RegainControl -= HeroController_RegainControl;
+        }
+
+        private static void HeroController_BackOnGround(On.HeroController.orig_BackOnGround orig, HeroController self)
+        {
+            orig(self);
+            RefreshAirDash();
+        }
+        private static void HeroController_Bounce(On.HeroController.orig_Bounce orig, HeroController self)
+        {
+            orig(self);
+            RefreshAirDash();
+        }
+        private static void HeroController_BounceHigh(On.HeroController.orig_BounceHigh orig, HeroController self)
+        {
+            orig(self);
+            RefreshAirDash();
+        }
+        private static void HeroController_DoWallJump(On.HeroController.orig_DoWallJump orig, HeroController self)
+        {
+            orig(self);
+            RefreshAirDash();
+        }
+        private static void HeroController_EnterSceneDreamGate(On.HeroController.orig_EnterSceneDreamGate orig, HeroController self)
+        {
+            orig(self);
+            RefreshAirDash();
+        }
+        private static void HeroController_ExitAcid(On.HeroController.orig_ExitAcid orig, HeroController self)
+        {
+            orig(self);
+            RefreshAirDash();
+        }
+        private static void HeroController_ResetAirMoves(On.HeroController.orig_ResetAirMoves orig, HeroController self)
+        {
+            orig(self);
+            RefreshAirDash();
+        }
+        private static void HeroController_ShroomBounce(On.HeroController.orig_ShroomBounce orig, HeroController self)
+        {
+            orig(self);
+            RefreshAirDash();
+        }
+
+        private static System.Collections.IEnumerator HeroController_EnterScene(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
+        {
+            yield return orig(self, enterGate, delayBeforeEnter);
+            RefreshAirDash();
+        }
+        private static System.Collections.IEnumerator HeroController_HazardRespawn(On.HeroController.orig_HazardRespawn orig, HeroController self)
+        {
+            yield return orig(self);
+            RefreshAirDash();
+        }
+        private static System.Collections.IEnumerator HeroController_Respawn(On.HeroController.orig_Respawn orig, HeroController self)
+        {
+            yield return orig(self);
+            RefreshAirDash();
+        }
+        private static void HeroController_LookForInput(On.HeroController.orig_LookForInput orig, HeroController self)
+        {
+            orig(self);
+
+            // For some reson, this function is private, and I'd rather copy and paste the code rather than reflect
+            bool canWallSlide = (self.cState.wallSliding && GameManager.instance.isPaused) || (!self.cState.touchingNonSlider && !self.inAcid
+                && !self.cState.dashing && self.playerData.GetBool("hasWalljump") && !self.cState.onGround && !self.cState.recoiling
+                && !GameManager.instance.isPaused && !self.controlReqlinquished && !self.cState.transitioning
+                && (self.cState.falling || self.cState.wallSliding) && !self.cState.doubleJumping && self.CanInput());
+
+            if (PlayerData.instance.GetBool(nameof(PlayerData.hasWalljump)) && canWallSlide && !self.cState.attacking)
+            {
+                if (self.touchingWallL && InputHandler.Instance.inputActions.left.IsPressed && !self.cState.wallSliding)
+                {
+                    RefreshAirDash();
+                }
+                if (self.touchingWallR && InputHandler.Instance.inputActions.right.IsPressed && !self.cState.wallSliding)
+                {
+                    RefreshAirDash();
+                }
+            }
+        }
+        private static void HeroController_Update(On.HeroController.orig_Update orig, HeroController self)
+        {
+            orig(self);
+
+            if (self.cState.wallSliding)
+            {
+                RefreshAirDash();
+            }
+        }
+        private static void HeroController_RegainControl(On.HeroController.orig_RegainControl orig, HeroController self)
+        {
+            if (self.controlReqlinquished && !self.cState.dead)
+            {
+                if (ReflectionHelper.GetAttr<HeroController, bool>(self, "startWithWallslide"))
+                {
+                    RefreshAirDash();
+                }
+            }
+            orig(self);
+        }
+        #endregion
+    }
+}

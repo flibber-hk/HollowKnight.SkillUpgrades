@@ -10,6 +10,7 @@ namespace SkillUpgrades.Skills
         public static void HookSkillUpgrades()
         {
             TripleJump.Hook();
+            BonusDash.Hook();
         }
 
     }

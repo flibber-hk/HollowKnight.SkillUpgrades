@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SkillSettings.cs" />
+    <Compile Include="Skills\BonusDash.cs" />
     <Compile Include="Skills\Skills.cs" />
     <Compile Include="Skills\TripleJump.cs" />
     <Compile Include="SkillUpgrades.cs" />
