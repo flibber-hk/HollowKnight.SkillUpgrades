@@ -21,5 +21,16 @@ namespace SkillUpgrades
         // The number of times the player can dash in air is this int; setting it to -1 means dash can be used infinitely
         public int AirDashMax = 2;
         #endregion
+
+        #region Vertical Cdash
+        // If this is set to false, the player cannot cdash in non-horizontal directions
+        public bool VerticalSuperdashEnabled = true;
+        // SoonTM: Diagonal CDash???
+        #endregion
+
+        #region Horizontal Dive
+        // If this is set to false, the player cannot dive in non-downward directions
+        public bool HorizontalDiveEnbled = true;
+        #endregion
     }
 }

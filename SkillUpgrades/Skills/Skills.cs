@@ -11,6 +11,8 @@ namespace SkillUpgrades.Skills
         {
             TripleJump.Hook();
             BonusDash.Hook();
+            VerticalSuperdash.Hook();
+            HorizontalQuake.Hook();
         }
 
     }
