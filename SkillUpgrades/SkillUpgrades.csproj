@@ -49,10 +49,15 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Skills\HorizontalQuake.cs" />
     <Compile Include="Util\ExecuteLambda.cs" />
+    <Compile Include="Util\ExecuteLambdaEveryFrame.cs" />
     <Compile Include="Util\PlaymakerExtensions.cs" />
     <Compile Include="SkillSettings.cs" />
     <Compile Include="Skills\BonusDash.cs" />

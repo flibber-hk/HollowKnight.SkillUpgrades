@@ -25,7 +25,8 @@ namespace SkillUpgrades
         #region Vertical Cdash
         // If this is set to false, the player cannot cdash in non-horizontal directions
         public bool VerticalSuperdashEnabled = true;
-        // SoonTM: Diagonal CDash???
+        // If this is set to true, the player can also cdash diagonally
+        public bool DiagonalSuperdashEnabled = true;
         #endregion
 
         #region Horizontal Dive
