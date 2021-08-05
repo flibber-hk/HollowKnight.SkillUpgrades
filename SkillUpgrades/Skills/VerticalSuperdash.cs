@@ -367,14 +367,6 @@ namespace SkillUpgrades.Skills
             {
                 SuperdashState = SuperdashDirection.Normal;
             }));
-
-            foreach (FsmState state in fsm.FsmStates)
-            {
-                state.AddFirstAction(new ExecuteLambda(() =>
-                {
-                    SkillUpgrades.instance.Log("VC STATELOG " + state.Name);
-                }));
-            }
         }
     }
 }
