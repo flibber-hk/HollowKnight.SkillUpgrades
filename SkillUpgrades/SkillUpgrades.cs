@@ -70,7 +70,7 @@ namespace SkillUpgrades
 
         public override string GetVersion()
         {
-            return "0.1";
+            return "0.2";
         }
 
     }
