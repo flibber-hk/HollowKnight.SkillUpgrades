@@ -6,7 +6,7 @@ using Modding;
 
 namespace SkillUpgrades
 {
-    public class GlobalSettings : ModSettings
+    public class GlobalSettings
     {
         #region Triple Jump
         // If this is set to true, the player can use wings multiple times in the air

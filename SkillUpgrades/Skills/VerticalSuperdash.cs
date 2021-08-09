@@ -143,7 +143,7 @@ namespace SkillUpgrades.Skills
             FsmState directionCheck = fsm.GetState("Direction");
             directionCheck.AddFirstAction(new ExecuteLambda(() =>
             {
-                if (GameManager.instance.inputHandler.inputActions.up.IsPressed && SkillUpgrades.instance.globalSettings.VerticalSuperdashEnabled)
+                if (GameManager.instance.inputHandler.inputActions.up.IsPressed && SkillUpgrades.globalSettings.VerticalSuperdashEnabled)
                 {
                     fsm.SendEvent("UP PRESSED");
                 }
@@ -166,6 +166,7 @@ namespace SkillUpgrades.Skills
             upDashing.GetActionOfType<GetVelocity2d>().SwapXandY();
             upDashing.RemoveTransitionsTo("Cancelable");
             fsm.AddState(upDashing);
+            upDashing.FixTransitions();
 
             // Cancelable dashing up
             FsmState upCancelable = new FsmState(fsm.GetState("Cancelable"))
@@ -175,6 +176,7 @@ namespace SkillUpgrades.Skills
             upCancelable.GetActionOfType<SetVelocity2d>().SwapXandY();
             upCancelable.GetActionOfType<GetVelocity2d>().SwapXandY();
             fsm.AddState(upCancelable);
+            upCancelable.FixTransitions();
 
             // Adding transitions
             directionCheck.AddTransition("UP PRESSED", upDirectionCheck.Name);
@@ -216,7 +218,7 @@ namespace SkillUpgrades.Skills
 
             directionCheck.AddFirstAction(new ExecuteLambda(() =>
             {
-                if (SkillUpgrades.instance.globalSettings.VerticalSuperdashEnabled && SkillUpgrades.instance.globalSettings.DiagonalSuperdashEnabled)
+                if (SkillUpgrades.globalSettings.VerticalSuperdashEnabled && SkillUpgrades.globalSettings.DiagonalSuperdashEnabled)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
@@ -284,6 +286,7 @@ namespace SkillUpgrades.Skills
 
             diagDashing.RemoveTransitionsTo("Cancelable");
             fsm.AddState(diagDashing);
+            diagDashing.FixTransitions();
 
             // Cancelable dashing diag
             FsmState diagCancelable = new FsmState(fsm.GetState("Cancelable"))
@@ -314,8 +317,8 @@ namespace SkillUpgrades.Skills
                     diagCancelable.Actions[6],
                 };
             }
-
             fsm.AddState(diagCancelable);
+            diagCancelable.FixTransitions();
 
             // Adding transitions
             directionCheck.AddTransition("DIAG PRESSED", diagDirectionCheck.Name);
@@ -332,7 +335,7 @@ namespace SkillUpgrades.Skills
 
             ExecuteLambda wallDiagTest = new ExecuteLambda(() =>
             {
-                if (SkillUpgrades.instance.globalSettings.VerticalSuperdashEnabled && SkillUpgrades.instance.globalSettings.DiagonalSuperdashEnabled)
+                if (SkillUpgrades.globalSettings.VerticalSuperdashEnabled && SkillUpgrades.globalSettings.DiagonalSuperdashEnabled)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {

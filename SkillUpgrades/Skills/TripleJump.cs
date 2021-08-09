@@ -28,7 +28,7 @@ namespace SkillUpgrades.Skills
 
         private static void AllowTripleJump(On.HeroController.orig_DoDoubleJump orig, HeroController self)
         {
-            if (!SkillUpgrades.instance.globalSettings.TripleJumpEnabled)
+            if (!SkillUpgrades.globalSettings.TripleJumpEnabled)
             {
                 orig(self);
                 return;
@@ -44,7 +44,7 @@ namespace SkillUpgrades.Skills
             orig(self);
             doubleJumpCount++;
 
-            if (doubleJumpCount < SkillUpgrades.instance.globalSettings.DoubleJumpMax || SkillUpgrades.instance.globalSettings.DoubleJumpMax == -1)
+            if (doubleJumpCount < SkillUpgrades.globalSettings.DoubleJumpMax || SkillUpgrades.globalSettings.DoubleJumpMax == -1)
             {
                 GameManager.instance.StartCoroutine(RefreshWingsInAir());
             }
@@ -55,7 +55,7 @@ namespace SkillUpgrades.Skills
             yield return new WaitUntil(() => doubleJumpCount == 0 || !InputHandler.Instance.inputActions.jump.IsPressed);
             if (doubleJumpCount != 0)
             {
-                ReflectionHelper.SetAttr(HeroController.instance, "doubleJumped", false);
+                ReflectionHelper.SetField(HeroController.instance, "doubleJumped", false);
             }
         }
 

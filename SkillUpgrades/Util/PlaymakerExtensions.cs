@@ -10,14 +10,23 @@ namespace SkillUpgrades.Util
     {
         public static void AddState(this PlayMakerFSM self, FsmState state)
         {
-            Fsm fsm = ReflectionHelper.GetAttr<PlayMakerFSM, Fsm>(self, "fsm");
-            FsmState[] states = ReflectionHelper.GetAttr<Fsm, FsmState[]>(fsm, "states");
+            Fsm fsm = ReflectionHelper.GetField<PlayMakerFSM, Fsm>(self, "fsm");
+            FsmState[] states = ReflectionHelper.GetField<Fsm, FsmState[]>(fsm, "states");
 
             FsmState[] newStates = new FsmState[states.Length + 1];
             Array.Copy(states, newStates, states.Length);
             newStates[states.Length] = state;
 
-            ReflectionHelper.SetAttr(fsm, "states", newStates);
+            ReflectionHelper.SetField(fsm, "states", newStates);
+        }
+
+        // Because copying states doesn't copy the transitions properly
+        public static void FixTransitions(this FsmState state)
+        {
+            foreach (FsmTransition trans in state.Transitions)
+            {
+                trans.ToFsmState = state.Fsm.GetState(trans.ToState);
+            }
         }
 
         public static FsmState GetState(this PlayMakerFSM self, string name)
@@ -59,6 +68,7 @@ namespace SkillUpgrades.Util
             FsmTransition trans = new FsmTransition
             {
                 ToState = toState,
+                ToFsmState = self.Fsm.GetState(toState),
                 FsmEvent = FsmEvent.EventListContains(eventName)
                     ? FsmEvent.GetFsmEvent(eventName)
                     : new FsmEvent(eventName)

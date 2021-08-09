@@ -6,16 +6,15 @@ using Modding;
 
 namespace SkillUpgrades
 {
-    public class SkillUpgrades : Mod
+    public class SkillUpgrades : Mod, IGlobalSettings<GlobalSettings>
     {
         internal static SkillUpgrades instance;
-        public GlobalSettings globalSettings { get; set; } = new GlobalSettings();
-        public override ModSettings GlobalSettings
-        {
-            get => globalSettings = globalSettings ?? new GlobalSettings();
-            set => globalSettings = value is GlobalSettings gSettings ? gSettings : globalSettings;
-        }
 
+        #region Global Settings
+        public static GlobalSettings globalSettings { get; set; } = new GlobalSettings();
+        public void OnLoadGlobal(GlobalSettings s) => globalSettings = s;
+        public GlobalSettings OnSaveGlobal() => globalSettings;
+        #endregion
 
         public override void Initialize()
         {

@@ -29,7 +29,7 @@ namespace SkillUpgrades.Skills
 
         private static void AllowExtraAirDash(On.HeroController.orig_HeroDash orig, HeroController self)
         {
-            if (!SkillUpgrades.instance.globalSettings.BonusAirDashEnabled)
+            if (!SkillUpgrades.globalSettings.BonusAirDashEnabled)
             {
                 orig(self);
                 return;
@@ -43,7 +43,7 @@ namespace SkillUpgrades.Skills
             {
                 airDashCount++;
 
-                if (airDashCount < SkillUpgrades.instance.globalSettings.AirDashMax || SkillUpgrades.instance.globalSettings.AirDashMax == -1)
+                if (airDashCount < SkillUpgrades.globalSettings.AirDashMax || SkillUpgrades.globalSettings.AirDashMax == -1)
                 {
                     GameManager.instance.StartCoroutine(RefreshDashInAir());
                 }
@@ -55,7 +55,7 @@ namespace SkillUpgrades.Skills
             yield return new WaitUntil(() => airDashCount == 0 || !InputHandler.Instance.inputActions.dash.IsPressed);
             if (airDashCount != 0)
             {
-                ReflectionHelper.SetAttr(HeroController.instance, "airDashed", false);
+                ReflectionHelper.SetField(HeroController.instance, "airDashed", false);
             }
         }
 
@@ -190,7 +190,7 @@ namespace SkillUpgrades.Skills
         {
             if (self.controlReqlinquished && !self.cState.dead)
             {
-                if (ReflectionHelper.GetAttr<HeroController, bool>(self, "startWithWallslide"))
+                if (ReflectionHelper.GetField<HeroController, bool>(self, "startWithWallslide"))
                 {
                     RefreshAirDash();
                 }

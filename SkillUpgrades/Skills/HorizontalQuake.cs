@@ -95,18 +95,18 @@ namespace SkillUpgrades.Skills
             directionCheck.RemoveActionsOfType<FsmStateAction>();
             directionCheck.AddAction(new ExecuteLambda(() =>
             {
-                if (!SkillUpgrades.instance.globalSettings.HorizontalDiveEnbled) fsm.SendEvent("FINISHED");
+                if (!SkillUpgrades.globalSettings.HorizontalDiveEnbled) fsm.SendEvent("FINISHED");
                 else if (InputHandler.Instance.inputActions.right.IsPressed) fsm.SendEvent("RIGHT");
                 else if (InputHandler.Instance.inputActions.left.IsPressed) fsm.SendEvent("LEFT");
                 else fsm.SendEvent("FINISHED");
             }));
+            fsm.AddState(directionCheck);
 
             qOnGround.RemoveTransitionsTo("Quake Antic");
             qOffGround.RemoveTransitionsTo("Quake Antic");
             qOnGround.AddTransition("FINISHED", directionCheck.Name);
             qOffGround.AddTransition("FINISHED", directionCheck.Name);
             directionCheck.AddTransition("FINISHED", "Quake Antic");
-            fsm.AddState(directionCheck);
 
             // Adding 12 states whee
             FsmState qaLeft = new FsmState(fsm.GetState("Quake Antic")) { Name = "Quake Antic HQL" };
@@ -135,12 +135,16 @@ namespace SkillUpgrades.Skills
             fsm.AddState(darkERight);
             FsmState diveDLeft = new FsmState(fsm.GetState("Quake1 Down")) { Name = "Quake1 Down HQL" };
             fsm.AddState(diveDLeft);
+            diveDLeft.FixTransitions();
             FsmState diveDRight = new FsmState(fsm.GetState("Quake1 Down")) { Name = "Quake1 Down HQR" };
             fsm.AddState(diveDRight);
+            diveDRight.FixTransitions();
             FsmState darkDLeft = new FsmState(fsm.GetState("Quake2 Down")) { Name = "Quake2 Down HQL" };
             fsm.AddState(darkDLeft);
+            darkDLeft.FixTransitions();
             FsmState darkDRight = new FsmState(fsm.GetState("Quake2 Down")) { Name = "Quake2 Down HQR" };
             fsm.AddState(darkDRight);
+            darkDRight.FixTransitions();
 
             // Transitions
             directionCheck.AddTransition("LEFT", qaLeft.Name);
@@ -192,6 +196,36 @@ namespace SkillUpgrades.Skills
             {
                 QuakeState = QuakeDirection.Normal;
             }));
+
+            foreach (FsmState state in fsm.FsmStates)
+            {
+                try
+                {
+                    SkillUpgrades.instance.Log($"VC STATE {state.Name}");
+                    foreach (FsmTransition trans in state.Transitions)
+                    {
+                        SkillUpgrades.instance.Log($"- TRANSITION to {trans?.ToState ?? "NULL"} / {trans?.ToFsmState?.Name ?? "NULL"} via {trans?.FsmEvent?.Name ?? "NULL"} / {trans?.EventName ?? "NULL"}");
+                        if (trans == null) SkillUpgrades.instance.Log("... trans is Null");
+                    }
+
+                    state.AddFirstAction(new ExecuteLambda(() =>
+                    {
+                        SkillUpgrades.instance.Log("VC STATELOG " + state.Name);
+                    }));
+                }
+                catch
+                {
+                    SkillUpgrades.instance.Log("ERROR VC STATELOG BEESIVE");
+                    try
+                    {
+                        SkillUpgrades.instance.Log(state.Transitions.Length);
+                    }
+                    catch
+                    {
+                        SkillUpgrades.instance.Log("DOUBLE ERROR");
+                    }
+                }
+            }
         }
     }
 }
