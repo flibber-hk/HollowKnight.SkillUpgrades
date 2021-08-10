@@ -196,36 +196,6 @@ namespace SkillUpgrades.Skills
             {
                 QuakeState = QuakeDirection.Normal;
             }));
-
-            foreach (FsmState state in fsm.FsmStates)
-            {
-                try
-                {
-                    SkillUpgrades.instance.Log($"VC STATE {state.Name}");
-                    foreach (FsmTransition trans in state.Transitions)
-                    {
-                        SkillUpgrades.instance.Log($"- TRANSITION to {trans?.ToState ?? "NULL"} / {trans?.ToFsmState?.Name ?? "NULL"} via {trans?.FsmEvent?.Name ?? "NULL"} / {trans?.EventName ?? "NULL"}");
-                        if (trans == null) SkillUpgrades.instance.Log("... trans is Null");
-                    }
-
-                    state.AddFirstAction(new ExecuteLambda(() =>
-                    {
-                        SkillUpgrades.instance.Log("VC STATELOG " + state.Name);
-                    }));
-                }
-                catch
-                {
-                    SkillUpgrades.instance.Log("ERROR VC STATELOG BEESIVE");
-                    try
-                    {
-                        SkillUpgrades.instance.Log(state.Transitions.Length);
-                    }
-                    catch
-                    {
-                        SkillUpgrades.instance.Log("DOUBLE ERROR");
-                    }
-                }
-            }
         }
     }
 }
