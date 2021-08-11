@@ -8,6 +8,8 @@ namespace SkillUpgrades
 {
     public class GlobalSettings
     {
+        public bool GlobalToggle = true;
+
         #region Triple Jump
         // If this is set to true, the player can use wings multiple times in the air
         public bool TripleJumpEnabled = true;
@@ -31,7 +33,7 @@ namespace SkillUpgrades
 
         #region Horizontal Dive
         // If this is set to false, the player cannot dive in non-downward directions
-        public bool HorizontalDiveEnbled = true;
+        public bool HorizontalDiveEnabled = true;
         #endregion
     }
 }

@@ -32,6 +32,14 @@ namespace SkillUpgrades
             {
                 new IMenuMod.MenuEntry
                 {
+                    Name = "Global Toggle",
+                    Description = "Turn this setting off to deactivate all skill upgrades.",
+                    Values = new string[]{ "On", "Off" },
+                    Saver = opt => globalSettings.GlobalToggle = opt==0,
+                    Loader = () => globalSettings.GlobalToggle ? 0 : 1,
+                },
+                new IMenuMod.MenuEntry
+                {
                     Name = "Multiple Wings",
                     Description = "Toggle whether wings can be used more than once before landing.",
                     Values = new string[]{ "On", "Off" },
@@ -59,8 +67,8 @@ namespace SkillUpgrades
                     Name = "Horizontal Dive",
                     Description = "Toggle whether Desolate Dive can be used horizontally.",
                     Values = new string[]{ "On", "Off" },
-                    Saver = opt => globalSettings.HorizontalDiveEnbled = opt==0,
-                    Loader = () => globalSettings.HorizontalDiveEnbled ? 0 : 1,
+                    Saver = opt => globalSettings.HorizontalDiveEnabled = opt==0,
+                    Loader = () => globalSettings.HorizontalDiveEnabled ? 0 : 1,
                 },
             };
         }

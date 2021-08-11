@@ -9,6 +9,8 @@ namespace SkillUpgrades.Skills
 {
     internal static class TripleJump
     {
+        private static bool tripleJumpEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.TripleJumpEnabled;
+
         private static int doubleJumpCount;
         internal static void RefreshDoubleJump()
         {
@@ -28,7 +30,7 @@ namespace SkillUpgrades.Skills
 
         private static void AllowTripleJump(On.HeroController.orig_DoDoubleJump orig, HeroController self)
         {
-            if (!SkillUpgrades.globalSettings.TripleJumpEnabled)
+            if (!tripleJumpEnabled)
             {
                 orig(self);
                 return;

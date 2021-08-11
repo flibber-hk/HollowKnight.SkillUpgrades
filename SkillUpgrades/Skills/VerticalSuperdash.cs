@@ -12,6 +12,8 @@ namespace SkillUpgrades.Skills
 {
     internal static class VerticalSuperdash
     {
+        private static bool verticalSuperdashEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.VerticalSuperdashEnabled;
+        private static bool diagonalSuperdashEnabled => verticalSuperdashEnabled && SkillUpgrades.globalSettings.DiagonalSuperdashEnabled;
         internal enum SuperdashDirection
         {
             Normal = 0,     // Anything not caused by this mod
@@ -143,7 +145,7 @@ namespace SkillUpgrades.Skills
             FsmState directionCheck = fsm.GetState("Direction");
             directionCheck.AddFirstAction(new ExecuteLambda(() =>
             {
-                if (GameManager.instance.inputHandler.inputActions.up.IsPressed && SkillUpgrades.globalSettings.VerticalSuperdashEnabled)
+                if (GameManager.instance.inputHandler.inputActions.up.IsPressed && verticalSuperdashEnabled)
                 {
                     fsm.SendEvent("UP PRESSED");
                 }
@@ -218,7 +220,7 @@ namespace SkillUpgrades.Skills
 
             directionCheck.AddFirstAction(new ExecuteLambda(() =>
             {
-                if (SkillUpgrades.globalSettings.VerticalSuperdashEnabled && SkillUpgrades.globalSettings.DiagonalSuperdashEnabled)
+                if (diagonalSuperdashEnabled)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
@@ -335,7 +337,7 @@ namespace SkillUpgrades.Skills
 
             ExecuteLambda wallDiagTest = new ExecuteLambda(() =>
             {
-                if (SkillUpgrades.globalSettings.VerticalSuperdashEnabled && SkillUpgrades.globalSettings.DiagonalSuperdashEnabled)
+                if (diagonalSuperdashEnabled)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {

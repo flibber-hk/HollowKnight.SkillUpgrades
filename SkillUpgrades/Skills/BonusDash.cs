@@ -9,6 +9,8 @@ namespace SkillUpgrades.Skills
 {
     internal static class BonusDash
     {
+        private static bool bonusAirDashEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.BonusAirDashEnabled;
+
         private static int airDashCount;
         internal static void RefreshAirDash()
         {
@@ -29,7 +31,7 @@ namespace SkillUpgrades.Skills
 
         private static void AllowExtraAirDash(On.HeroController.orig_HeroDash orig, HeroController self)
         {
-            if (!SkillUpgrades.globalSettings.BonusAirDashEnabled)
+            if (!bonusAirDashEnabled)
             {
                 orig(self);
                 return;

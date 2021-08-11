@@ -13,6 +13,8 @@ namespace SkillUpgrades.Skills
 {
     internal static class HorizontalQuake
     {
+        private static bool horizontalDiveEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.HorizontalDiveEnabled;
+
         private static QuakeDirection _quakeState;
 
         internal static QuakeDirection QuakeState
@@ -95,7 +97,7 @@ namespace SkillUpgrades.Skills
             directionCheck.RemoveActionsOfType<FsmStateAction>();
             directionCheck.AddAction(new ExecuteLambda(() =>
             {
-                if (!SkillUpgrades.globalSettings.HorizontalDiveEnbled) fsm.SendEvent("FINISHED");
+                if (!horizontalDiveEnabled) fsm.SendEvent("FINISHED");
                 else if (InputHandler.Instance.inputActions.right.IsPressed) fsm.SendEvent("RIGHT");
                 else if (InputHandler.Instance.inputActions.left.IsPressed) fsm.SendEvent("LEFT");
                 else fsm.SendEvent("FINISHED");
