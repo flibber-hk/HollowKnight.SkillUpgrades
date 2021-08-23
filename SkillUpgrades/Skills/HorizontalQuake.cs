@@ -137,16 +137,12 @@ namespace SkillUpgrades.Skills
             fsm.AddState(darkERight);
             FsmState diveDLeft = new FsmState(fsm.GetState("Quake1 Down")) { Name = "Quake1 Down HQL" };
             fsm.AddState(diveDLeft);
-            diveDLeft.FixTransitions();
             FsmState diveDRight = new FsmState(fsm.GetState("Quake1 Down")) { Name = "Quake1 Down HQR" };
             fsm.AddState(diveDRight);
-            diveDRight.FixTransitions();
             FsmState darkDLeft = new FsmState(fsm.GetState("Quake2 Down")) { Name = "Quake2 Down HQL" };
             fsm.AddState(darkDLeft);
-            darkDLeft.FixTransitions();
             FsmState darkDRight = new FsmState(fsm.GetState("Quake2 Down")) { Name = "Quake2 Down HQR" };
             fsm.AddState(darkDRight);
-            darkDRight.FixTransitions();
 
             // Transitions
             directionCheck.AddTransition("LEFT", qaLeft.Name);

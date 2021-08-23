@@ -21,6 +21,7 @@ namespace SkillUpgrades.Skills
             Diagonal
         }
 
+        private static SuperdashDirection _queuedSuperdashState = SuperdashDirection.Normal;
         private static SuperdashDirection _superdashState = SuperdashDirection.Normal;
         internal static SuperdashDirection SuperdashState
         {
@@ -60,6 +61,7 @@ namespace SkillUpgrades.Skills
                 }
 
                 _superdashState = value;
+                _queuedSuperdashState = SuperdashDirection.Normal;
             }
         }
 
@@ -118,113 +120,20 @@ namespace SkillUpgrades.Skills
 
             PlayMakerFSM fsm = self.superDash;
 
-            #region Vertical
-            FsmState upDirectionCheck = new FsmState(fsm.GetState("Direction"))
-            {
-                Name = "Up Direction Check VC"
-            };
-            upDirectionCheck.ClearTransitions();
-            fsm.AddState(upDirectionCheck);
-
-            FsmState upStateR = new FsmState(fsm.GetState("Right"))
-            {
-                Name = "Up Right VC"
-            };
-            upStateR.ClearTransitions();
-            upStateR.AddAction(new ExecuteLambda(() => SuperdashState = SuperdashDirection.Upward));
-            fsm.AddState(upStateR);
-
-            FsmState upStateL = new FsmState(fsm.GetState("Right"))
-            {
-                Name = "Up Left VC"
-            };
-            upStateL.ClearTransitions();
-            upStateL.AddAction(new ExecuteLambda(() => SuperdashState = SuperdashDirection.Upward));
-            fsm.AddState(upStateL);
-
-            FsmState directionCheck = fsm.GetState("Direction");
-            directionCheck.AddFirstAction(new ExecuteLambda(() =>
-            {
-                if (GameManager.instance.inputHandler.inputActions.up.IsPressed && verticalSuperdashEnabled)
-                {
-                    fsm.SendEvent("UP PRESSED");
-                }
-            }));
-
-            // Start dashing up
-            FsmState upDashStart = new FsmState(fsm.GetState("Dash Start"))
-            {
-                Name = "Up Dash Start VC"
-            };
-            upDashStart.ClearTransitions();
-            fsm.AddState(upDashStart);
-
-            // Dashing Up
-            FsmState upDashing = new FsmState(fsm.GetState("Dashing"))
-            {
-                Name = "Up Dashing VC"
-            };
-            upDashing.GetActionOfType<SetVelocity2d>().SwapXandY();
-            upDashing.GetActionOfType<GetVelocity2d>().SwapXandY();
-            upDashing.RemoveTransitionsTo("Cancelable");
-            fsm.AddState(upDashing);
-            upDashing.FixTransitions();
-
-            // Cancelable dashing up
-            FsmState upCancelable = new FsmState(fsm.GetState("Cancelable"))
-            {
-                Name = "Up Cancelable VC"
-            };
-            upCancelable.GetActionOfType<SetVelocity2d>().SwapXandY();
-            upCancelable.GetActionOfType<GetVelocity2d>().SwapXandY();
-            fsm.AddState(upCancelable);
-            upCancelable.FixTransitions();
-
-            // Adding transitions
-            directionCheck.AddTransition("UP PRESSED", upDirectionCheck.Name);
-            upDirectionCheck.AddTransition("LEFT", upStateL.Name);
-            upDirectionCheck.AddTransition("RIGHT", upStateR.Name);
-            upStateR.AddTransition("FINISHED", upDashStart.Name);
-            upStateL.AddTransition("FINISHED", upDashStart.Name);
-            upDashStart.AddTransition("FINISHED", upDashing.Name);
-            upDashing.AddTransition("WAIT", upCancelable.Name);
-            #endregion
-
-
-            #region Diagonal
+            #region Add FSM Variables
             FsmFloat vSpeed = fsm.AddFsmFloat("V Speed VC");
             FsmFloat hSpeed = fsm.AddFsmFloat("H Speed VC");
+            #endregion
 
-            FsmState diagDirectionCheck = new FsmState(fsm.GetState("Direction"))
+            #region Set Direction
+            fsm.GetState("Direction").AddFirstAction(new ExecuteLambda(() =>
             {
-                Name = "Diag Direction Check VC"
-            };
-            diagDirectionCheck.ClearTransitions();
-            fsm.AddState(diagDirectionCheck);
-
-            FsmState diagStateR = new FsmState(fsm.GetState("Right"))
-            {
-                Name = "Diag Right VC"
-            };
-            diagStateR.ClearTransitions();
-            diagStateR.AddAction(new ExecuteLambda(() => SuperdashState = SuperdashDirection.Diagonal));
-            fsm.AddState(diagStateR);
-
-            FsmState diagStateL = new FsmState(fsm.GetState("Right"))
-            {
-                Name = "Diag Left VC"
-            };
-            diagStateL.ClearTransitions();
-            diagStateL.AddAction(new ExecuteLambda(() => SuperdashState = SuperdashDirection.Diagonal));
-            fsm.AddState(diagStateL);
-
-            directionCheck.AddFirstAction(new ExecuteLambda(() =>
-            {
+                bool shouldDiagonal = false;
+                bool shouldVertical = false;
                 if (diagonalSuperdashEnabled)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
-                        bool shouldDiagonal = false;
                         if (GameManager.instance.inputHandler.inputActions.right.IsPressed && HeroController.instance.cState.facingRight)
                         {
                             shouldDiagonal = true;
@@ -233,133 +142,100 @@ namespace SkillUpgrades.Skills
                         {
                             shouldDiagonal = true;
                         }
-                        if (shouldDiagonal) fsm.SendEvent("DIAG PRESSED");
                     }
                 }
-            }));
-
-            // Start dashing diag
-            FsmState diagDashStart = new FsmState(fsm.GetState("Dash Start"))
-            {
-                Name = "Diag Dash Start VC"
-            };
-            diagDashStart.ClearTransitions();
-            fsm.AddState(diagDashStart);
-
-            // Dashing Diag
-            FsmState diagDashing = new FsmState(fsm.GetState("Dashing"))
-            {
-                Name = "Diag Dashing VC"
-            };
-
-            {
-                ExecuteLambda setVelocityVariables = new ExecuteLambda(() =>
-                {
-                    float velComponent = fsm.FsmVariables.GetFsmFloat("Current SD Speed").Value;
-                    velComponent *= (float)(Math.Sqrt(2) / 2f);
-                    vSpeed.Value = velComponent;
-                    hSpeed.Value = velComponent * (HeroController.instance.cState.facingRight ? 1 : -1);
-                });
-                ExecuteLambdaEveryFrame decideToStop = new ExecuteLambdaEveryFrame(() =>
-                {
-                    Vector2 vector = HeroController.instance.gameObject.GetComponent<Rigidbody2D>().velocity;
-                    if (Math.Abs(vector.x) < 0.1f || Math.Abs(vector.y) < 0.1f)
-                    {
-                        fsm.FsmVariables.GetFsmBool("Zero Last Frame").Value = true;
-                    }
-                });
-                SetVelocity2d setVel = diagDashing.GetActionOfType<SetVelocity2d>();
-                setVel.x = hSpeed;
-                setVel.y = vSpeed;
-
-                diagDashing.Actions = new FsmStateAction[]
-                {
-                    setVelocityVariables,
-                    diagDashing.Actions[0],
-                    diagDashing.Actions[1],
-                    setVel,
-                    diagDashing.Actions[3],
-                    diagDashing.Actions[4],
-                    decideToStop,
-                    diagDashing.Actions[7],
-                    diagDashing.Actions[8],
-                };
-            }
-
-            diagDashing.RemoveTransitionsTo("Cancelable");
-            fsm.AddState(diagDashing);
-            diagDashing.FixTransitions();
-
-            // Cancelable dashing diag
-            FsmState diagCancelable = new FsmState(fsm.GetState("Cancelable"))
-            {
-                Name = "Diag Cancelable VC"
-            };
-
-            {
-                ExecuteLambdaEveryFrame decideToStop = new ExecuteLambdaEveryFrame(() =>
-                {
-                    Vector2 vector = HeroController.instance.gameObject.GetComponent<Rigidbody2D>().velocity;
-                    if (Math.Abs(vector.x) < 0.1f || Math.Abs(vector.y) < 0.1f)
-                    {
-                        fsm.FsmVariables.GetFsmBool("Zero Last Frame").Value = true;
-                    }
-                });
-                SetVelocity2d setVel = diagCancelable.GetActionOfType<SetVelocity2d>();
-                setVel.x = hSpeed;
-                setVel.y = vSpeed;
-
-                diagCancelable.Actions = new FsmStateAction[]
-                {
-                    diagCancelable.Actions[0],
-                    setVel,
-                    diagCancelable.Actions[2],
-                    decideToStop,
-                    diagCancelable.Actions[5],
-                    diagCancelable.Actions[6],
-                };
-            }
-            fsm.AddState(diagCancelable);
-            diagCancelable.FixTransitions();
-
-            // Adding transitions
-            directionCheck.AddTransition("DIAG PRESSED", diagDirectionCheck.Name);
-            diagDirectionCheck.AddTransition("LEFT", diagStateL.Name);
-            diagDirectionCheck.AddTransition("RIGHT", diagStateR.Name);
-            diagStateR.AddTransition("FINISHED", diagDashStart.Name);
-            diagStateL.AddTransition("FINISHED", diagDashStart.Name);
-            diagDashStart.AddTransition("FINISHED", diagDashing.Name);
-            diagDashing.AddTransition("WAIT", diagCancelable.Name);
-            #endregion
-
-            #region Diagonal Wall Cdash
-            FsmState wallDirectionCheck = fsm.GetState("Direction Wall");
-
-            ExecuteLambda wallDiagTest = new ExecuteLambda(() =>
-            {
-                if (diagonalSuperdashEnabled)
+                if (verticalSuperdashEnabled && !shouldDiagonal)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
-                        fsm.SendEvent("UP PRESSED");
+                        shouldVertical = true;
                     }
+                }
+
+                if (shouldDiagonal)
+                {
+                    _queuedSuperdashState = SuperdashDirection.Diagonal;
+                }
+                else if (shouldVertical)
+                {
+                    _queuedSuperdashState = SuperdashDirection.Upward;
+                }
+            }));
+
+            fsm.GetState("Direction Wall").AddFirstAction(new ExecuteLambda(() =>
+            {
+                if (diagonalSuperdashEnabled && GameManager.instance.inputHandler.inputActions.up.IsPressed)
+                {
+                    _queuedSuperdashState = SuperdashDirection.Diagonal;
+                }
+            }));
+
+            fsm.GetState("Left").AddAction(new ExecuteLambda(() =>
+            {
+                SuperdashState = _queuedSuperdashState;
+            })); 
+            fsm.GetState("Right").AddAction(new ExecuteLambda(() =>
+            {
+                SuperdashState = _queuedSuperdashState;
+            }));
+            #endregion
+
+            #region Modify Dashing and Cancelable states
+            FsmState dashing = fsm.GetState("Dashing");
+            ExecuteLambda setVelocityVariables = new ExecuteLambda(() =>
+            {
+                float velComponent = Math.Abs(fsm.FsmVariables.GetFsmFloat("Current SD Speed").Value);
+                switch (SuperdashState)
+                {
+                    case SuperdashDirection.Diagonal:
+                        velComponent *= (float)(Math.Sqrt(2) / 2f);
+                        vSpeed.Value = velComponent;
+                        hSpeed.Value = velComponent * (HeroController.instance.cState.facingRight ? 1 : -1);
+                        break;
+                    case SuperdashDirection.Upward:
+                        vSpeed.Value = velComponent;
+                        hSpeed.Value = 0f;
+                        break;
+                    default:
+                    case SuperdashDirection.Normal:
+                        vSpeed.Value = 0f;
+                        hSpeed.Value = velComponent * (HeroController.instance.cState.facingRight ? 1 : -1);
+                        break;
                 }
             });
 
-            wallDirectionCheck.Actions = new FsmStateAction[]
+            SetVelocity2d setVel = dashing.GetActionOfType<SetVelocity2d>();
+            setVel.x = hSpeed;
+            setVel.y = vSpeed;
+
+            DecideToStopAction decideToStop = new DecideToStopAction(hSpeed, vSpeed, fsm.FsmVariables.GetFsmBool("Zero Last Frame"));
+
+            dashing.Actions = new FsmStateAction[]
             {
-                wallDirectionCheck.Actions[0],
-                wallDirectionCheck.Actions[1],
-                wallDirectionCheck.Actions[2],
-                wallDirectionCheck.Actions[3],
-                wallDiagTest,
-                wallDirectionCheck.Actions[4]
+                    setVelocityVariables,
+                    dashing.Actions[0],
+                    dashing.Actions[1],
+                    setVel,
+                    dashing.Actions[3],
+                    dashing.Actions[4],
+                    decideToStop,
+                    dashing.Actions[7],
+                    dashing.Actions[8],
             };
 
-            wallDirectionCheck.AddTransition("UP PRESSED", diagDirectionCheck.Name);
+            FsmState cancelable = fsm.GetState("Cancelable");
+            cancelable.Actions = new FsmStateAction[]
+            {
+                    cancelable.Actions[0],
+                    setVel,
+                    cancelable.Actions[2],
+                    decideToStop,
+                    cancelable.Actions[5],
+                    cancelable.Actions[6],
+            };
             #endregion
 
-            // Reset Vertical Charge variable
+            #region Reset Vertical Charge variable
             fsm.GetState("Air Cancel").AddFirstAction(new ExecuteLambda(() =>
             {
                 SuperdashState = SuperdashDirection.Normal;
@@ -372,6 +248,16 @@ namespace SkillUpgrades.Skills
             {
                 SuperdashState = SuperdashDirection.Normal;
             }));
+            #endregion
+
+            foreach (FsmState state in fsm.FsmStates)
+            {
+                state.AddFirstAction(new ExecuteLambda(() =>
+                {
+                    SkillUpgrades.instance.Log("VC STATELOG " + state.Name);
+                }));
+            }
+
         }
     }
 }

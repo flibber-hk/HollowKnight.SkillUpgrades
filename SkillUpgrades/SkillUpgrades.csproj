@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Skills\HorizontalQuake.cs" />
+    <Compile Include="Util\DecideToStopAction.cs" />
     <Compile Include="Util\ExecuteLambda.cs" />
     <Compile Include="Util\ExecuteLambdaEveryFrame.cs" />
     <Compile Include="Util\PlaymakerExtensions.cs" />

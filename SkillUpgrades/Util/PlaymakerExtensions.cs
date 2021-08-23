@@ -18,14 +18,11 @@ namespace SkillUpgrades.Util
             newStates[states.Length] = state;
 
             ReflectionHelper.SetField(fsm, "states", newStates);
-        }
 
-        // Because copying states doesn't copy the transitions properly
-        public static void FixTransitions(this FsmState state)
-        {
+            // Because copying states doesn't copy the transitions properly
             foreach (FsmTransition trans in state.Transitions)
             {
-                trans.ToFsmState = state.Fsm.GetState(trans.ToState);
+                trans.ToFsmState = self.Fsm.GetState(trans.ToState);
             }
         }
 
@@ -124,6 +121,18 @@ namespace SkillUpgrades.Util
             fsm.FsmVariables.FloatVariables = floatVariables;
 
             return newFsmFloat;
+        }
+
+        public static FsmInt AddFsmInt(this PlayMakerFSM fsm, string name)
+        {
+            FsmInt newFsmInt = new FsmInt(name);
+
+            FsmInt[] intVariables = new FsmInt[fsm.FsmVariables.IntVariables.Length + 1];
+            System.Array.Copy(fsm.FsmVariables.IntVariables, intVariables, fsm.FsmVariables.IntVariables.Length);
+            intVariables[fsm.FsmVariables.IntVariables.Length] = newFsmInt;
+            fsm.FsmVariables.IntVariables = intVariables;
+
+            return newFsmInt;
         }
     }
 }
