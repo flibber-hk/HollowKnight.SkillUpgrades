@@ -208,7 +208,7 @@ namespace SkillUpgrades.Skills
             setVel.x = hSpeed;
             setVel.y = vSpeed;
 
-            DecideToStopAction decideToStop = new DecideToStopAction(hSpeed, vSpeed, fsm.FsmVariables.GetFsmBool("Zero Last Frame"));
+            DecideToStopSuperdash decideToStop = new DecideToStopSuperdash(hSpeed, vSpeed, fsm.FsmVariables.GetFsmBool("Zero Last Frame"));
 
             dashing.Actions = new FsmStateAction[]
             {

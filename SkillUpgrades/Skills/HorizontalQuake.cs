@@ -86,114 +86,100 @@ namespace SkillUpgrades.Skills
             {
                 QuakeState = QuakeDirection.Normal;
             }));
-
-            FsmState qOnGround = fsm.GetState("Q On Ground");
-            FsmState qOffGround = fsm.GetState("Q Off Ground");
-            FsmState directionCheck = new FsmState(fsm.GetState("Cancel"))
-            {
-                Name = "Direction Check HQ"
-            };
-            directionCheck.ClearTransitions();
-            directionCheck.RemoveActionsOfType<FsmStateAction>();
-            directionCheck.AddAction(new ExecuteLambda(() =>
-            {
-                if (!horizontalDiveEnabled) fsm.SendEvent("FINISHED");
-                else if (InputHandler.Instance.inputActions.right.IsPressed) fsm.SendEvent("RIGHT");
-                else if (InputHandler.Instance.inputActions.left.IsPressed) fsm.SendEvent("LEFT");
-                else fsm.SendEvent("FINISHED");
-            }));
-            fsm.AddState(directionCheck);
-
-            qOnGround.RemoveTransitionsTo("Quake Antic");
-            qOffGround.RemoveTransitionsTo("Quake Antic");
-            qOnGround.AddTransition("FINISHED", directionCheck.Name);
-            qOffGround.AddTransition("FINISHED", directionCheck.Name);
-            directionCheck.AddTransition("FINISHED", "Quake Antic");
-
-            // Adding 12 states whee
-            FsmState qaLeft = new FsmState(fsm.GetState("Quake Antic")) { Name = "Quake Antic HQL" };
-            qaLeft.ClearTransitions();
-            fsm.AddState(qaLeft);
-            FsmState qaRight = new FsmState(fsm.GetState("Quake Antic")) { Name = "Quake Antic HQR" };
-            qaRight.ClearTransitions();
-            fsm.AddState(qaRight);
-            FsmState lcLeft = new FsmState(fsm.GetState("Level Check 2")) { Name = "Level Check 2 HQL" };
-            lcLeft.ClearTransitions();
-            fsm.AddState(lcLeft);
-            FsmState lcRight = new FsmState(fsm.GetState("Level Check 2")) { Name = "Level Check 2 HQR" };
-            lcRight.ClearTransitions();
-            fsm.AddState(lcRight);
-            FsmState diveELeft = new FsmState(fsm.GetState("Q1 Effect")) { Name = "Q1 Effect HQL" };
-            diveELeft.ClearTransitions();
-            fsm.AddState(diveELeft);
-            FsmState diveERight = new FsmState(fsm.GetState("Q1 Effect")) { Name = "Q1 Effect HQR" };
-            diveERight.ClearTransitions();
-            fsm.AddState(diveERight);
-            FsmState darkELeft = new FsmState(fsm.GetState("Q2 Effect")) { Name = "Q2 Effect HQL" };
-            darkELeft.ClearTransitions();
-            fsm.AddState(darkELeft);
-            FsmState darkERight = new FsmState(fsm.GetState("Q2 Effect")) { Name = "Q2 Effect HQR" };
-            darkERight.ClearTransitions();
-            fsm.AddState(darkERight);
-            FsmState diveDLeft = new FsmState(fsm.GetState("Quake1 Down")) { Name = "Quake1 Down HQL" };
-            fsm.AddState(diveDLeft);
-            FsmState diveDRight = new FsmState(fsm.GetState("Quake1 Down")) { Name = "Quake1 Down HQR" };
-            fsm.AddState(diveDRight);
-            FsmState darkDLeft = new FsmState(fsm.GetState("Quake2 Down")) { Name = "Quake2 Down HQL" };
-            fsm.AddState(darkDLeft);
-            FsmState darkDRight = new FsmState(fsm.GetState("Quake2 Down")) { Name = "Quake2 Down HQR" };
-            fsm.AddState(darkDRight);
-
-            // Transitions
-            directionCheck.AddTransition("LEFT", qaLeft.Name);
-            directionCheck.AddTransition("RIGHT", qaRight.Name);
-            qaLeft.AddTransition("ANIM END", lcLeft.Name);
-            qaRight.AddTransition("ANIM END", lcRight.Name);
-            lcLeft.AddTransition("LEVEL 1", diveELeft.Name);
-            lcLeft.AddTransition("LEVEL 2", darkELeft.Name);
-            lcRight.AddTransition("LEVEL 1", diveERight.Name);
-            lcRight.AddTransition("LEVEL 2", darkERight.Name);
-            diveELeft.AddTransition("FINISHED", diveDLeft.Name);
-            diveERight.AddTransition("FINISHED", diveDRight.Name);
-            darkELeft.AddTransition("FINISHED", darkDLeft.Name);
-            darkERight.AddTransition("FINISHED", darkDRight.Name);
-
-
-            // Don't need to leave the ground when horizontal quaking
-            qaLeft.AddFirstAction(new ExecuteLambda(() => fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0f));
-            qaRight.AddFirstAction(new ExecuteLambda(() => fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0f));
-
-            // Set dive state
-            qaLeft.AddFirstAction(new ExecuteLambda(() => QuakeState = QuakeDirection.Leftward));
-            qaRight.AddFirstAction(new ExecuteLambda(() => QuakeState = QuakeDirection.Rightward));
-
-
-            // Set velocity
-            diveDLeft.GetActionOfType<SetVelocity2d>().SwapXandY();
-            diveDLeft.GetActionOfType<GetVelocity2d>().SwapXandY();
-            diveDLeft.GetActionOfType<CheckCollisionSide>().SetBottomToLeft();
-
-            darkDLeft.GetActionOfType<SetVelocity2d>().SwapXandY();
-            darkDLeft.GetActionOfType<GetVelocity2d>().SwapXandY();
-            darkDLeft.GetActionOfType<CheckCollisionSide>().SetBottomToLeft();
-
-
-            diveDRight.GetActionOfType<SetVelocity2d>().SwapXandY();
-            diveDRight.GetActionOfType<SetVelocity2d>().x.Value *= -1;
-            diveDRight.GetActionOfType<GetVelocity2d>().SwapXandY();
-            diveDRight.GetActionOfType<CheckCollisionSide>().SetBottomToRight();
-
-            darkDRight.GetActionOfType<SetVelocity2d>().SwapXandY();
-            darkDRight.GetActionOfType<SetVelocity2d>().x.Value *= -1;
-            darkDRight.GetActionOfType<GetVelocity2d>().SwapXandY();
-            darkDRight.GetActionOfType<CheckCollisionSide>().SetBottomToRight();
-
-
-            // Fix hero on "swag dive"
             fsm.GetState("Reset Cam Zoom").AddFirstAction(new ExecuteLambda(() =>
             {
                 QuakeState = QuakeDirection.Normal;
             }));
+
+            #region Add FSM Variables
+            FsmFloat vSpeed = fsm.AddFsmFloat("V Speed HQ");
+            FsmFloat hSpeed = fsm.AddFsmFloat("H Speed HQ");
+            #endregion
+
+            #region Set Direction Value
+            fsm.GetState("Quake Antic").AddFirstAction(new ExecuteLambda(() =>
+            {
+                if (horizontalDiveEnabled)
+                {
+                    if (InputHandler.Instance.inputActions.right.IsPressed) QuakeState = QuakeDirection.Rightward;
+                    else if (InputHandler.Instance.inputActions.left.IsPressed) QuakeState = QuakeDirection.Leftward;
+                }
+                switch (QuakeState)
+                {
+                    case QuakeDirection.Rightward:
+                        fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0f;
+                        vSpeed.Value = 0f;
+                        hSpeed.Value = 50f;
+                        break;
+
+                    case QuakeDirection.Leftward:
+                        fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0f;
+                        vSpeed.Value = 0f;
+                        hSpeed.Value = -50f;
+                        break;
+
+                    case QuakeDirection.Normal:
+                        vSpeed.Value = -50f;
+                        hSpeed.Value = 0f;
+                        break;
+                }
+            }));
+            #endregion
+
+            #region Velocity values
+            void ModifyQuakeDownState(FsmState s)
+            {
+                ExecuteLambda setCCSevent = new ExecuteLambda(() =>
+                {
+                    CheckCollisionSide ccs = s.GetActionOfType<CheckCollisionSide>();
+                    FsmEvent heroLanded = FsmEvent.GetFsmEvent("HERO LANDED");
+
+
+                    if (hSpeed.Value < -0.4f)
+                    {
+                        ccs.leftHitEvent = heroLanded;
+                        ccs.bottomHitEvent = null;
+                        ccs.rightHitEvent = null;
+                    }
+                    else if (hSpeed.Value > 0.4f)
+                    {
+                        ccs.leftHitEvent = null;
+                        ccs.bottomHitEvent = null;
+                        ccs.rightHitEvent = heroLanded;
+                    }
+                    else
+                    {
+                        ccs.leftHitEvent = null;
+                        ccs.bottomHitEvent = heroLanded;
+                        ccs.rightHitEvent = null;
+                    }
+                });
+
+                SetVelocity2d setvel = s.GetActionOfType<SetVelocity2d>();
+                setvel.x = hSpeed;
+                setvel.y = vSpeed;
+
+                DecideToStopQuake decideToStop = new DecideToStopQuake(hSpeed, vSpeed);
+
+                s.Actions = new FsmStateAction[]
+                {
+                    setCCSevent,
+                    s.Actions[0],
+                    s.Actions[1],
+                    s.Actions[2],
+                    s.Actions[3],
+                    s.Actions[4],
+                    s.Actions[5],
+                    setvel,
+                    s.Actions[7],
+                    s.Actions[8], // CheckCollisionSide
+                    decideToStop
+                };
+            }
+
+            ModifyQuakeDownState(fsm.GetState("Quake1 Down"));
+            ModifyQuakeDownState(fsm.GetState("Quake2 Down"));
+            #endregion
         }
     }
 }

@@ -9,13 +9,13 @@ using UnityEngine;
 
 namespace SkillUpgrades.Util
 {
-    internal class DecideToStopAction : ComponentAction<Rigidbody2D>
+    internal class DecideToStopSuperdash : ComponentAction<Rigidbody2D>
     {
         private readonly FsmFloat _hSpeed;
         private readonly FsmFloat _vSpeed;
         private readonly FsmBool _zeroLast;
 
-        public DecideToStopAction(FsmFloat hSpeed, FsmFloat vSpeed, FsmBool zeroLast)
+        public DecideToStopSuperdash(FsmFloat hSpeed, FsmFloat vSpeed, FsmBool zeroLast)
         {
             _hSpeed = hSpeed;
             _vSpeed = vSpeed;
@@ -31,7 +31,7 @@ namespace SkillUpgrades.Util
             }
             catch (Exception e)
             {
-                LogError("Error in DecideToStopAction (OnEnter/UpdateCache):\n" + e);
+                LogError("Error in DecideToStopSuperdash (OnEnter/UpdateCache):\n" + e);
             }
 
             try
@@ -40,7 +40,7 @@ namespace SkillUpgrades.Util
             }
             catch (Exception e)
             {
-                LogError("Error in DecideToStopAction (OnEnter):\n" + e);
+                LogError("Error in DecideToStopSuperdash (OnEnter):\n" + e);
             }
         }
 
@@ -52,7 +52,7 @@ namespace SkillUpgrades.Util
             }
             catch (Exception e)
             {
-                LogError("Error in DecideToStopAction (OnUpdate):\n" + e);
+                LogError("Error in DecideToStopSuperdash (OnUpdate):\n" + e);
             }
         }
 
@@ -60,8 +60,8 @@ namespace SkillUpgrades.Util
         {
             Vector2 vector = rigidbody2d.velocity;
 
-            if (Math.Abs(_hSpeed.Value) >= 0.1f && Math.Abs(vector.x) < 0.1f) _zeroLast.Value = true;
-            if (Math.Abs(_vSpeed.Value) >= 0.1f && Math.Abs(vector.y) < 0.1f) _zeroLast.Value = true;
+            if (Math.Abs(_hSpeed.Value) >= 0.2f && Math.Abs(vector.x) < 0.1f) _zeroLast.Value = true;
+            if (Math.Abs(_vSpeed.Value) >= 0.2f && Math.Abs(vector.y) < 0.1f) _zeroLast.Value = true;
         }
     }
 }
