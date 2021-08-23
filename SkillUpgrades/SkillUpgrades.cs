@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Modding;
 
@@ -28,49 +29,27 @@ namespace SkillUpgrades
 
         public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? toggleButtonEntry)
         {
-            return new List<IMenuMod.MenuEntry>()
+            List<IMenuMod.MenuEntry> menuEntries = new List<IMenuMod.MenuEntry>();
+
+            foreach (FieldInfo fi in typeof(GlobalSettings).GetFields())
             {
-                new IMenuMod.MenuEntry
+                if (fi.FieldType == typeof(bool))
                 {
-                    Name = "Global Toggle",
-                    Description = "Turn this setting off to deactivate all skill upgrades.",
-                    Values = new string[]{ "On", "Off" },
-                    Saver = opt => globalSettings.GlobalToggle = opt==0,
-                    Loader = () => globalSettings.GlobalToggle ? 0 : 1,
-                },
-                new IMenuMod.MenuEntry
-                {
-                    Name = "Multiple Wings",
-                    Description = "Toggle whether wings can be used more than once before landing.",
-                    Values = new string[]{ "On", "Off" },
-                    Saver = opt => globalSettings.TripleJumpEnabled = opt==0,
-                    Loader = () => globalSettings.TripleJumpEnabled ? 0 : 1,
-                },
-                new IMenuMod.MenuEntry
-                {
-                    Name = "Multiple Air Dash",
-                    Description = "Toggle whether dash can be used more than once before landing.",
-                    Values = new string[]{ "On", "Off" },
-                    Saver = opt => globalSettings.BonusAirDashEnabled = opt==0,
-                    Loader = () => globalSettings.BonusAirDashEnabled ? 0 : 1,
-                },
-                new IMenuMod.MenuEntry
-                {
-                    Name = "Vertical Superdash",
-                    Description = "Toggle whether Crystal Heart can be used in non-horizontal directions.",
-                    Values = new string[]{ "On", "Off" },
-                    Saver = opt => globalSettings.VerticalSuperdashEnabled = opt==0,
-                    Loader = () => globalSettings.VerticalSuperdashEnabled ? 0 : 1,
-                },
-                new IMenuMod.MenuEntry
-                {
-                    Name = "Horizontal Dive",
-                    Description = "Toggle whether Desolate Dive can be used horizontally.",
-                    Values = new string[]{ "On", "Off" },
-                    Saver = opt => globalSettings.HorizontalDiveEnabled = opt==0,
-                    Loader = () => globalSettings.HorizontalDiveEnabled ? 0 : 1,
-                },
-            };
+                    if (fi.GetCustomAttribute<MenuToggleable>() is MenuToggleable mt)
+                    {
+                        menuEntries.Add(new IMenuMod.MenuEntry()
+                        {
+                            Name = mt.name,
+                            Description = mt.description,
+                            Values = new string[] { "On", "Off" },
+                            Saver = opt => { fi.SetValue(globalSettings, opt == 0); },
+                            Loader = () => (bool)fi.GetValue(globalSettings) ? 0 : 1
+                        });
+                    }
+                }
+            }
+
+            return menuEntries;
         }
 
         public bool ToggleButtonInsideMenu => false;
