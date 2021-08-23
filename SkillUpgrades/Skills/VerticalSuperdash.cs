@@ -249,15 +249,6 @@ namespace SkillUpgrades.Skills
                 SuperdashState = SuperdashDirection.Normal;
             }));
             #endregion
-
-            foreach (FsmState state in fsm.FsmStates)
-            {
-                state.AddFirstAction(new ExecuteLambda(() =>
-                {
-                    SkillUpgrades.instance.Log("VC STATELOG " + state.Name);
-                }));
-            }
-
         }
     }
 }
