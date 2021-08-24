@@ -27,6 +27,12 @@ namespace SkillUpgrades
         public int AirDashMax = 2;
         #endregion
 
+        #region Directional Dash
+        // If this is set to true, the player can dash in 8 directions
+        [MenuToggleable("Directional Dash", "Toggle whether dash can be used in all 8 directions.")]
+        public bool DirectionalDash = true;
+        #endregion
+
         #region Vertical Cdash
         // If this is set to false, the player cannot cdash in non-horizontal directions
         [MenuToggleable("Vertical Superdash", "Toggle whether Crystal Heart can be used in non-horizontal directions.")]
