@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -25,7 +26,34 @@ namespace SkillUpgrades.Skills
             On.HeroController.HeroDash += ModifyPrefabDirection;
             IL.HeroController.HeroDash += ModifyDashmasterBool;
             ModHooks.GetPlayerBoolHook += InterpretDashmasterBool;
+
+            On.HeroController.JumpReleased += MaintainMomentum;
+            On.HeroController.Update += CancelPersistentMomentum;
         }
+
+        #region Maintaining vertical momentum out of an upward dash
+        private static void CancelPersistentMomentum(On.HeroController.orig_Update orig, HeroController self)
+        {
+            orig(self);
+            if (self.current_velocity.y <= 0f)
+            {
+                _maintainingVerticalDashMomentum = false;
+            }
+        }
+
+        private static void MaintainMomentum(On.HeroController.orig_JumpReleased orig, HeroController self)
+        {
+            if (HeroRigidBody.velocity.y > 0 && !self.inAcid && !self.cState.shroomBouncing 
+                && _maintainingVerticalDashMomentum && SkillUpgrades.globalSettings.MaintainVerticalMomentum)
+            {
+                ReflectionHelper.SetField<HeroController, bool>(self, "jumpQueuing", false);
+                ReflectionHelper.SetField<HeroController, bool>(self, "doubleJumpQueuing", false);
+                if (self.cState.swimming) self.cState.swimming = false;
+            }
+
+            orig(self);
+        }
+        #endregion
 
         private static bool CalculateDashVector()
         {
@@ -98,7 +126,9 @@ namespace SkillUpgrades.Skills
                 y *= (float)(1 / Math.Sqrt(2));
             }
 
-            return new Vector2(x, y);
+            _lastDashVector = new Vector2(x, y);
+            _maintainingVerticalDashMomentum = _dashDirection.HasFlag(DashDirection.Up);
+            return _lastDashVector;
         }
 
         private static void ModifyPrefabDirection(On.HeroController.orig_HeroDash orig, HeroController self)
@@ -184,6 +214,19 @@ namespace SkillUpgrades.Skills
 
         private static DashDirection _dashDirection;
         private static FieldInfo _dashEffect;
+        private static Rigidbody2D _heroRigidBody;
+
+        private static Rigidbody2D HeroRigidBody
+        {
+            get
+            {
+                if (_heroRigidBody == null) _heroRigidBody = HeroController.instance.GetComponent<Rigidbody2D>();
+                return _heroRigidBody;
+            }
+        }
+
+        private static Vector2 _lastDashVector;
+        private static bool _maintainingVerticalDashMomentum = false;
         private const string EnabledBool = "DirectionalDash_Dashmaster";
     }
 }

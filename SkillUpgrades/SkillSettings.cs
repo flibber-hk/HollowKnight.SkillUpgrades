@@ -31,6 +31,8 @@ namespace SkillUpgrades
         // If this is set to true, the player can dash in 8 directions
         [MenuToggleable("Directional Dash", "Toggle whether dash can be used in all 8 directions.")]
         public bool DirectionalDash = true;
+        // If this is set to true, the knight will keep its vertical momentum after finishing an upward dash
+        public bool MaintainVerticalMomentum = true;
         #endregion
 
         #region Vertical Cdash
