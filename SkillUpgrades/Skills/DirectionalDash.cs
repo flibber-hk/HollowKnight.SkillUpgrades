@@ -37,8 +37,6 @@ namespace SkillUpgrades.Skills
             orig(self);
             if (self.current_velocity.y <= 0f && !self.cState.dashing)
             {
-                if (_maintainingVerticalDashMomentum) SkillUpgrades.instance.Log("Cancelling...");
-
                 _maintainingVerticalDashMomentum = false;
             }
         }
