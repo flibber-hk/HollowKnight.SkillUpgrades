@@ -14,6 +14,7 @@ namespace SkillUpgrades.Skills
             DirectionalDash.Hook();
             VerticalSuperdash.Hook();
             HorizontalQuake.Hook();
+            SpiralScream.Hook();
         }
 
     }

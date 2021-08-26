@@ -50,6 +50,12 @@ namespace SkillUpgrades
         [MenuToggleable("Horizontal Dive", "Toggle whether Desolate Dive can be used horizontally.")]
         public bool HorizontalDiveEnabled = true;
         #endregion
+
+        #region Spiral Scream
+        // If this is set to true, the player can shriek clockwise/anticlockwise by holding a direction when shrieking
+        [MenuToggleable("Spiral Scream", "Toggle whether Howling Wraiths can sweep a circle around the knight")]
+        public bool SpiralScream = true;
+        #endregion
     }
 
     public class MenuToggleable : Attribute
