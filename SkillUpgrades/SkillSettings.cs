@@ -33,6 +33,8 @@ namespace SkillUpgrades
         public bool DirectionalDash = true;
         // If this is set to true, the knight will keep its vertical momentum after finishing an upward dash
         public bool MaintainVerticalMomentum = true;
+        // If this is set to false, down-diagonal dashes will instead be sent left/right
+        public bool AllowDownDiagonalDashes = true;
         #endregion
 
         #region Vertical Cdash

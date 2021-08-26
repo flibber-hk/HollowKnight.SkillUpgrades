@@ -35,8 +35,10 @@ namespace SkillUpgrades.Skills
         private static void CancelPersistentMomentum(On.HeroController.orig_Update orig, HeroController self)
         {
             orig(self);
-            if (self.current_velocity.y <= 0f)
+            if (self.current_velocity.y <= 0f && !self.cState.dashing)
             {
+                if (_maintainingVerticalDashMomentum) SkillUpgrades.instance.Log("Cancelling...");
+
                 _maintainingVerticalDashMomentum = false;
             }
         }
@@ -49,6 +51,7 @@ namespace SkillUpgrades.Skills
                 ReflectionHelper.SetField<HeroController, bool>(self, "jumpQueuing", false);
                 ReflectionHelper.SetField<HeroController, bool>(self, "doubleJumpQueuing", false);
                 if (self.cState.swimming) self.cState.swimming = false;
+                return;
             }
 
             orig(self);
@@ -71,6 +74,13 @@ namespace SkillUpgrades.Skills
                 if (hero.cState.facingRight) direction |= DashDirection.Right;
                 else direction |= DashDirection.Left;
             }
+
+            if (!SkillUpgrades.globalSettings.AllowDownDiagonalDashes && direction.HasFlag(DashDirection.Down))
+            {
+                if (direction == (DashDirection.Down | DashDirection.Left)) direction = DashDirection.Left;
+                else if (direction == (DashDirection.Down | DashDirection.Right)) direction = DashDirection.Right;
+            }
+
             _dashDirection = direction;
 
             return false;
