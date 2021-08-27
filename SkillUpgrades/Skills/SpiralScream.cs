@@ -67,6 +67,7 @@ namespace SkillUpgrades.Skills
         public void OnEnable()
         {
             ResetRotation();
+            angle = 0f;
             circled = false;
         }
 
@@ -86,8 +87,7 @@ namespace SkillUpgrades.Skills
 
         public void ResetRotation()
         {
-            gameObject.transform.RotateAround(HeroController.instance.transform.position, Vector3.forward, -angle * direction);
-            angle = 0f;
+            gameObject.transform.rotation = Quaternion.identity;
         }
     }
 }
