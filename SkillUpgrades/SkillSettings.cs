@@ -55,6 +55,12 @@ namespace SkillUpgrades
         // If this is set to true, the player can shriek clockwise/anticlockwise by holding a direction when shrieking
         [MenuToggleable("Spiral Scream", "Toggle whether Howling Wraiths can sweep a circle around the knight")]
         public bool SpiralScream = true;
+		#endregion
+
+        #region Downward Fireball
+        // If this is set to false, the player cannot fireball in non-horizontal directions
+        [MenuToggleable("Downward Fireball", "Toggle whether Vengeful Spirit can be used downward.")]
+        public bool DownwardFireballEnabled = true;
         #endregion
     }
 

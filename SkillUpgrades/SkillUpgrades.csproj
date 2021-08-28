@@ -77,6 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Skills\DirectionalDash.cs" />
+    <Compile Include="Skills\DownwardFireball.cs" />
     <Compile Include="Skills\HorizontalQuake.cs" />
     <Compile Include="Skills\SpiralScream.cs" />
     <Compile Include="Util\DecideToStopQuake.cs" />

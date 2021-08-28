@@ -134,5 +134,17 @@ namespace SkillUpgrades.Util
 
             return newFsmInt;
         }
+
+        public static FsmBool AddFsmBool(this PlayMakerFSM fsm, string name)
+        {
+            FsmBool newFsmBool = new FsmBool(name);
+
+            FsmBool[] boolVariables = new FsmBool[fsm.FsmVariables.BoolVariables.Length + 1];
+            System.Array.Copy(fsm.FsmVariables.BoolVariables, boolVariables, fsm.FsmVariables.BoolVariables.Length);
+            boolVariables[fsm.FsmVariables.BoolVariables.Length] = newFsmBool;
+            fsm.FsmVariables.BoolVariables = boolVariables;
+
+            return newFsmBool;
+        }
     }
 }
