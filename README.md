@@ -22,4 +22,7 @@ Hold a direction as well as down to dive to the left or right. Non-downward dive
 #### Spiral Scream: Scream in a circle around the knight
 Hold a direction as well as up to make Howling Wraiths or Abyss Shriek sweep a circle around the knight, instead of staying above the knight.
 
-Also includes a global toggle - if this is off, all upgrades will be disabled. Each upgrade can be toggled individually from the mod menu.
+#### Downward Fireball: Shoot fireballs downward
+Holding no direction while casting will cause the fireball to go downward (and the knight's recoil will be upward).
+
+Also includes a global toggle - if this is off, all upgrades will be disabled. Each upgrade can be toggled individually from the mod menu, although any upgrade-specific preferences will need to be modified directly in the global settings file.
