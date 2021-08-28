@@ -46,6 +46,12 @@ namespace SkillUpgrades
         [MenuToggleable("Horizontal Dive", "Toggle whether Desolate Dive can be used horizontally.")]
         public bool HorizontalDiveEnabled = true;
         #endregion
+
+        #region Downward Fireball
+        // If this is set to false, the player cannot fireball in non-horizontal directions
+        [MenuToggleable("Downward Fireball", "Toggle whether Vengeful Spirit can be used downward.")]
+        public bool DownwardFireballEnabled = true;
+        #endregion
     }
 
     public class MenuToggleable : Attribute
