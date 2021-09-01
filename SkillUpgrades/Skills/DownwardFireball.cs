@@ -131,9 +131,11 @@ namespace SkillUpgrades.Skills
             idle.GetActionOfType<SetVelocity2d>().SwapXandY();
             idle.GetActionOfType<GetVelocity2d>().SwapXandY();
 
-            // Why does this not appear in the fsm viewer
-            FsmState idleNoCollision = fsm.GetState("Idle (No Collision)");
-            idleNoCollision?.GetActionOfType<SetVelocity2d>().SwapXandY();
+            // We need to modify the state added by QoL
+            if (fsm.GetState("Idle (No Collision)") is FsmState idleNoCollision)
+            {
+                idleNoCollision.GetActionOfType<SetVelocity2d>().SwapXandY();
+            }
         }
 
         private static void ModifyFireballFSM(On.HeroController.orig_Start orig, HeroController self)
