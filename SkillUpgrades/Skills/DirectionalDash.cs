@@ -10,6 +10,7 @@ using Modding;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using UnityEngine;
+using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
@@ -43,7 +44,7 @@ namespace SkillUpgrades.Skills
 
         private static void MaintainMomentum(On.HeroController.orig_JumpReleased orig, HeroController self)
         {
-            if (HeroRigidBody.velocity.y > 0 && !self.inAcid && !self.cState.shroomBouncing 
+            if (Ref.HeroRigidBody.velocity.y > 0 && !self.inAcid && !self.cState.shroomBouncing 
                 && _maintainingVerticalDashMomentum && SkillUpgrades.globalSettings.MaintainVerticalMomentum)
             {
                 ReflectionHelper.SetField<HeroController, bool>(self, "jumpQueuing", false);
@@ -222,16 +223,6 @@ namespace SkillUpgrades.Skills
 
         private static DashDirection _dashDirection;
         private static FieldInfo _dashEffect;
-        private static Rigidbody2D _heroRigidBody;
-
-        private static Rigidbody2D HeroRigidBody
-        {
-            get
-            {
-                if (_heroRigidBody == null) _heroRigidBody = HeroController.instance.GetComponent<Rigidbody2D>();
-                return _heroRigidBody;
-            }
-        }
 
         private static Vector2 _lastDashVector;
         private static bool _maintainingVerticalDashMomentum = false;
