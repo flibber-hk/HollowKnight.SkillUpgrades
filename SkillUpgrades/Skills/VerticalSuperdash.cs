@@ -31,7 +31,7 @@ namespace SkillUpgrades.Skills
             {
                 if (value == SuperdashDirection.Upward && _superdashState == SuperdashDirection.Normal)
                 {
-                    HeroController.instance.transform.Rotate(0, 0, -90 * HeroController.instance.transform.localScale.x);
+                    HeroController.instance.RotateHero(-90);
                 }
                 else if (value == SuperdashDirection.Normal && _superdashState == SuperdashDirection.Upward)
                 {
@@ -42,11 +42,11 @@ namespace SkillUpgrades.Skills
                         burst.transform.parent = HeroController.instance.gameObject.transform;
                         burst.SetActive(false);
                     }
-                    HeroController.instance.transform.Rotate(0, 0, 90 * HeroController.instance.transform.localScale.x);
+                    HeroController.instance.RotateHero(90);
                 }
                 else if (value == SuperdashDirection.Diagonal && _superdashState == SuperdashDirection.Normal)
                 {
-                    HeroController.instance.transform.Rotate(0, 0, -45 * HeroController.instance.transform.localScale.x);
+                    HeroController.instance.RotateHero(-45);
                 }
                 else if (value == SuperdashDirection.Normal && _superdashState == SuperdashDirection.Diagonal)
                 {
@@ -57,7 +57,7 @@ namespace SkillUpgrades.Skills
                         burst.transform.parent = HeroController.instance.gameObject.transform;
                         burst.SetActive(false);
                     }
-                    HeroController.instance.transform.Rotate(0, 0, 45 * HeroController.instance.transform.localScale.x);
+                    HeroController.instance.RotateHero(45);
                 }
 
                 _superdashState = value;
