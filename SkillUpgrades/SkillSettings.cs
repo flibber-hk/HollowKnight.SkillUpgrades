@@ -29,6 +29,12 @@ namespace SkillUpgrades
         public bool AllowDownDiagonalDashes = true;
         #endregion
 
+        #region Wall Climb
+        // If this is set to true, the player can climb up and down walls
+        [MenuToggleable("Wall Climb", "Toggle whether claw can be used to climb up and down walls.")]
+        public bool WallClimb = true;
+        #endregion
+
         #region Triple Jump
         // If this is set to true, the player can use wings multiple times in the air
         [MenuToggleable("Multiple Wings", "Toggle whether wings can be used more than once before landing.")]
@@ -59,7 +65,7 @@ namespace SkillUpgrades
 
         #region Spiral Scream
         // If this is set to true, the player can shriek clockwise/anticlockwise by holding a direction when shrieking
-        [MenuToggleable("Spiral Scream", "Toggle whether Howling Wraiths can sweep a circle around the knight")]
+        [MenuToggleable("Spiral Scream", "Toggle whether Howling Wraiths can sweep a circle around the knight.")]
         public bool SpiralScream = true;
         #endregion
     }
