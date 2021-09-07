@@ -59,7 +59,7 @@ namespace SkillUpgrades
 
         #region Spiral Scream
         // If this is set to true, the player can shriek clockwise/anticlockwise by holding a direction when shrieking
-        [MenuToggleable("Spiral Scream", "Toggle whether Howling Wraiths can sweep a circle around the knight")]
+        [MenuToggleable("Spiral Scream", "Toggle whether Howling Wraiths can sweep a circle around the knight.")]
         public bool SpiralScream = true;
         #endregion
     }

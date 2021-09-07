@@ -23,21 +23,22 @@ namespace SkillUpgrades.Skills
 
             set
             {
+                // The knight might not be facing in the direction it dives
                 if (_quakeState == QuakeDirection.Normal && value == QuakeDirection.Leftward)
                 {
-                    HeroController.instance.transform.Rotate(0, 0, -90);
+                    HeroController.instance.RotateHero(-90, respectDirection: false);
                 }
                 else if (_quakeState == QuakeDirection.Normal && value == QuakeDirection.Rightward)
                 {
-                    HeroController.instance.transform.Rotate(0, 0, 90);
+                    HeroController.instance.RotateHero(90, respectDirection: false);
                 }
                 else if (_quakeState == QuakeDirection.Leftward && value == QuakeDirection.Normal)
                 {
-                    HeroController.instance.transform.Rotate(0, 0, 90);
+                    HeroController.instance.RotateHero(90, respectDirection: false);
                 }
                 else if (_quakeState == QuakeDirection.Rightward && value == QuakeDirection.Normal)
                 {
-                    HeroController.instance.transform.Rotate(0, 0, -90);
+                    HeroController.instance.RotateHero(-90, respectDirection: false);
                 }
                 _quakeState = value;
             }
