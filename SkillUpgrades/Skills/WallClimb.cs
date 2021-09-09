@@ -16,8 +16,8 @@ namespace SkillUpgrades.Skills
     {
         private static bool climbEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.WallClimb;
 
-        public const float ClimbSpeed = 5f;
-        public const float ClimbSpeedConveyor = ClimbSpeed;
+        public static float ClimbSpeed = SkillUpgrades.globalSettings.ClimbSpeed;
+        public static float ClimbSpeedConveyor = ClimbSpeed;
         
         internal static void Hook()
         {

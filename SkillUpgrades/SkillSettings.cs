@@ -33,6 +33,8 @@ namespace SkillUpgrades
         // If this is set to true, the player can climb up and down walls
         [MenuToggleable("Wall Climb", "Toggle whether claw can be used to climb up and down walls.")]
         public bool WallClimb = true;
+        // Allow the user to set their climb speed in the global settings
+        public float ClimbSpeed = 5.0f;
         #endregion
 
         #region Triple Jump
