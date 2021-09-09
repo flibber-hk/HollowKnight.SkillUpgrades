@@ -83,11 +83,26 @@ namespace SkillUpgrades.Skills
             orig(self);
 
             FsmState wallCancel = self.superDash.GetState("Charge Cancel Wall");
-            if (wallCancel.Actions[2] is SendMessage sm)
+            if (wallCancel.Actions[2] is SendMessage _)
             {
                 wallCancel.Actions[2] = new ExecuteLambda(() =>
                 {
-                    if (!climbEnabled) HeroController.instance.AffectedByGravity(true);
+                    if (!climbEnabled)
+                    {
+                        HeroController.instance.AffectedByGravity(true);
+                    }
+                });
+            }
+
+            FsmState regainControl = self.superDash.GetState("Regain Control");
+            if (regainControl.Actions[5] is SendMessage _)
+            {
+                regainControl.Actions[5] = new ExecuteLambda(() =>
+                {
+                    if (!climbEnabled || !HeroController.instance.cState.wallSliding)
+                    {
+                        HeroController.instance.AffectedByGravity(true);
+                    }
                 });
             }
         }
@@ -182,6 +197,5 @@ namespace SkillUpgrades.Skills
 
             }
         }
-
     }
 }
