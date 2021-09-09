@@ -16,6 +16,7 @@ namespace SkillUpgrades.Skills
             HorizontalQuake.Hook();
             SpiralScream.Hook();
             DownwardFireball.Hook();
+            WallClimb.Hook();
         }
 
     }
