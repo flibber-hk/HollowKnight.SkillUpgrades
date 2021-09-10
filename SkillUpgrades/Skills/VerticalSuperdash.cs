@@ -12,8 +12,8 @@ namespace SkillUpgrades.Skills
 {
     internal static class VerticalSuperdash
     {
-        private static bool verticalSuperdashEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.VerticalSuperdashEnabled;
-        private static bool diagonalSuperdashEnabled => verticalSuperdashEnabled && SkillUpgrades.globalSettings.DiagonalSuperdashEnabled;
+        private static bool verticalSuperdashEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.VerticalSuperdashEnabled == true;
+        private static bool diagonalSuperdashEnabled => verticalSuperdashEnabled && SkillUpgrades.globalSettings.DiagonalSuperdash;
         internal enum SuperdashDirection
         {
             Normal = 0,     // Anything not caused by this mod

@@ -9,7 +9,7 @@ namespace SkillUpgrades.Skills
 {
     internal static class TripleJump
     {
-        private static bool tripleJumpEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.TripleJumpEnabled;
+        private static bool tripleJumpEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.TripleJumpEnabled == true;
 
         private static int doubleJumpCount;
         internal static void RefreshDoubleJump()

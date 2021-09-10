@@ -11,7 +11,7 @@ namespace SkillUpgrades.Skills
 {
     internal static class SpiralScream
     {
-        private static bool spiralScreamEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.SpiralScream;
+        private static bool spiralScreamEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.SpiralScreamEnabled == true;
 
         internal static void Hook()
         {

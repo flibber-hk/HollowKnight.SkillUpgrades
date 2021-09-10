@@ -13,7 +13,7 @@ namespace SkillUpgrades.Skills
 {
     internal static class HorizontalQuake
     {
-        private static bool horizontalDiveEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.HorizontalDiveEnabled;
+        private static bool horizontalDiveEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.HorizontalDiveEnabled == true;
 
         private static QuakeDirection _quakeState;
 

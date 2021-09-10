@@ -14,7 +14,7 @@ namespace SkillUpgrades.Skills
 {
     internal static class WallClimb
     {
-        private static bool climbEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.WallClimb;
+        private static bool climbEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.WallClimbEnabled == true;
 
         public static float ClimbSpeed = SkillUpgrades.globalSettings.ClimbSpeed;
         public static float ClimbSpeedConveyor = ClimbSpeed;

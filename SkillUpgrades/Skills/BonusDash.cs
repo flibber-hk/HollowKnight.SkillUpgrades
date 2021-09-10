@@ -9,7 +9,7 @@ namespace SkillUpgrades.Skills
 {
     internal static class BonusDash
     {
-        private static bool bonusAirDashEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.BonusAirDashEnabled;
+        private static bool bonusAirDashEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.BonusAirDashEnabled == true;
 
         private static int airDashCount;
         internal static void RefreshAirDash()

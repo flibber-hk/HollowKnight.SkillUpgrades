@@ -31,22 +31,26 @@ namespace SkillUpgrades
         {
             List<IMenuMod.MenuEntry> menuEntries = new List<IMenuMod.MenuEntry>();
 
+            if (globalSettings.GlobalToggle == null) return menuEntries;
+
             foreach (FieldInfo fi in typeof(GlobalSettings).GetFields())
             {
-                if (fi.FieldType == typeof(bool))
+                if (!(fi.GetCustomAttribute<MenuToggleable>() is MenuToggleable mt))
                 {
-                    if (fi.GetCustomAttribute<MenuToggleable>() is MenuToggleable mt)
-                    {
-                        menuEntries.Add(new IMenuMod.MenuEntry()
-                        {
-                            Name = mt.name,
-                            Description = mt.description,
-                            Values = new string[] { "On", "Off" },
-                            Saver = opt => { fi.SetValue(globalSettings, opt == 0); },
-                            Loader = () => (bool)fi.GetValue(globalSettings) ? 0 : 1
-                        });
-                    }
+                    continue;
                 }
+                if ((bool?)fi.GetValue(globalSettings) == null)
+                {
+                    continue;
+                }
+                menuEntries.Add(new IMenuMod.MenuEntry()
+                {
+                    Name = mt.name,
+                    Description = mt.description,
+                    Values = new string[] { "On", "Off" },
+                    Saver = opt => { fi.SetValue(globalSettings, (bool?)(opt == 0)); },
+                    Loader = () => (bool)fi.GetValue(globalSettings) ? 0 : 1
+                });
             }
 
             return menuEntries;

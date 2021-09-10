@@ -16,7 +16,7 @@ namespace SkillUpgrades.Skills
 {
     internal static class DirectionalDash
     {
-        private static bool directionalDashEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.DirectionalDash;
+        private static bool directionalDashEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.DirectionalDashEnabled == true;
 
         internal static void Hook()
         {

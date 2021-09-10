@@ -13,7 +13,7 @@ namespace SkillUpgrades.Skills
 {
     internal static class DownwardFireball
     {
-        private static bool downwardFireballEnabled => SkillUpgrades.globalSettings.GlobalToggle && SkillUpgrades.globalSettings.DownwardFireballEnabled;
+        private static bool downwardFireballEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.DownwardFireballEnabled == true;
         internal static void Hook()
         {
             On.HeroController.Start += ModifyFireballFSM;
