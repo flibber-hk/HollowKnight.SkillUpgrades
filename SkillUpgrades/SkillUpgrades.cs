@@ -42,7 +42,7 @@ namespace SkillUpgrades
                     skill.Initialize();
                     skill.skillUpgradeActive = true;
 
-                    if (enabled == false)
+                    if (enabled == false || !globalSettings.GlobalToggle)
                     {
                         skill.skillUpgradeActive = false;
                         skill.Unload();
@@ -58,7 +58,14 @@ namespace SkillUpgrades
         {
             List<IMenuMod.MenuEntry> menuEntries = new List<IMenuMod.MenuEntry>();
 
-            // TODO: Global toggle
+            menuEntries.Add(new IMenuMod.MenuEntry()
+            {
+                Name = "Global Toggle",
+                Description = "Turn this setting off to deactivate all skill upgrades.",
+                Values = new string[] { "False", "True" },
+                Saver = opt => ApplyGlobalToggle(opt == 1),
+                Loader = () => globalSettings.GlobalToggle ? 1 : 0
+            });
 
             foreach (var kvp in _skills)
             {
@@ -70,7 +77,7 @@ namespace SkillUpgrades
                     Description = skill.Description,
                     Values = new string[] { "False", "True" },
                     Saver = opt => Toggle(name, opt == 1),
-                    Loader = () => globalSettings.EnabledSkills[name] == true ? 1 : 0,
+                    Loader = () => globalSettings.EnabledSkills[name] == true ? 1 : 0
                 };
 
                 menuEntries.Add(entry);
@@ -83,7 +90,33 @@ namespace SkillUpgrades
         public bool ToggleButtonInsideMenu => false;
         #endregion
 
-        // TODO: Global Toggle
+        internal static void ApplyGlobalToggle(bool enable)
+        {
+            if (enable == globalSettings.GlobalToggle) return;
+
+            if (enable)
+            {
+                foreach (var kvp in _skills)
+                {
+                    if (globalSettings.EnabledSkills[kvp.Key] == true)
+                    {
+                        AbstractSkillUpgrade skill = kvp.Value;
+                        if (skill.IsUnloadable) skill.Initialize();
+                        skill.skillUpgradeActive = true;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var kvp in _skills)
+                {
+                    kvp.Value.skillUpgradeActive = false;
+                    kvp.Value.Unload();
+                }    
+            }
+
+            globalSettings.GlobalToggle = enable;
+        }
 
         internal static void Toggle(string name, bool enable)
         {
@@ -92,7 +125,7 @@ namespace SkillUpgrades
             if (globalSettings.EnabledSkills[name] == enable) return;
 
             AbstractSkillUpgrade skill = _skills[name];
-            if (enable)
+            if (enable && globalSettings.GlobalToggle)
             {
                 if (skill.IsUnloadable) skill.Initialize();
                 skill.skillUpgradeActive = true;
@@ -109,6 +142,11 @@ namespace SkillUpgrades
         public override string GetVersion()
         {
             return "0.2";
+        }
+
+        public override int LoadPriority()
+        {
+            return 25;
         }
 
     }
