@@ -11,13 +11,16 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    internal static class DownwardFireball
+    internal class DownwardFireball : AbstractSkillUpgrade
     {
-        private static bool downwardFireballEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.DownwardFireballEnabled == true;
-        internal static void Hook()
+        public override string Name => "Downward Fireball";
+        public override string Description => "Toggle whether Vengeful Spirit can be used downward.";
+
+        public override void Initialize()
         {
             On.HeroController.Start += ModifyFireballFSM;
         }
+
 
         public static bool FireballDown = false;
 
@@ -138,7 +141,7 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        private static void ModifyFireballFSM(On.HeroController.orig_Start orig, HeroController self)
+        private void ModifyFireballFSM(On.HeroController.orig_Start orig, HeroController self)
         {
             orig(self);
 
@@ -164,7 +167,7 @@ namespace SkillUpgrades.Skills
             #region Set/Unset down fireball bool
             fsm.GetState("Level Check").AddFirstAction(new ExecuteLambda(() =>
             {
-                if (downwardFireballEnabled && !InputHandler.Instance.inputActions.left.IsPressed && !InputHandler.Instance.inputActions.right.IsPressed)
+                if (skillUpgradeActive && !InputHandler.Instance.inputActions.left.IsPressed && !InputHandler.Instance.inputActions.right.IsPressed)
                 {
                     FireballDown = true;
                 }

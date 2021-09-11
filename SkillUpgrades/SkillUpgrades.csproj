@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Skills\AbstractSkillUpgrade.cs" />
     <Compile Include="Skills\DirectionalDash.cs" />
     <Compile Include="Skills\DownwardFireball.cs" />
     <Compile Include="Skills\HorizontalQuake.cs" />
@@ -89,7 +90,6 @@
     <Compile Include="Util\PlaymakerExtensions.cs" />
     <Compile Include="SkillSettings.cs" />
     <Compile Include="Skills\BonusDash.cs" />
-    <Compile Include="Skills\Skills.cs" />
     <Compile Include="Skills\TripleJump.cs" />
     <Compile Include="Skills\VerticalSuperdash.cs" />
     <Compile Include="SkillUpgrades.cs" />

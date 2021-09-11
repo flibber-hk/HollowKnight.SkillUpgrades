@@ -12,14 +12,17 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    internal static class WallClimb
+    internal class WallClimb : AbstractSkillUpgrade
     {
-        private static bool climbEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.WallClimbEnabled == true;
-
-        public static float ClimbSpeed = SkillUpgrades.globalSettings.ClimbSpeed;
+        [SerializeToSetting]
+        public static float ClimbSpeed = 5.0f;
         public static float ClimbSpeedConveyor = ClimbSpeed;
+
+
+        public override string Name => "Wall Climb";
+        public override string Description => "Toggle whether claw can be used to climb up and down walls.";
         
-        internal static void Hook()
+        public override void Initialize()
         {
             // Replace WALLSLIDE_SPEED with 0 in the Fixed Update function, so the knight doesn't move down walls. 
             // Doing it like this allows the skill to be more easily toggled "live".
@@ -78,7 +81,7 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        private static void SuperdashWallCancel(On.HeroController.orig_Start orig, HeroController self)
+        private void SuperdashWallCancel(On.HeroController.orig_Start orig, HeroController self)
         {
             orig(self);
 
@@ -87,7 +90,7 @@ namespace SkillUpgrades.Skills
             {
                 wallCancel.Actions[2] = new ExecuteLambda(() =>
                 {
-                    if (!climbEnabled)
+                    if (!skillUpgradeActive)
                     {
                         HeroController.instance.AffectedByGravity(true);
                     }
@@ -99,7 +102,7 @@ namespace SkillUpgrades.Skills
             {
                 regainControl.Actions[5] = new ExecuteLambda(() =>
                 {
-                    if (!climbEnabled || !HeroController.instance.cState.wallSliding)
+                    if (!skillUpgradeActive || !HeroController.instance.cState.wallSliding)
                     {
                         HeroController.instance.AffectedByGravity(true);
                     }
@@ -107,7 +110,7 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        private static void StayOnWall(ILContext il)
+        private void StayOnWall(ILContext il)
         {
             ILCursor cursor = new ILCursor(il).Goto(0);
 
@@ -120,11 +123,11 @@ namespace SkillUpgrades.Skills
                 i => i.MatchCallvirt<InControl.OneAxisInputControl>("get_WasPressed")
             ))
             {
-                cursor.EmitDelegate<Func<bool, bool>>(pressed => pressed && !climbEnabled);
+                cursor.EmitDelegate<Func<bool, bool>>(pressed => pressed && !skillUpgradeActive);
             }
         }
 
-        private static void SetWallslideSpeed(ILContext il)
+        private void SetWallslideSpeed(ILContext il)
         {
             ILCursor cursor = new ILCursor(il).Goto(0);
 
@@ -135,15 +138,15 @@ namespace SkillUpgrades.Skills
                 i => i.MatchLdfld<HeroController>(nameof(HeroController.WALLSLIDE_SPEED))
             ))
             {
-                cursor.EmitDelegate<Func<float, float>>((s) => climbEnabled ? 0 : s);
+                cursor.EmitDelegate<Func<float, float>>((s) => skillUpgradeActive ? 0 : s);
             }
         }
 
-        private static void MoveUpOrDown(On.HeroController.orig_Update orig, HeroController self)
+        private void MoveUpOrDown(On.HeroController.orig_Update orig, HeroController self)
         {
             orig(self);
 
-            if (climbEnabled && self.cState.wallSliding && Ref.HeroRigidBody.gravityScale <= Mathf.Epsilon && !self.cState.onConveyorV)
+            if (skillUpgradeActive && self.cState.wallSliding && Ref.HeroRigidBody.gravityScale <= Mathf.Epsilon && !self.cState.onConveyorV)
             {
                 Vector2 pos = HeroController.instance.transform.position;
 
@@ -162,14 +165,13 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        private static void HeroController_ResetState(On.HeroController.orig_ResetState orig, HeroController self)
+        private void HeroController_ResetState(On.HeroController.orig_ResetState orig, HeroController self)
         {
-            if (self.cState.wallSliding && climbEnabled) HeroController.instance.AffectedByGravity(true);
+            if (self.cState.wallSliding && skillUpgradeActive) HeroController.instance.AffectedByGravity(true);
             orig(self);
         }
 
-        // Currently, this does not stop gravity from being reactivated when the player cancels a wall C-dash before finishing charging.
-        private static void SetGravityOnWallslide(ILContext il)
+        private void SetGravityOnWallslide(ILContext il)
         {
             ILCursor cursor = new ILCursor(il).Goto(0);
             int matchedBool = -1;
@@ -186,10 +188,10 @@ namespace SkillUpgrades.Skills
                 switch (matchedBool)
                 {
                     case 0:
-                        cursor.EmitDelegate<Action>(() => { if (climbEnabled) HeroController.instance.AffectedByGravity(true); });
+                        cursor.EmitDelegate<Action>(() => { if (skillUpgradeActive) HeroController.instance.AffectedByGravity(true); });
                         break;
                     case 1:
-                        cursor.EmitDelegate<Action>(() => { if (climbEnabled) HeroController.instance.AffectedByGravity(false); });
+                        cursor.EmitDelegate<Action>(() => { if (skillUpgradeActive) HeroController.instance.AffectedByGravity(false); });
                         break;
                     default:
                         break;

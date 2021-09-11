@@ -1,86 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using Modding;
 
 namespace SkillUpgrades
 {
+     [Serializable]
     public class GlobalSettings
     {
-        [MenuToggleable("Global Toggle", "Turn this setting off to deactivate all skill upgrades.")]
-        public bool? GlobalToggle = true;
+        private readonly Assembly _asm = Assembly.GetAssembly(typeof(GlobalSettings));
 
-        #region Bonus Air Dash
-        // If this is set to true, the player can dash multiple times in the air
-        [MenuToggleable("Multiple Air Dash", "Toggle whether dash can be used more than once before landing.")]
-        public bool? BonusAirDashEnabled = true;
-        // The number of times the player can dash in air is this int; setting it to -1 means dash can be used infinitely
-        public int AirDashMax = 2;
-        #endregion
+        internal readonly Dictionary<FieldInfo, Type> Fields = new Dictionary<FieldInfo, Type>();
 
-        #region Directional Dash
-        // If this is set to true, the player can dash in 8 directions
-        [MenuToggleable("Directional Dash", "Toggle whether dash can be used in all 8 directions.")]
-        public bool? DirectionalDashEnabled = true;
-        // If this is set to true, the knight will keep its vertical momentum after finishing an upward dash
-        public bool MaintainVerticalMomentum = true;
-        // If this is set to false, down-diagonal dashes will instead be sent left/right
-        public bool AllowDownDiagonalDashes = true;
-        #endregion
+        public Dictionary<string, bool?> EnabledSkills { get; set; } = new Dictionary<string, bool?>();
 
-        #region Wall Climb
-        // If this is set to true, the player can climb up and down walls
-        [MenuToggleable("Wall Climb", "Toggle whether claw can be used to climb up and down walls.")]
-        public bool? WallClimbEnabled = true;
-        // Allow the user to set their climb speed in the global settings
-        public float ClimbSpeed = 5.0f;
-        #endregion
+        public Dictionary<string, bool> Booleans { get; set; } = new Dictionary<string, bool>();
+        public Dictionary<string, float> Floats { get; set; } = new Dictionary<string, float>();
+        public Dictionary<string, int> Integers { get; set; } = new Dictionary<string, int>();
 
-        #region Triple Jump
-        // If this is set to true, the player can use wings multiple times in the air
-        [MenuToggleable("Multiple Wings", "Toggle whether wings can be used more than once before landing.")]
-        public bool? TripleJumpEnabled = true;
-        // The number of times the player can use wings in air is this int; setting it to -1 means wings can be used infinitely
-        public int DoubleJumpMax = 2;
-        #endregion
+        public bool GlobalToggle = true; // TODO: Implement this
 
-        #region Vertical Cdash
-        // If this is set to false, the player cannot cdash in non-horizontal directions
-        [MenuToggleable("Vertical Superdash", "Toggle whether Crystal Heart can be used in non-horizontal directions.")]
-        public bool? VerticalSuperdashEnabled = true;
-        // If this is set to false, the player can not cdash diagonally
-        public bool DiagonalSuperdash = true;
-        #endregion
-
-        #region Downward Fireball
-        // If this is set to false, the player cannot fireball downward
-        [MenuToggleable("Downward Fireball", "Toggle whether Vengeful Spirit can be used downward.")]
-        public bool? DownwardFireballEnabled = true;
-        #endregion
-
-        #region Horizontal Dive
-        // If this is set to false, the player cannot dive in non-downward directions
-        [MenuToggleable("Horizontal Dive", "Toggle whether Desolate Dive can be used horizontally.")]
-        public bool? HorizontalDiveEnabled = true;
-        #endregion
-
-        #region Spiral Scream
-        // If this is set to true, the player can shriek clockwise/anticlockwise by holding a direction when shrieking
-        [MenuToggleable("Spiral Scream", "Toggle whether Howling Wraiths can sweep a circle around the knight.")]
-        public bool? SpiralScreamEnabled = true;
-        #endregion
-    }
-
-    public class MenuToggleable : Attribute
-    {
-        public string name;
-        public string description;
-
-        public MenuToggleable(string name, string description = "")
+        public GlobalSettings()
         {
-            this.name = name;
-            this.description = description;
+            foreach (Type t in _asm.GetTypes())
+            {
+                foreach (FieldInfo fi in t.GetFields().Where(x => Attribute.IsDefined(x, typeof(SerializeToSetting))))
+                {
+                    Fields.Add(fi, t);
+                }
+            }
+        }
+
+        [OnSerializing]
+        public void OnBeforeSerialize(StreamingContext _)
+        {
+            foreach (var (fi, type) in Fields)
+            {
+                if (fi.FieldType == typeof(bool))
+                {
+                    Booleans[$"{type.Name}:{fi.Name}"] = (bool)fi.GetValue(null);
+                }
+                else if (fi.FieldType == typeof(float))
+                {
+                    Floats[$"{type.Name}:{fi.Name}"] = (float)fi.GetValue(null);
+                }
+                else if (fi.FieldType == typeof(int))
+                {
+                    Integers[$"{type.Name}:{fi.Name}"] = (int)fi.GetValue(null);
+                }
+            }
+        }
+
+
+        [OnDeserialized]
+        public void OnAfterDeserialize(StreamingContext _)
+        {
+            foreach (var (fi, type) in Fields)
+            {
+                if (fi.FieldType == typeof(bool))
+                {
+                    if (Booleans.TryGetValue($"{type.Name}:{fi.Name}", out bool val)) fi.SetValue(null, val);
+                }
+                else if (fi.FieldType == typeof(float))
+                {
+                    if (Floats.TryGetValue($"{type.Name}:{fi.Name}", out float val)) fi.SetValue(null, val);
+                }
+                else if (fi.FieldType == typeof(int))
+                {
+                    if (Integers.TryGetValue($"{type.Name}:{fi.Name}", out int val)) fi.SetValue(null, val);
+                }
+            }
         }
     }
+
+    public class SerializeToSetting : Attribute { }
 }

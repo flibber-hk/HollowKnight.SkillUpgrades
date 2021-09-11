@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,37 +8,34 @@ using UnityEngine;
 
 namespace SkillUpgrades.Skills
 {
-    internal static class BonusDash
+    internal class BonusDash : AbstractSkillUpgrade
     {
-        private static bool bonusAirDashEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.BonusAirDashEnabled == true;
+        [SerializeToSetting]
+        public static int AirDashMax = 2;
 
-        private static int airDashCount;
-        internal static void RefreshAirDash()
-        {
-            airDashCount = 0;
-        }
+        public override string Name => "Multiple Air Dash";
+        public override string Description => "Toggle whether dash can be used more than once before landing.";
 
-        internal static void Hook()
+        public override void Initialize()
         {
             AddRefreshHooks();
             On.HeroController.HeroDash += AllowExtraAirDash;
         }
 
-        internal static void UnHook()
+        public override void Unload()
         {
             RemoveRefreshHooks();
             On.HeroController.HeroDash -= AllowExtraAirDash;
         }
 
-        private static void AllowExtraAirDash(On.HeroController.orig_HeroDash orig, HeroController self)
+
+        private int airDashCount;
+        internal void RefreshAirDash()
         {
-            if (!bonusAirDashEnabled)
-            {
-                orig(self);
-                return;
-            }
-
-
+            airDashCount = 0;
+        }
+        private void AllowExtraAirDash(On.HeroController.orig_HeroDash orig, HeroController self)
+        {
             bool shouldAirDash = !self.cState.onGround && !self.cState.inAcid;
 
             orig(self);
@@ -45,14 +43,14 @@ namespace SkillUpgrades.Skills
             {
                 airDashCount++;
 
-                if (airDashCount < SkillUpgrades.globalSettings.AirDashMax || SkillUpgrades.globalSettings.AirDashMax == -1)
+                if (airDashCount < AirDashMax || AirDashMax == -1)
                 {
                     GameManager.instance.StartCoroutine(RefreshDashInAir());
                 }
             }
         }
 
-        private static System.Collections.IEnumerator RefreshDashInAir()
+        private IEnumerator RefreshDashInAir()
         {
             yield return new WaitUntil(() => airDashCount == 0 || !InputHandler.Instance.inputActions.dash.IsPressed);
             if (airDashCount != 0)
@@ -63,7 +61,7 @@ namespace SkillUpgrades.Skills
 
         // Apparently, these are all the places where the game refreshes the player's air dash; we need to set the airDashCount to 0
         #region Restore Air Dash
-        private static void AddRefreshHooks()
+        private void AddRefreshHooks()
         {
             On.HeroController.BackOnGround += HeroController_BackOnGround;
             On.HeroController.Bounce += HeroController_Bounce;
@@ -82,7 +80,7 @@ namespace SkillUpgrades.Skills
             On.HeroController.RegainControl += HeroController_RegainControl;
         }
 
-        private static void RemoveRefreshHooks()
+        private void RemoveRefreshHooks()
         {
             On.HeroController.BackOnGround -= HeroController_BackOnGround;
             On.HeroController.Bounce -= HeroController_Bounce;
@@ -101,63 +99,63 @@ namespace SkillUpgrades.Skills
             On.HeroController.RegainControl -= HeroController_RegainControl;
         }
 
-        private static void HeroController_BackOnGround(On.HeroController.orig_BackOnGround orig, HeroController self)
+        private void HeroController_BackOnGround(On.HeroController.orig_BackOnGround orig, HeroController self)
         {
             orig(self);
             RefreshAirDash();
         }
-        private static void HeroController_Bounce(On.HeroController.orig_Bounce orig, HeroController self)
+        private void HeroController_Bounce(On.HeroController.orig_Bounce orig, HeroController self)
         {
             orig(self);
             RefreshAirDash();
         }
-        private static void HeroController_BounceHigh(On.HeroController.orig_BounceHigh orig, HeroController self)
+        private void HeroController_BounceHigh(On.HeroController.orig_BounceHigh orig, HeroController self)
         {
             orig(self);
             RefreshAirDash();
         }
-        private static void HeroController_DoWallJump(On.HeroController.orig_DoWallJump orig, HeroController self)
+        private void HeroController_DoWallJump(On.HeroController.orig_DoWallJump orig, HeroController self)
         {
             orig(self);
             RefreshAirDash();
         }
-        private static void HeroController_EnterSceneDreamGate(On.HeroController.orig_EnterSceneDreamGate orig, HeroController self)
+        private void HeroController_EnterSceneDreamGate(On.HeroController.orig_EnterSceneDreamGate orig, HeroController self)
         {
             orig(self);
             RefreshAirDash();
         }
-        private static void HeroController_ExitAcid(On.HeroController.orig_ExitAcid orig, HeroController self)
+        private void HeroController_ExitAcid(On.HeroController.orig_ExitAcid orig, HeroController self)
         {
             orig(self);
             RefreshAirDash();
         }
-        private static void HeroController_ResetAirMoves(On.HeroController.orig_ResetAirMoves orig, HeroController self)
+        private void HeroController_ResetAirMoves(On.HeroController.orig_ResetAirMoves orig, HeroController self)
         {
             orig(self);
             RefreshAirDash();
         }
-        private static void HeroController_ShroomBounce(On.HeroController.orig_ShroomBounce orig, HeroController self)
+        private void HeroController_ShroomBounce(On.HeroController.orig_ShroomBounce orig, HeroController self)
         {
             orig(self);
             RefreshAirDash();
         }
 
-        private static System.Collections.IEnumerator HeroController_EnterScene(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
+        private System.Collections.IEnumerator HeroController_EnterScene(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
             yield return orig(self, enterGate, delayBeforeEnter);
             RefreshAirDash();
         }
-        private static System.Collections.IEnumerator HeroController_HazardRespawn(On.HeroController.orig_HazardRespawn orig, HeroController self)
+        private System.Collections.IEnumerator HeroController_HazardRespawn(On.HeroController.orig_HazardRespawn orig, HeroController self)
         {
             yield return orig(self);
             RefreshAirDash();
         }
-        private static System.Collections.IEnumerator HeroController_Respawn(On.HeroController.orig_Respawn orig, HeroController self)
+        private System.Collections.IEnumerator HeroController_Respawn(On.HeroController.orig_Respawn orig, HeroController self)
         {
             yield return orig(self);
             RefreshAirDash();
         }
-        private static void HeroController_LookForInput(On.HeroController.orig_LookForInput orig, HeroController self)
+        private void HeroController_LookForInput(On.HeroController.orig_LookForInput orig, HeroController self)
         {
             orig(self);
 
@@ -179,7 +177,7 @@ namespace SkillUpgrades.Skills
                 }
             }
         }
-        private static void HeroController_Update(On.HeroController.orig_Update orig, HeroController self)
+        private void HeroController_Update(On.HeroController.orig_Update orig, HeroController self)
         {
             orig(self);
 
@@ -188,7 +186,7 @@ namespace SkillUpgrades.Skills
                 RefreshAirDash();
             }
         }
-        private static void HeroController_RegainControl(On.HeroController.orig_RegainControl orig, HeroController self)
+        private void HeroController_RegainControl(On.HeroController.orig_RegainControl orig, HeroController self)
         {
             if (self.controlReqlinquished && !self.cState.dead)
             {

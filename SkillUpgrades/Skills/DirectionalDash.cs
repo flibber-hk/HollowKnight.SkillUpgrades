@@ -14,11 +14,18 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    internal static class DirectionalDash
+    internal class DirectionalDash : AbstractSkillUpgrade
     {
-        private static bool directionalDashEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.DirectionalDashEnabled == true;
+        [SerializeToSetting]
+        public static bool AllowDownDiagonalDashes = true;
+        [SerializeToSetting]
+        public static bool MaintainVerticalMomentum = true;
 
-        internal static void Hook()
+        public override string Name => "Directional Dash";
+        public override string Description => "Toggle whether dash can be used in all 8 directions.";
+
+
+        public override void Initialize()
         {
             _dashEffect = typeof(HeroController).GetField("dashEffect", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -30,6 +37,19 @@ namespace SkillUpgrades.Skills
 
             On.HeroController.JumpReleased += MaintainMomentum;
             On.HeroController.Update += CancelPersistentMomentum;
+        }
+        public override void Unload()
+        {
+            _dashEffect = null;
+
+            ModHooks.DashPressedHook -= CalculateDashVector;
+            ModHooks.DashVectorHook -= OverrideDashVector;
+            On.HeroController.HeroDash -= ModifyPrefabDirection;
+            IL.HeroController.HeroDash -= ModifyDashmasterBool;
+            ModHooks.GetPlayerBoolHook -= InterpretDashmasterBool;
+
+            On.HeroController.JumpReleased -= MaintainMomentum;
+            On.HeroController.Update -= CancelPersistentMomentum;
         }
 
         #region Maintaining vertical momentum out of an upward dash
@@ -45,7 +65,7 @@ namespace SkillUpgrades.Skills
         private static void MaintainMomentum(On.HeroController.orig_JumpReleased orig, HeroController self)
         {
             if (Ref.HeroRigidBody.velocity.y > 0 && !self.inAcid && !self.cState.shroomBouncing 
-                && _maintainingVerticalDashMomentum && SkillUpgrades.globalSettings.MaintainVerticalMomentum)
+                && _maintainingVerticalDashMomentum && MaintainVerticalMomentum)
             {
                 ReflectionHelper.SetField<HeroController, bool>(self, "jumpQueuing", false);
                 ReflectionHelper.SetField<HeroController, bool>(self, "doubleJumpQueuing", false);
@@ -74,7 +94,7 @@ namespace SkillUpgrades.Skills
                 else direction |= DashDirection.Left;
             }
 
-            if (!SkillUpgrades.globalSettings.AllowDownDiagonalDashes && direction.HasFlag(DashDirection.Down))
+            if (!AllowDownDiagonalDashes && direction.HasFlag(DashDirection.Down))
             {
                 if (direction == (DashDirection.Down | DashDirection.Left)) direction = DashDirection.Left;
                 else if (direction == (DashDirection.Down | DashDirection.Right)) direction = DashDirection.Right;
@@ -87,8 +107,6 @@ namespace SkillUpgrades.Skills
 
         private static Vector2 OverrideDashVector(Vector2 arg)
         {
-            if (!directionalDashEnabled) return arg;
-
             HeroController hero = HeroController.instance;
 
             float num;
@@ -143,8 +161,6 @@ namespace SkillUpgrades.Skills
         private static void ModifyPrefabDirection(On.HeroController.orig_HeroDash orig, HeroController self)
         {
             orig(self);
-
-            if (!directionalDashEnabled) return;
 
             float z = GetPrefabDirection(_dashDirection);
 
@@ -215,8 +231,7 @@ namespace SkillUpgrades.Skills
         {
             if (name == EnabledBool)
             {
-                if (directionalDashEnabled) return false;
-                else return PlayerData.instance.GetBool(nameof(PlayerData.equippedCharm_31));
+                return false;
             }
             return orig;
         }

@@ -9,16 +9,18 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    internal static class SpiralScream
+    internal class SpiralScream : AbstractSkillUpgrade
     {
-        private static bool spiralScreamEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.SpiralScreamEnabled == true;
+        public override string Name => "Spiral Scream";
+        public override string Description => "Toggle whether Howling Wraiths can sweep a circle around the knight";
 
-        internal static void Hook()
+        public override void Initialize()
         {
             On.HeroController.Start += EnableSpiralScream;
         }
 
-        private static void EnableSpiralScream(On.HeroController.orig_Start orig, HeroController self)
+
+        private void EnableSpiralScream(On.HeroController.orig_Start orig, HeroController self)
         {
             orig(self);
 
@@ -30,14 +32,12 @@ namespace SkillUpgrades.Skills
             {
                 fsm.FsmVariables.GetFsmGameObject("Scr Heads").Value.AddComponent<Circler>();
                 fsm.FsmVariables.GetFsmGameObject("Scr Heads 2").Value.AddComponent<Circler>();
-                // fsm.FsmVariables.GetFsmGameObject("Scr Orbs").Value.AddComponent<Circler>();
-                // fsm.FsmVariables.GetFsmGameObject("Scr Orbs 2").Value.AddComponent<Circler>();
             }));
 
             FsmState screamGet = fsm.GetState("Scream Get?");
             screamGet.AddFirstAction(new ExecuteLambda(() =>
             {
-                if (!spiralScreamEnabled)
+                if (!skillUpgradeActive)
                 {
                     Circler.direction = 0;
                     return;

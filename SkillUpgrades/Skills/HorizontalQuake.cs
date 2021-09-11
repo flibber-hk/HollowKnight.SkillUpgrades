@@ -11,9 +11,18 @@ using System.Collections;
 
 namespace SkillUpgrades.Skills
 {
-    internal static class HorizontalQuake
+    internal class HorizontalQuake : AbstractSkillUpgrade
     {
-        private static bool horizontalDiveEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.HorizontalDiveEnabled == true;
+        public override string Name => "Horizontal Dive";
+        public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
+
+        public override void Initialize()
+        {
+            On.HeroController.EnterScene += DisableHorizontalQuakeEntry;
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetQuakeState;
+
+            On.HeroController.Start += ModifyQuakeFSM;
+        }
 
         private static QuakeDirection _quakeState;
 
@@ -51,17 +60,9 @@ namespace SkillUpgrades.Skills
             Rightward
         }
 
-        internal static void Hook()
-        {
-            On.HeroController.EnterScene += DisableHorizontalQuakeEntry;
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetQuakeState;
-
-            On.HeroController.Start += ModifyQuakeFSM;
-        }
 
 
-
-        private static IEnumerator DisableHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
+        private IEnumerator DisableHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
             GlobalEnums.GatePosition gatePosition = enterGate.GetGatePosition();
             if (gatePosition == GlobalEnums.GatePosition.left || gatePosition == GlobalEnums.GatePosition.right || gatePosition == GlobalEnums.GatePosition.door)
@@ -72,12 +73,12 @@ namespace SkillUpgrades.Skills
             return orig(self, enterGate, delayBeforeEnter);
         }
 
-        private static void ResetQuakeState(Scene arg0, Scene arg1)
+        private void ResetQuakeState(Scene arg0, Scene arg1)
         {
             QuakeState = QuakeDirection.Normal;
         }
 
-        private static void ModifyQuakeFSM(On.HeroController.orig_Start orig, HeroController self)
+        private void ModifyQuakeFSM(On.HeroController.orig_Start orig, HeroController self)
         {
             orig(self);
 
@@ -100,7 +101,7 @@ namespace SkillUpgrades.Skills
             #region Set Direction Value
             fsm.GetState("Quake Antic").AddFirstAction(new ExecuteLambda(() =>
             {
-                if (horizontalDiveEnabled)
+                if (skillUpgradeActive)
                 {
                     if (InputHandler.Instance.inputActions.right.IsPressed) QuakeState = QuakeDirection.Rightward;
                     else if (InputHandler.Instance.inputActions.left.IsPressed) QuakeState = QuakeDirection.Leftward;

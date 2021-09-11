@@ -10,10 +10,24 @@ using UnityEngine.SceneManagement;
 
 namespace SkillUpgrades.Skills
 {
-    internal static class VerticalSuperdash
+    internal class VerticalSuperdash : AbstractSkillUpgrade
     {
-        private static bool verticalSuperdashEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.VerticalSuperdashEnabled == true;
-        private static bool diagonalSuperdashEnabled => verticalSuperdashEnabled && SkillUpgrades.globalSettings.DiagonalSuperdash;
+        [SerializeToSetting]
+        public static bool DiagonalSuperdash = true;
+
+        public override string Name => "Vertical Cdash";
+        public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";
+
+
+        public override void Initialize()
+        {
+            On.CameraTarget.Update += FixVerticalCamera;
+            On.GameManager.FinishedEnteringScene += DisableUpwardOneways;
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetSuperdashState;
+            On.HeroController.Start += ModifySuperdashFsm;
+        }
+
+
         internal enum SuperdashDirection
         {
             Normal = 0,     // Anything not caused by this mod
@@ -66,15 +80,9 @@ namespace SkillUpgrades.Skills
         }
 
 
-        internal static void Hook()
-        {
-            On.CameraTarget.Update += FixVerticalCamera;
-            On.GameManager.FinishedEnteringScene += DisableUpwardOneways;
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetSuperdashState;
-            On.HeroController.Start += ModifySuperdashFsm;
-        }
 
-        private static void FixVerticalCamera(On.CameraTarget.orig_Update orig, CameraTarget self)
+
+        private void FixVerticalCamera(On.CameraTarget.orig_Update orig, CameraTarget self)
         {
             orig(self);
 
@@ -96,7 +104,7 @@ namespace SkillUpgrades.Skills
         }
         // Deactivate upward oneway transitions after spawning in so the player doesn't accidentally
         // softlock by vc-ing into them
-        private static void DisableUpwardOneways(On.GameManager.orig_FinishedEnteringScene orig, GameManager self)
+        private void DisableUpwardOneways(On.GameManager.orig_FinishedEnteringScene orig, GameManager self)
         {
             orig(self);
 
@@ -109,12 +117,12 @@ namespace SkillUpgrades.Skills
                     break;
             }
         }
-        private static void ResetSuperdashState(Scene arg0, Scene arg1)
+        private void ResetSuperdashState(Scene arg0, Scene arg1)
         {
             SuperdashState = SuperdashDirection.Normal;
         }
 
-        private static void ModifySuperdashFsm(On.HeroController.orig_Start orig, HeroController self)
+        private void ModifySuperdashFsm(On.HeroController.orig_Start orig, HeroController self)
         {
             orig(self);
 
@@ -130,7 +138,7 @@ namespace SkillUpgrades.Skills
             {
                 bool shouldDiagonal = false;
                 bool shouldVertical = false;
-                if (diagonalSuperdashEnabled)
+                if (DiagonalSuperdash && skillUpgradeActive)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
@@ -144,7 +152,7 @@ namespace SkillUpgrades.Skills
                         }
                     }
                 }
-                if (verticalSuperdashEnabled && !shouldDiagonal)
+                if (skillUpgradeActive && !shouldDiagonal)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
@@ -164,7 +172,7 @@ namespace SkillUpgrades.Skills
 
             fsm.GetState("Direction Wall").AddFirstAction(new ExecuteLambda(() =>
             {
-                if (diagonalSuperdashEnabled && GameManager.instance.inputHandler.inputActions.up.IsPressed)
+                if (DiagonalSuperdash && skillUpgradeActive && GameManager.instance.inputHandler.inputActions.up.IsPressed)
                 {
                     _queuedSuperdashState = SuperdashDirection.Diagonal;
                 }

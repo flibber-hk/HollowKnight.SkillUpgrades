@@ -7,9 +7,27 @@ using UnityEngine;
 
 namespace SkillUpgrades.Skills
 {
-    internal static class TripleJump
+    internal class TripleJump : AbstractSkillUpgrade
     {
-        private static bool tripleJumpEnabled => SkillUpgrades.globalSettings.GlobalToggle == true && SkillUpgrades.globalSettings.TripleJumpEnabled == true;
+        [SerializeToSetting]
+        public static int DoubleJumpMax = 2;
+
+        public override string Name => "Multiple Wings";
+        public override string Description => "Toggle whether wings can be used more than once before landing.";
+
+
+        public override void Initialize()
+        {
+            doubleJumpCount = 0;
+            AddRefreshHooks();
+            On.HeroController.DoDoubleJump += AllowTripleJump;
+        }
+        public override void Unload()
+        {
+            RemoveRefreshHooks();
+            On.HeroController.DoDoubleJump -= AllowTripleJump;
+        }
+
 
         private static int doubleJumpCount;
         internal static void RefreshDoubleJump()
@@ -17,25 +35,8 @@ namespace SkillUpgrades.Skills
             doubleJumpCount = 0;
         }
 
-        internal static void Hook()
-        {
-            AddRefreshHooks();
-            On.HeroController.DoDoubleJump += AllowTripleJump;
-        }
-        internal static void UnHook()
-        {
-            RemoveRefreshHooks();
-            On.HeroController.DoDoubleJump -= AllowTripleJump;
-        }
-
         private static void AllowTripleJump(On.HeroController.orig_DoDoubleJump orig, HeroController self)
         {
-            if (!tripleJumpEnabled)
-            {
-                orig(self);
-                return;
-            }
-
             // If the player has double jumped, deactivate the wings prefabs so they can reactivate
             if (doubleJumpCount > 0)
             {
@@ -46,7 +47,7 @@ namespace SkillUpgrades.Skills
             orig(self);
             doubleJumpCount++;
 
-            if (doubleJumpCount < SkillUpgrades.globalSettings.DoubleJumpMax || SkillUpgrades.globalSettings.DoubleJumpMax == -1)
+            if (doubleJumpCount < DoubleJumpMax || DoubleJumpMax == -1)
             {
                 GameManager.instance.StartCoroutine(RefreshWingsInAir());
             }
