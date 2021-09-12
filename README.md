@@ -2,31 +2,21 @@
 
 Mod that upgrades some skills. Includes:
 
-#### Multiple Air Dash: Dash more than once before landing.
-Manually set the value in the global settings file to the number of times you can dash before landing, or -1 for infinite.
+- Multiple Air Dash: Dash more than once before landing.
+- Directional Dash: Dash in the 8 cardinal directions.
+- Wall Climb: Climb walls without having to jump. Hold up or down to move vertically while wall-clinging.
+- Multiple Wings: Use wings more than once in the air.
+- Vertical Cdash: Cdash vertically and diagonally. Hold up when releasing a ground cdash charge to cdash upwards, hold up and forward (or just up from a wall) to cdash diagonal.
+- Downward Fireball: Shoot fireballs downward. Hold no direction when casting to send a fireball downwards (or hold left/right to shoot normally).
+- Horizontal Dive: Dive to the left or right. Hold left or right as well as down when casting to dive horizontally. This can lead to the player clipping out of bounds, so be careful.
+- Spiral Scream: Scream in a circle around the knight. Hold left or right as well as up when casting to cause the wraiths/shriek to sweep a circle around the knight.
 
-#### Directional Dash: Dash in the 8 cardinal directions.
-Two options can be toggled in the global settings. 
-- By default, the knight maintains its vertical momentum out of an upward/diagonal dash - this behaviour can be disabled (so the knight will stop completely, much like a horizontal dash)
-- By default, the knight can dash in all 8 directions - the ability to dash down-diagonally can be disabled (down-diagonal dashes will be replaced with horizontal dashes).
+Also includes a global toggle - if this is off, all upgrades will be disabled. Each upgrade, as well as the global toggle, can be toggled individually from the mod menu. The use case for this would be disabling the mod temporarily without losing the skills' individual settings (this is equivalent to toggling the mod off, though for technical reasons having a proper toggle button would be impossible).
 
-#### Wall Climb: Climb walls without having to jump
-The knight will stick to walls instead of sliding down; hold up or down to climb.
-- The knight's climb speed can be adjusted in the global settings.
-
-#### Multiple Wings: Use wings more than once in the air.
-Manually set the value in the global settings file to the number of times you can double jump before landing, or -1 for infinite.
-
-#### Vertical Cdash: Cdash vertically and diagonally.
-Hold up when releasing from a ground charge to cdash upwards. Hold up as well as the direction you're facing (ground or wall) to cdash diagonally - this option can be disabled in the global settings file. Non-horizontal Cdash does not persist through transitions.
-
-#### Downward Fireball: Shoot fireballs downward
-Holding no direction while casting will cause the fireball to go downward (and the knight's recoil will be upward); hold left or right to shoot fireballs normally.
-
-#### Horizontal Dive: Dive to the left or right.
-Hold a direction as well as down to dive to the left or right. Non-downward dive does not persist through transitions.
-
-#### Spiral Scream: Scream in a circle around the knight
-Hold a direction as well as up to make Howling Wraiths or Abyss Shriek sweep a circle around the knight, instead of staying above the knight.
-
-Also includes a global toggle - if this is off, all upgrades will be disabled. Each upgrade can be toggled individually from the mod menu, although any upgrade-specific preferences will need to be modified directly in the global settings file.
+## Global settings
+Manually editing the global settings file (while the game is closed) can let the player tweak some of the properties of the skill upgrades. These options include:
+- AllowDownDiagonalDashes: if this is set to false, dashing down-diagonally is banned, and the player will dash in the direction they would if they had dashmaster on (so left/right usually, or down if down is held but neither left nor right)
+- MaintainVerticalDashMomentum: By default, the knight will continue moving vertically after an upward or up-diagonal dash ends (slowed down by gravity); this behaviour can be disabled, to match how the knight stops moving horizontally with no left/right input after a regular dash
+- DiagonalSuperdash: If this is disabled, the knight will only be able to cdash upward or horizontally (no diagonal).
+- ClimbSpeed: The default climb speed is 5.0, but this can be modified.
+- AirDashMax, DoubleJumpMax: The number of times the knight can air dash or double jump can be changed - setting this value to -1 will cause it to be treated as infinite.
