@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Modding;
 using SkillUpgrades.Skills;
+using SkillUpgrades.Util;
 
 namespace SkillUpgrades
 {
@@ -51,6 +52,7 @@ namespace SkillUpgrades
 
             }
 
+            if (_skills.Values.Any(skill => skill.InvolvesHeroRotation)) HeroRotation.Hook();
         }
 
         #region Menu

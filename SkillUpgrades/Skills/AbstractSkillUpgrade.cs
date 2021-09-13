@@ -22,6 +22,8 @@ namespace SkillUpgrades.Skills
         public abstract string Description { get; }
 
 
+        public virtual bool InvolvesHeroRotation => false;
+
         public bool IsUnloadable => GetType().GetMethod(nameof(AbstractSkillUpgrade.Unload))?.DeclaringType != typeof(AbstractSkillUpgrade);
 
         public bool skillUpgradeActive = true;

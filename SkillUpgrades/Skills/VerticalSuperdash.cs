@@ -18,6 +18,7 @@ namespace SkillUpgrades.Skills
         public override string Name => "Vertical Cdash";
         public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";
 
+        public override bool InvolvesHeroRotation => true;
 
         public override void Initialize()
         {
@@ -47,22 +48,11 @@ namespace SkillUpgrades.Skills
                 {
                     HeroController.instance.RotateHero(-90);
                 }
-                else if (value == SuperdashDirection.Normal && _superdashState == SuperdashDirection.Upward)
-                {
-                    // We need to set the SD Burst inactive before un-rotating the hero,
-                    // so it doesn't rotate with it
-                    if (GameObject.Find("SD Burst") is GameObject burst)
-                    {
-                        burst.transform.parent = HeroController.instance.gameObject.transform;
-                        burst.SetActive(false);
-                    }
-                    HeroController.instance.RotateHero(90);
-                }
                 else if (value == SuperdashDirection.Diagonal && _superdashState == SuperdashDirection.Normal)
                 {
                     HeroController.instance.RotateHero(-45);
                 }
-                else if (value == SuperdashDirection.Normal && _superdashState == SuperdashDirection.Diagonal)
+                else if (value == SuperdashDirection.Normal)
                 {
                     // We need to set the SD Burst inactive before un-rotating the hero,
                     // so it doesn't rotate with it
@@ -71,7 +61,7 @@ namespace SkillUpgrades.Skills
                         burst.transform.parent = HeroController.instance.gameObject.transform;
                         burst.SetActive(false);
                     }
-                    HeroController.instance.RotateHero(45);
+                    HeroRotation.ResetHero();
                 }
 
                 _superdashState = value;

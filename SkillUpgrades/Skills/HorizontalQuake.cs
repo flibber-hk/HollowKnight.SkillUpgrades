@@ -16,6 +16,8 @@ namespace SkillUpgrades.Skills
         public override string Name => "Horizontal Dive";
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
 
+        public override bool InvolvesHeroRotation => true;
+
         public override void Initialize()
         {
             On.HeroController.EnterScene += DisableHorizontalQuakeEntry;
@@ -43,11 +45,11 @@ namespace SkillUpgrades.Skills
                 }
                 else if (_quakeState == QuakeDirection.Leftward && value == QuakeDirection.Normal)
                 {
-                    HeroController.instance.RotateHero(90, respectDirection: false);
+                    HeroRotation.ResetHero();
                 }
                 else if (_quakeState == QuakeDirection.Rightward && value == QuakeDirection.Normal)
                 {
-                    HeroController.instance.RotateHero(-90, respectDirection: false);
+                    HeroRotation.ResetHero();
                 }
                 _quakeState = value;
             }
@@ -108,14 +110,15 @@ namespace SkillUpgrades.Skills
                 }
                 switch (QuakeState)
                 {
+                    // Very small Quake Antic Speed to move off the ground, so we don't stop quaking when hitting a seam
                     case QuakeDirection.Rightward:
-                        fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0f;
+                        fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0.1f;
                         vSpeed.Value = 0f;
                         hSpeed.Value = 50f;
                         break;
 
                     case QuakeDirection.Leftward:
-                        fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0f;
+                        fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0.1f;
                         vSpeed.Value = 0f;
                         hSpeed.Value = -50f;
                         break;
