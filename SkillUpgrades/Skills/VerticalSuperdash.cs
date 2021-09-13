@@ -28,69 +28,32 @@ namespace SkillUpgrades.Skills
             On.HeroController.Start += ModifySuperdashFsm;
         }
 
+        /// <summary>
+        /// The angle the knight is superdashing, measured anticlockwise when the knight is facing left and clockwise when facing right
+        /// </summary>
+        internal float SuperdashAngle { get; set; } = 0f;
 
-        internal enum SuperdashDirection
+        internal void ResetSuperdashAngle()
         {
-            Normal = 0,     // Anything not caused by this mod
-            Upward,
-            Diagonal
-        }
-
-        private static SuperdashDirection _queuedSuperdashState = SuperdashDirection.Normal;
-        private static SuperdashDirection _superdashState = SuperdashDirection.Normal;
-        internal static SuperdashDirection SuperdashState
-        {
-            get => _superdashState;
-
-            set
+            if (GameObject.Find("SD Burst") is GameObject burst)
             {
-                if (value == SuperdashDirection.Upward && _superdashState == SuperdashDirection.Normal)
-                {
-                    HeroController.instance.RotateHero(-90);
-                }
-                else if (value == SuperdashDirection.Diagonal && _superdashState == SuperdashDirection.Normal)
-                {
-                    HeroController.instance.RotateHero(-45);
-                }
-                else if (value == SuperdashDirection.Normal)
-                {
-                    // We need to set the SD Burst inactive before un-rotating the hero,
-                    // so it doesn't rotate with it
-                    if (GameObject.Find("SD Burst") is GameObject burst)
-                    {
-                        burst.transform.parent = HeroController.instance.gameObject.transform;
-                        burst.SetActive(false);
-                    }
-                    HeroRotation.ResetHero();
-                }
-
-                _superdashState = value;
-                _queuedSuperdashState = SuperdashDirection.Normal;
+                burst.transform.parent = HeroController.instance.gameObject.transform;
+                burst.SetActive(false);
             }
+
+            SuperdashAngle = 0f;
+            HeroRotation.ResetHero();
         }
-
-
 
 
         private void FixVerticalCamera(On.CameraTarget.orig_Update orig, CameraTarget self)
         {
             orig(self);
+            if (self.hero_ctrl == null || !GameManager.instance.IsGameplayScene()) return;
+            if (!self.superDashing) return;
 
-            if (self.hero_ctrl != null && GameManager.instance.IsGameplayScene())
-            {
-                if (!self.superDashing) return;
-                
-                if (SuperdashState == SuperdashDirection.Upward)     // if vertical cdash
-                {
-                    self.cameraCtrl.lookOffset += Math.Abs(self.dashOffset);
-                    self.dashOffset = 0;
-                }
-                else if (SuperdashState == SuperdashDirection.Diagonal)
-                {
-                    self.cameraCtrl.lookOffset += Math.Abs(self.dashOffset) * ((float)Math.Sqrt(2) / 2f);
-                    self.dashOffset *= (float)Math.Sqrt(2) / 2f;
-                }
-            }
+            self.cameraCtrl.lookOffset += Math.Abs(self.dashOffset) * Mathf.Sin(SuperdashAngle * Mathf.PI / 180);
+            self.dashOffset *= Mathf.Cos(SuperdashAngle * Mathf.PI / 180);
         }
         // Deactivate upward oneway transitions after spawning in so the player doesn't accidentally
         // softlock by vc-ing into them
@@ -109,7 +72,7 @@ namespace SkillUpgrades.Skills
         }
         private void ResetSuperdashState(Scene arg0, Scene arg1)
         {
-            SuperdashState = SuperdashDirection.Normal;
+            ResetSuperdashAngle();
         }
 
         private void ModifySuperdashFsm(On.HeroController.orig_Start orig, HeroController self)
@@ -152,29 +115,36 @@ namespace SkillUpgrades.Skills
 
                 if (shouldDiagonal)
                 {
-                    _queuedSuperdashState = SuperdashDirection.Diagonal;
+                    SuperdashAngle = -45;
                 }
                 else if (shouldVertical)
                 {
-                    _queuedSuperdashState = SuperdashDirection.Upward;
+                    SuperdashAngle = -90;
                 }
             }));
 
             fsm.GetState("Direction Wall").AddFirstAction(new ExecuteLambda(() =>
             {
-                if (DiagonalSuperdash && skillUpgradeActive && GameManager.instance.inputHandler.inputActions.up.IsPressed)
+                if (DiagonalSuperdash && skillUpgradeActive)
                 {
-                    _queuedSuperdashState = SuperdashDirection.Diagonal;
+                    if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
+                    {
+                        SuperdashAngle = -45;
+                    }
+                    else if (GameManager.instance.inputHandler.inputActions.down.IsPressed)
+                    {
+                        SuperdashAngle = 45;
+                    }
                 }
             }));
 
             fsm.GetState("Left").AddAction(new ExecuteLambda(() =>
             {
-                SuperdashState = _queuedSuperdashState;
+                HeroController.instance.RotateHero(SuperdashAngle);
             })); 
             fsm.GetState("Right").AddAction(new ExecuteLambda(() =>
             {
-                SuperdashState = _queuedSuperdashState;
+                HeroController.instance.RotateHero(SuperdashAngle);
             }));
             #endregion
 
@@ -183,23 +153,9 @@ namespace SkillUpgrades.Skills
             ExecuteLambda setVelocityVariables = new ExecuteLambda(() =>
             {
                 float velComponent = Math.Abs(fsm.FsmVariables.GetFsmFloat("Current SD Speed").Value);
-                switch (SuperdashState)
-                {
-                    case SuperdashDirection.Diagonal:
-                        velComponent *= (float)(Math.Sqrt(2) / 2f);
-                        vSpeed.Value = velComponent;
-                        hSpeed.Value = velComponent * (HeroController.instance.cState.facingRight ? 1 : -1);
-                        break;
-                    case SuperdashDirection.Upward:
-                        vSpeed.Value = velComponent;
-                        hSpeed.Value = 0f;
-                        break;
-                    default:
-                    case SuperdashDirection.Normal:
-                        vSpeed.Value = 0f;
-                        hSpeed.Value = velComponent * (HeroController.instance.cState.facingRight ? 1 : -1);
-                        break;
-                }
+
+                vSpeed.Value = velComponent * (-1) * Mathf.Sin(SuperdashAngle * Mathf.PI / 180);
+                hSpeed.Value = velComponent * Mathf.Cos(SuperdashAngle * Mathf.PI / 180) * (HeroController.instance.cState.facingRight ? 1 : -1);
             });
 
             SetVelocity2d setVel = dashing.GetActionOfType<SetVelocity2d>();
@@ -236,15 +192,15 @@ namespace SkillUpgrades.Skills
             #region Reset Vertical Charge variable
             fsm.GetState("Air Cancel").AddFirstAction(new ExecuteLambda(() =>
             {
-                SuperdashState = SuperdashDirection.Normal;
+                ResetSuperdashAngle();
             }));
             fsm.GetState("Cancel").AddFirstAction(new ExecuteLambda(() =>
             {
-                SuperdashState = SuperdashDirection.Normal;
+                ResetSuperdashAngle();
             }));
             fsm.GetState("Hit Wall").AddFirstAction(new ExecuteLambda(() =>
             {
-                SuperdashState = SuperdashDirection.Normal;
+                ResetSuperdashAngle();
             }));
             #endregion
         }
