@@ -1,17 +1,19 @@
 # HollowKnight.SkillUpgrades
 
-Mod that upgrades some skills. Includes:
+Mod that adds toggleable upgrades and tweaks to some of the Knight's skills.
 
-- Multiple Air Dash: Dash more than once before landing.
-- Directional Dash: Dash in the 8 cardinal directions.
-- Wall Climb: Climb walls without having to jump. Hold up or down to move vertically while wall-clinging.
-- Multiple Wings: Use wings more than once in the air.
-- Vertical Cdash: Cdash vertically and diagonally. Hold up when releasing a ground cdash charge to cdash upwards, hold up and forward (or just up from a wall) to cdash diagonal.
-- Downward Fireball: Shoot fireballs downward. Hold no direction when casting to send a fireball downwards (or hold left/right to shoot normally).
-- Horizontal Dive: Dive to the left or right. Hold left or right as well as down when casting to dive horizontally. This can lead to the player clipping out of bounds, so be careful.
-- Spiral Scream: Scream in a circle around the knight. Hold left or right as well as up when casting to cause the wraiths/shriek to sweep a circle around the knight.
+Includes the following:
 
-Also includes a global toggle - if this is off, all upgrades will be disabled. Each upgrade, as well as the global toggle, can be toggled individually from the mod menu. The use case for this would be disabling the mod temporarily without losing the skills' individual settings (this is equivalent to toggling the mod off, though for technical reasons having a proper toggle button would be impossible).
+- **Multiple Air Dash**: Dash more than once before landing.
+- **Directional Dash**: Dash in the 8 cardinal directions.
+- **Wall Climb**: Climb walls without having to jump. Hold up or down to move vertically while wall-clinging.
+- **Multiple Wings**: Use wings more than once in the air.
+- **Vertical Cdash**: Cdash vertically and diagonally. Hold up when releasing a ground cdash charge to cdash upwards, hold up and forward (or just up from a wall) to cdash diagonal.
+- **Downward Fireball**: Shoot fireballs downward. Hold no direction when casting to send a fireball downwards (or hold left/right to shoot normally).
+- **Horizontal Dive**: Dive to the left or right. Hold left or right as well as down when casting to dive horizontally. This can lead to the player clipping out of bounds, so be careful.
+- **Spiral Scream**: Scream in a circle around the knight. Hold left or right as well as up when casting to cause the wraiths/shriek to sweep a circle around the knight.
+
+Also includes a global toggle - if this is off, all upgrades will be disabled. Each upgrade, as well as the global toggle, can be toggled individually from the mod menu. 
 
 ## Global settings
 Manually editing the global settings file (while the game is closed) can let the player tweak some of the properties of the skill upgrades. These options include:
@@ -21,4 +23,4 @@ Manually editing the global settings file (while the game is closed) can let the
 - ClimbSpeed: The default climb speed is 5.0, but this can be modified.
 - AirDashMax, DoubleJumpMax: The number of times the knight can air dash or double jump can be changed - setting this value to -1 will cause it to be treated as infinite.
 
-Some of the skills may conflict with other mods; if their value in the EnabledModules dictionary is set to null, the skill will simply not be loaded (and not be toggleable in-game). 
+Some of the skill upgrades require substantial changes to some of the knight's components to function, and these changes can't easily be reversed. In order not to conflict with other mods, it is possible to prevent those upgrades from loading entirely by setting the value in the EnabledModules section of the global settings to `null`. Any skill upgrade disabled in this way will not be able to be toggled in-game.
