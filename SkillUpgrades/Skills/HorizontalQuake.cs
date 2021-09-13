@@ -26,43 +26,15 @@ namespace SkillUpgrades.Skills
             On.HeroController.Start += ModifyQuakeFSM;
         }
 
-        private static QuakeDirection _quakeState;
-
-        internal static QuakeDirection QuakeState
+        /// <summary>
+        /// The angle the knight is diving, measured anticlockwise (regardless of facing direction)
+        /// </summary>
+        internal float QuakeAngle { get; set; } = 0f;
+        internal void ResetQuakeAngle()
         {
-            get => _quakeState;
-
-            set
-            {
-                // The knight might not be facing in the direction it dives
-                if (_quakeState == QuakeDirection.Normal && value == QuakeDirection.Leftward)
-                {
-                    HeroController.instance.RotateHero(-90, respectDirection: false);
-                }
-                else if (_quakeState == QuakeDirection.Normal && value == QuakeDirection.Rightward)
-                {
-                    HeroController.instance.RotateHero(90, respectDirection: false);
-                }
-                else if (_quakeState == QuakeDirection.Leftward && value == QuakeDirection.Normal)
-                {
-                    HeroRotation.ResetHero();
-                }
-                else if (_quakeState == QuakeDirection.Rightward && value == QuakeDirection.Normal)
-                {
-                    HeroRotation.ResetHero();
-                }
-                _quakeState = value;
-            }
+            QuakeAngle = 0f;
+            HeroRotation.ResetHero();
         }
-
-        internal enum QuakeDirection
-        {
-            Normal = 0,
-            Leftward,
-            Rightward
-        }
-
-
 
         private IEnumerator DisableHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
@@ -77,7 +49,7 @@ namespace SkillUpgrades.Skills
 
         private void ResetQuakeState(Scene arg0, Scene arg1)
         {
-            QuakeState = QuakeDirection.Normal;
+            ResetQuakeAngle();
         }
 
         private void ModifyQuakeFSM(On.HeroController.orig_Start orig, HeroController self)
@@ -88,11 +60,11 @@ namespace SkillUpgrades.Skills
 
             fsm.GetState("Quake Finish").AddFirstAction(new ExecuteLambda(() =>
             {
-                QuakeState = QuakeDirection.Normal;
+                ResetQuakeAngle();
             }));
             fsm.GetState("Reset Cam Zoom").AddFirstAction(new ExecuteLambda(() =>
             {
-                QuakeState = QuakeDirection.Normal;
+                ResetQuakeAngle();
             }));
 
             #region Add FSM Variables
@@ -105,29 +77,20 @@ namespace SkillUpgrades.Skills
             {
                 if (skillUpgradeActive)
                 {
-                    if (InputHandler.Instance.inputActions.right.IsPressed) QuakeState = QuakeDirection.Rightward;
-                    else if (InputHandler.Instance.inputActions.left.IsPressed) QuakeState = QuakeDirection.Leftward;
+                    if (InputHandler.Instance.inputActions.right.IsPressed) QuakeAngle = 90;
+                    else if (InputHandler.Instance.inputActions.left.IsPressed) QuakeAngle = -90;
+                    HeroController.instance.RotateHero(QuakeAngle, respectFacingDirection: false);
                 }
-                switch (QuakeState)
+
+                float quakeAnticSpeed = fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value;
+                if (QuakeAngle != 0f && quakeAnticSpeed != 0f)
                 {
                     // Very small Quake Antic Speed to move off the ground, so we don't stop quaking when hitting a seam
-                    case QuakeDirection.Rightward:
-                        fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0.1f;
-                        vSpeed.Value = 0f;
-                        hSpeed.Value = 50f;
-                        break;
-
-                    case QuakeDirection.Leftward:
-                        fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = 0.1f;
-                        vSpeed.Value = 0f;
-                        hSpeed.Value = -50f;
-                        break;
-
-                    case QuakeDirection.Normal:
-                        vSpeed.Value = -50f;
-                        hSpeed.Value = 0f;
-                        break;
+                    fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = Math.Max(0.1f, quakeAnticSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180));
                 }
+
+                vSpeed.Value = -50f * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
+                hSpeed.Value = 50f * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
             }));
             #endregion
 

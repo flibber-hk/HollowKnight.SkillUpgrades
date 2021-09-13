@@ -10,15 +10,6 @@ namespace SkillUpgrades.Util
 {
     internal static class HeroRotation
     {
-        private static BoxCollider2D _heroBoxCollider;
-        public static BoxCollider2D HeroBoxCollider
-        {
-            get
-            {
-                if (_heroBoxCollider == null) _heroBoxCollider = HeroController.instance.GetComponent<BoxCollider2D>();
-                return _heroBoxCollider;
-            }
-        }
         public static void Hook()
         {
             On.HeroController.SetupGameRefs += CreatePolygonColliderForHero;
@@ -65,14 +56,14 @@ namespace SkillUpgrades.Util
         /// </summary>
         /// <param name="hero">HeroController.instance</param>
         /// <param name="angle">Angle to rotate</param>
-        /// <param name="respectDirection">If true, instead rotate clockwise when the hero is facing right</param>
-        public static void RotateHero(this HeroController hero, float angle, bool respectDirection = true)
+        /// <param name="respectFacingDirection">If true, instead rotate clockwise when the hero is facing right</param>
+        public static void RotateHero(this HeroController hero, float angle, bool respectFacingDirection = true)
         {
             Transform t = hero.wallPuffPrefab.transform.parent;
             hero.wallPuffPrefab.transform.parent = null;
 
             Vector2[] colliderBounds = HeroCollider.GetPath(0);
-            float rotation = angle * (respectDirection ? hero.transform.localScale.x : 1);
+            float rotation = angle * (respectFacingDirection ? hero.transform.localScale.x : 1);
             hero.transform.Rotate(0, 0, rotation);
             HeroCollider.SetPath(0, ApplyRotationToPoints(colliderBounds, -rotation * hero.transform.localScale.x));
 
