@@ -15,6 +15,9 @@ namespace SkillUpgrades.Skills
         [SerializeToSetting]
         public static bool DiagonalSuperdash = true;
 
+        [SerializeToSetting]
+        public static bool BreakDiveFloorsFromBelow = false;
+
         public override string Name => "Vertical Cdash";
         public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";
 
@@ -43,6 +46,7 @@ namespace SkillUpgrades.Skills
 
             SuperdashAngle = 0f;
             HeroRotation.ResetHero();
+            if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL END");
         }
 
 
@@ -141,10 +145,12 @@ namespace SkillUpgrades.Skills
             fsm.GetState("Left").AddAction(new ExecuteLambda(() =>
             {
                 HeroController.instance.RotateHero(SuperdashAngle);
+                if (BreakDiveFloorsFromBelow && SuperdashAngle <= -30) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
             })); 
             fsm.GetState("Right").AddAction(new ExecuteLambda(() =>
             {
                 HeroController.instance.RotateHero(SuperdashAngle);
+                if (BreakDiveFloorsFromBelow && SuperdashAngle <= -30) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
             }));
             #endregion
 
