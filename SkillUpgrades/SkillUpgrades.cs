@@ -40,6 +40,8 @@ namespace SkillUpgrades
                 {
                     _skills[skill.Name] = skill;
 
+                    Logger.Log($"[SkillUpgrades]:[{skill.Name}] - Loading skill upgrade");
+
                     skill.Initialize();
                     skill.skillUpgradeActive = true;
 
@@ -53,6 +55,8 @@ namespace SkillUpgrades
             }
 
             if (_skills.Values.Any(skill => skill.InvolvesHeroRotation)) HeroRotation.Hook();
+
+            Log("Initialization done!");
         }
 
         #region Menu
@@ -103,7 +107,7 @@ namespace SkillUpgrades
                     if (globalSettings.EnabledSkills[kvp.Key] == true)
                     {
                         AbstractSkillUpgrade skill = kvp.Value;
-                        if (skill.IsUnloadable) skill.Initialize();
+                        skill.ReInitialize();
                         skill.skillUpgradeActive = true;
                     }
                 }
@@ -129,7 +133,7 @@ namespace SkillUpgrades
             AbstractSkillUpgrade skill = _skills[name];
             if (enable && globalSettings.GlobalToggle)
             {
-                if (skill.IsUnloadable) skill.Initialize();
+                skill.ReInitialize();
                 skill.skillUpgradeActive = true;
             }
             else

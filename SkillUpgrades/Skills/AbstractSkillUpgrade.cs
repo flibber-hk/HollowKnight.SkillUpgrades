@@ -25,6 +25,10 @@ namespace SkillUpgrades.Skills
         public virtual bool InvolvesHeroRotation => false;
 
         public bool IsUnloadable => GetType().GetMethod(nameof(AbstractSkillUpgrade.Unload))?.DeclaringType != typeof(AbstractSkillUpgrade);
+        /// <summary>
+        /// Initialize the skill upgrade if it was properly unloaded earlier
+        /// </summary>
+        public void ReInitialize() { if (IsUnloadable) Initialize(); }
 
         public bool skillUpgradeActive = true;
     }
