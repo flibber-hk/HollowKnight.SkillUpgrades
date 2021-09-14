@@ -59,7 +59,7 @@ namespace SkillUpgrades.Util
             bool shouldStop = false;
 
             // Check Collision Side
-            // The code for this is quite complicated so I'll just do some cursed 
+            // The code for this is quite complicated so I'll just do some cursed modification of the CheckCollisionSide action
 
             // GetVelocity
             Vector2 vector = rigidbody2d.velocity;

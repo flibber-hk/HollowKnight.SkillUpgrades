@@ -102,24 +102,28 @@ namespace SkillUpgrades.Skills
                     CheckCollisionSide ccs = s.GetActionOfType<CheckCollisionSide>();
                     FsmEvent heroLanded = FsmEvent.GetFsmEvent("HERO LANDED");
 
-
                     if (hSpeed.Value < -0.4f)
                     {
                         ccs.leftHitEvent = heroLanded;
-                        ccs.bottomHitEvent = null;
                         ccs.rightHitEvent = null;
                     }
                     else if (hSpeed.Value > 0.4f)
                     {
                         ccs.leftHitEvent = null;
-                        ccs.bottomHitEvent = null;
                         ccs.rightHitEvent = heroLanded;
                     }
                     else
                     {
                         ccs.leftHitEvent = null;
-                        ccs.bottomHitEvent = heroLanded;
                         ccs.rightHitEvent = null;
+                    }
+                    if (vSpeed.Value > 0.4f)
+                    {
+                        ccs.bottomHitEvent = heroLanded;
+                    }
+                    else
+                    {
+                        ccs.bottomHitEvent = null;
                     }
                 });
 
