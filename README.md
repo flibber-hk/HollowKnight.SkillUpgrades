@@ -8,7 +8,7 @@ Includes the following:
 - **Directional Dash**: Dash in the 8 cardinal directions.
 - **Wall Climb**: Climb walls without having to jump. Hold up or down to move vertically while wall-clinging.
 - **Multiple Wings**: Use wings more than once in the air.
-- **Vertical Cdash**: Cdash vertically and diagonally. Hold up when releasing a ground cdash charge to cdash upwards, hold up and forward (or just up from a wall) to cdash diagonal.
+- **Vertical Cdash**: Cdash vertically and diagonally. Hold up when releasing a ground cdash charge to cdash upwards, hold up and forward to cdash diagonal. Hold up or down when releasing a wall cdash charge to cdash diagonally up or down.
 - **Downward Fireball**: Shoot fireballs downward. Hold no direction when casting to send a fireball downwards (or hold left/right to shoot normally).
 - **Horizontal Dive**: Dive to the left or right. Hold left or right as well as down when casting to dive horizontally. This can lead to the player clipping out of bounds, so be careful.
 - **Spiral Scream**: Scream in a circle around the knight. Hold left or right as well as up when casting to cause the wraiths/shriek to sweep a circle around the knight.
