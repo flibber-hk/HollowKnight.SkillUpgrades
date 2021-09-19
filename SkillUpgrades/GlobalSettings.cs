@@ -8,7 +8,7 @@ using Modding;
 
 namespace SkillUpgrades
 {
-     [Serializable]
+    [Serializable]
     public class GlobalSettings
     {
         private readonly Assembly _asm = Assembly.GetAssembly(typeof(GlobalSettings));

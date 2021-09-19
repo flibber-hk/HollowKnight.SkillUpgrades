@@ -9,7 +9,7 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades
 {
-    public class SkillUpgrades : Mod, IGlobalSettings<GlobalSettings>, IMenuMod
+    public class SkillUpgrades : Mod, IGlobalSettings<GlobalSettings>, ILocalSettings<LocalSettings>, IMenuMod
     {
         internal static SkillUpgrades instance;
         private static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new Dictionary<string, AbstractSkillUpgrade>();
@@ -18,6 +18,23 @@ namespace SkillUpgrades
         public static GlobalSettings globalSettings { get; set; } = new GlobalSettings();
         public void OnLoadGlobal(GlobalSettings s) => globalSettings = s;
         public GlobalSettings OnSaveGlobal() => globalSettings;
+        #endregion
+
+        #region Local Settings
+        public static LocalSettings localSettings { get; set; } = new LocalSettings();
+        public void OnLoadLocal(LocalSettings s)
+        {
+            localSettings = s;
+            foreach (string skill in _skills.Keys)
+            {
+                if (!localSettings.EnabledSkills.ContainsKey(skill))
+                {
+                    localSettings.EnabledSkills[skill] = null;
+                }
+                UpdateSkillState(skill);
+            }
+        }
+        public LocalSettings OnSaveLocal() => localSettings;
         #endregion
 
         public override void Initialize()
@@ -35,6 +52,11 @@ namespace SkillUpgrades
                     globalSettings.EnabledSkills[skill.Name] = enabled;
                 }
                 
+                if (enabled == null && skill.IsUnloadable)
+                {
+                    enabled = false;
+                    globalSettings.EnabledSkills[skill.Name] = enabled;
+                }
 
                 if (enabled != null)
                 {
@@ -96,58 +118,48 @@ namespace SkillUpgrades
         public bool ToggleButtonInsideMenu => false;
         #endregion
 
-        internal static void ApplyGlobalToggle(bool enable)
+        internal static void UpdateSkillState(string name)
         {
-            if (enable == globalSettings.GlobalToggle) return;
-
-            if (enable)
+            if (!_skills.TryGetValue(name, out AbstractSkillUpgrade skill))
             {
-                foreach (var kvp in _skills)
-                {
-                    if (globalSettings.EnabledSkills[kvp.Key] == true)
-                    {
-                        AbstractSkillUpgrade skill = kvp.Value;
-                        skill.ReInitialize();
-                        skill.skillUpgradeActive = true;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var kvp in _skills)
-                {
-                    kvp.Value.skillUpgradeActive = false;
-                    kvp.Value.Unload();
-                }    
+                instance.LogError($"UpdateSkillState: skill not found: {name}");
+                return;
             }
 
-            globalSettings.GlobalToggle = enable;
-        }
+            bool shouldEnable = localSettings?.EnabledSkills[name]
+                ?? globalSettings.EnabledSkills[name] ?? false;
+            shouldEnable &= globalSettings.GlobalToggle;
 
-        internal static void Toggle(string name, bool enable)
-        {
-            if (globalSettings.EnabledSkills[name] == null) return;
-
-            if (globalSettings.EnabledSkills[name] == enable) return;
-
-            AbstractSkillUpgrade skill = _skills[name];
-            if (enable && globalSettings.GlobalToggle)
+            if (shouldEnable && !skill.skillUpgradeActive)
             {
                 skill.ReInitialize();
                 skill.skillUpgradeActive = true;
             }
-            else
+            else if (!shouldEnable && skill.skillUpgradeActive)
             {
                 skill.skillUpgradeActive = false;
                 skill.Unload();
             }
+        }
+        internal static void ApplyGlobalToggle(bool enable)
+        {
+            globalSettings.GlobalToggle = enable;
 
+            foreach (string name in _skills.Keys)
+            {
+                UpdateSkillState(name);
+            }
+        }
+        internal static void Toggle(string name, bool enable)
+        {
             globalSettings.EnabledSkills[name] = enable;
+
+            UpdateSkillState(name);
         }
 
         public override string GetVersion()
         {
-            return "0.2";
+            return "0.3";
         }
 
         public override int LoadPriority()
