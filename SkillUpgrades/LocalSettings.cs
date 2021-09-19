@@ -9,7 +9,8 @@ namespace SkillUpgrades
     [Serializable]
     public class LocalSettings
     {
-        public Dictionary<string, bool?> EnabledSkills { get; set; } = new Dictionary<string, bool?>();
+        internal Dictionary<string, bool?> EnabledSkills { get; set; } = new Dictionary<string, bool?>();
+        public List<string> AvailableSkills => EnabledSkills.Keys.ToList();
 
         /*
         public Dictionary<string, bool?> Booleans { get; set; } = new Dictionary<string, bool?>();
@@ -32,7 +33,7 @@ namespace SkillUpgrades
         /// <param name="skillName">The Name of the skill to set (note - not the class name)</param>
         /// <param name="set">True or False to enable or disable the skill, null to revert to the global setting.</param>
         /// <returns>True if the skill was loaded, false otherwise.</returns>
-        public bool SetSkill(string skillName, bool set)
+        public bool SetSkill(string skillName, bool? set)
         {
             if (!EnabledSkills.ContainsKey(skillName))
             {
