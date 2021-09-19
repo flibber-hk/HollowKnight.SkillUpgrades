@@ -10,7 +10,7 @@ Includes the following:
 - **Multiple Wings**: Use wings more than once in the air.
 - **Vertical Cdash**: Cdash vertically and diagonally. Hold up when releasing a ground cdash charge to cdash upwards, hold up and forward to cdash diagonal. Hold up or down when releasing a wall cdash charge to cdash diagonally up or down.
 - **Downward Fireball**: Shoot fireballs downward. Hold no direction when casting to send a fireball downwards (or hold left/right to shoot normally).
-- **Horizontal Dive**: Dive to the left or right. Hold left or right as well as down when casting to dive horizontally. This can lead to the player clipping out of bounds, so be careful.
+- **Horizontal Dive**: Dive to the left or right. Hold left or right as well as down when casting to dive horizontally.
 - **Spiral Scream**: Scream in a circle around the knight. Hold left or right as well as up when casting to cause the wraiths/shriek to sweep a circle around the knight.
 
 Also includes a global toggle - if this is off, all upgrades will be disabled. Each upgrade, as well as the global toggle, can be toggled individually from the mod menu. 
@@ -23,4 +23,4 @@ Manually editing the global settings file (while the game is closed) can let the
 - ClimbSpeed: The default climb speed is 5.0, but this can be modified.
 - AirDashMax, DoubleJumpMax: The number of times the knight can air dash or double jump can be changed - setting this value to -1 will cause it to be treated as infinite.
 
-Some of the skill upgrades require substantial changes to some of the knight's components to function, and these changes can't easily be reversed. In order not to conflict with other mods, it is possible to prevent those upgrades from loading entirely by setting the value in the EnabledModules section of the global settings to `null`. Any skill upgrade disabled in this way will not be able to be toggled in-game.
+Some of the skill upgrades require substantial changes to some of the knight's components to function, and these changes can't easily be reversed. In order not to conflict with other mods, it is possible to prevent those upgrades from loading entirely by setting the value in the EnabledModules section of the global settings to `null`. Any such skill upgrade disabled in this way will not be able to be toggled in-game.
