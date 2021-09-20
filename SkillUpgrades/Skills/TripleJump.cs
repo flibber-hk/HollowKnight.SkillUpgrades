@@ -137,7 +137,7 @@ namespace SkillUpgrades.Skills
             (
                 MoveType.After,
                 i => i.MatchLdcI4(0),
-                i => i.MatchStfld<HeroController>("airDashed")
+                i => i.MatchStfld<HeroController>("doubleJumped")
             ))
             {
                 cursor.EmitDelegate<Action>(() => doubleJumpCount = 0);
