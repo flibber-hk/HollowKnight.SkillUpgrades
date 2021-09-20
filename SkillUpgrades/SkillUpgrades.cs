@@ -62,7 +62,7 @@ namespace SkillUpgrades
                 {
                     _skills[skill.Name] = skill;
 
-                    Logger.Log($"[SkillUpgrades]:[{skill.Name}] - Loading skill upgrade");
+                    skill.Log("Loading skill upgrade");
 
                     skill.Initialize();
                     skill.skillUpgradeActive = true;

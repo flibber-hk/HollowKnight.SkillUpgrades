@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Modding;
 
 namespace SkillUpgrades.Skills
 {
-    public abstract class AbstractSkillUpgrade
+    public abstract class AbstractSkillUpgrade : Loggable
     {
         /// <summary>
         /// Initialize the skill upgrade
@@ -31,5 +32,14 @@ namespace SkillUpgrades.Skills
         public void ReInitialize() { if (IsUnloadable) Initialize(); }
 
         public bool skillUpgradeActive = true;
+
+
+        #region Logging
+        // Why must I do it like this :hivescream:
+        protected AbstractSkillUpgrade()
+        {
+            ReflectionHelper.SetField<Loggable, string>(this, "ClassName", $"SkillUpgrades]:[{GetType().Name}");
+        }
+        #endregion
     }
 }
