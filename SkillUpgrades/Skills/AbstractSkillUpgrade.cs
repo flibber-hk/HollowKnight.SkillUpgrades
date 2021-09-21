@@ -35,7 +35,7 @@ namespace SkillUpgrades.Skills
 
 
         #region Logging
-        // Why must I do it like this :hivescream:
+        // It would be nice to be able to inherit from Loggable (or SimpleLogger IG) and be able to set the prefix, but we can't, so here we are
         protected AbstractSkillUpgrade()
         {
             ReflectionHelper.SetField<Loggable, string>(this, "ClassName", $"SkillUpgrades]:[{GetType().Name}");
