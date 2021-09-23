@@ -151,7 +151,8 @@ namespace SkillUpgrades.Skills
                     pos.y -= Time.deltaTime * ClimbSpeed;
                 }
 
-                if (InputHandler.Instance.inputActions.up.IsPressed)
+                // Don't go up if touching ceiling
+                if (InputHandler.Instance.inputActions.up.IsPressed && !HeroCentreNearRoof(0.1f))
                 {
                     pos.y += Time.deltaTime * ClimbSpeed;
                 }
@@ -191,8 +192,32 @@ namespace SkillUpgrades.Skills
                     default:
                         break;
                 }
-
             }
+        }
+
+        private bool HeroCentreNearRoof(float tol)
+        {
+            Vector2 vec = new Vector2(Ref.HeroCollider.bounds.center.x, Ref.HeroCollider.bounds.max.y);
+
+            RaycastHit2D raycastHit2D = Physics2D.Raycast(vec, Vector2.up, tol, 256);
+            return raycastHit2D.collider != null;
+        }
+
+        private bool HeroNearRoof(float tol)
+        {
+            Vector2 vec = new Vector2(Ref.HeroCollider.bounds.min.x, Ref.HeroCollider.bounds.max.y);
+            RaycastHit2D raycastHit2D = Physics2D.Raycast(vec, Vector2.up, tol, 256);
+            if (raycastHit2D.collider != null) return true;
+
+            Vector2 vec2 = new Vector2(Ref.HeroCollider.bounds.center.x, Ref.HeroCollider.bounds.max.y);
+            RaycastHit2D raycastHit2D2 = Physics2D.Raycast(vec2, Vector2.up, tol, 256);
+            if (raycastHit2D2.collider != null) return true;
+
+            Vector2 vec3 = new Vector2(Ref.HeroCollider.bounds.max.x, Ref.HeroCollider.bounds.max.y);
+            RaycastHit2D raycastHit2D3 = Physics2D.Raycast(vec3, Vector2.up, tol, 256);
+            if (raycastHit2D3.collider != null) return true;
+
+            return false;
         }
     }
 }

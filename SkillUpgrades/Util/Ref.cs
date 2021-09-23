@@ -13,5 +13,16 @@ namespace SkillUpgrades.Util
                 return _heroRigidBody;
             }
         }
+
+        private static Collider2D _heroCollider;
+        public static Collider2D HeroCollider
+        {
+            get
+            {
+                if (_heroCollider == null) _heroCollider = HeroController.instance.GetComponent<Collider2D>();
+                return _heroCollider;
+            }
+            internal set => _heroCollider = value;
+        }
     }
 }

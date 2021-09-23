@@ -44,7 +44,8 @@ namespace SkillUpgrades.Util
             // Switch to our new collider
             ReflectionHelper.SetField<HeroController, Collider2D>(self, "col2d", newCol2d);
             HeroCollider = newCol2d;
-            UnityEngine.Object.Destroy(col2d);
+            Ref.HeroCollider = newCol2d;
+            Object.Destroy(col2d);
         }
 
         /// <summary>
