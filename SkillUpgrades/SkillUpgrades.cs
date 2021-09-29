@@ -8,32 +8,15 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades
 {
-    public class SkillUpgrades : Mod, IGlobalSettings<GlobalSettings>, ILocalSettings<LocalSettings>, IMenuMod
+    public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, IMenuMod
     {
         internal static SkillUpgrades instance;
         internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new Dictionary<string, AbstractSkillUpgrade>();
 
         #region Global Settings
-        public static GlobalSettings globalSettings { get; set; } = new GlobalSettings();
-        public void OnLoadGlobal(GlobalSettings s) => globalSettings = s;
-        public GlobalSettings OnSaveGlobal() => globalSettings;
-        #endregion
-
-        #region Local Settings
-        public static LocalSettings localSettings { get; set; } = new LocalSettings();
-        public void OnLoadLocal(LocalSettings s)
-        {
-            localSettings = s;
-            foreach (string skill in _skills.Keys)
-            {
-                if (!localSettings.EnabledSkills.ContainsKey(skill))
-                {
-                    localSettings.EnabledSkills[skill] = null;
-                }
-                UpdateSkillState(skill);
-            }
-        }
-        public LocalSettings OnSaveLocal() => localSettings;
+        public static SkillUpgradeSettings globalSettings { get; set; } = new SkillUpgradeSettings();
+        public void OnLoadGlobal(SkillUpgradeSettings s) => globalSettings = s;
+        public SkillUpgradeSettings OnSaveGlobal() => globalSettings;
         #endregion
 
         public override void Initialize()
@@ -44,7 +27,6 @@ namespace SkillUpgrades
             foreach (Type t in Assembly.GetAssembly(typeof(SkillUpgrades)).GetTypes().Where(x => x.IsSubclassOf(typeof(AbstractSkillUpgrade))))
             {
                 AbstractSkillUpgrade skill = (AbstractSkillUpgrade)Activator.CreateInstance(t);
-                if (!localSettings.EnabledSkills.ContainsKey(skill.Name)) localSettings.EnabledSkills[skill.Name] = null;
 
                 if (!globalSettings.EnabledSkills.TryGetValue(skill.Name, out bool? enabled))
                 {
@@ -126,11 +108,16 @@ namespace SkillUpgrades
                 return;
             }
 
-            if (!localSettings.EnabledSkills.ContainsKey(name)) localSettings.EnabledSkills[name] = null;
-
-            bool shouldEnable = localSettings?.EnabledSkills[name]
-                ?? globalSettings.EnabledSkills[name] ?? false;
-            shouldEnable &= globalSettings.GlobalToggle;
+            bool shouldEnable;
+            if (SettingsOverrides.EnabledSkills.TryGetValue(name, out bool overrideValue))
+            {
+                shouldEnable = overrideValue;
+            }
+            else
+            {
+                shouldEnable = globalSettings.EnabledSkills[name] ?? false;
+                shouldEnable &= globalSettings.GlobalToggle;
+            }
 
             if (shouldEnable && !skill.skillUpgradeActive)
             {

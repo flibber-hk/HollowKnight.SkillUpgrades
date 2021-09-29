@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SkillUpgrades
 {
-    public abstract class SkillUpgradeSettings
+    [Serializable]
+    public class SkillUpgradeSettings
     {
+        public bool GlobalToggle = true;
+
         public Dictionary<string, bool?> EnabledSkills { get; set; } = new Dictionary<string, bool?>();
         public Dictionary<string, bool> Booleans { get; set; } = new Dictionary<string, bool>();
         public Dictionary<string, float> Floats { get; set; } = new Dictionary<string, float>();

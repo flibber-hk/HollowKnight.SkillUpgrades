@@ -1,4 +1,5 @@
-﻿using Modding;
+﻿using System.Runtime.CompilerServices;
+using Modding;
 
 namespace SkillUpgrades.Skills
 {
@@ -29,29 +30,35 @@ namespace SkillUpgrades.Skills
         protected internal bool skillUpgradeActive = true;
 
         #region Adjustable Fields
-        protected bool GetBool(string name, bool @default)
+        protected bool GetBool(bool @default, [CallerMemberName] string name = null)
         {
+            if (name == null) return default;
+
             string key = SkillUpgradeSettings.GetKey(Name, name);
 
-            if (SkillUpgrades.localSettings.Booleans.TryGetValue(key, out bool ret)) return ret;
+            if (SettingsOverrides.Booleans.TryGetValue(key, out bool ret)) return ret;
             else if (SkillUpgrades.globalSettings.Booleans.TryGetValue(key, out ret)) return ret;
 
             SkillUpgrades.globalSettings.Booleans[key] = @default; return @default;
         }
-        protected int GetInt(string name, int @default)
+        protected int GetInt(int @default, [CallerMemberName] string name = null)
         {
+            if (name == null) return default;
+
             string key = SkillUpgradeSettings.GetKey(Name, name);
 
-            if (SkillUpgrades.localSettings.Integers.TryGetValue(key, out int ret)) return ret;
+            if (SettingsOverrides.Integers.TryGetValue(key, out int ret)) return ret;
             else if (SkillUpgrades.globalSettings.Integers.TryGetValue(key, out ret)) return ret;
 
             SkillUpgrades.globalSettings.Integers[key] = @default; return @default;
         }
-        protected float GetFloat(string name, float @default)
+        protected float GetFloat(float @default, [CallerMemberName] string name = null)
         {
+            if (name == null) return default;
+
             string key = SkillUpgradeSettings.GetKey(Name, name);
 
-            if (SkillUpgrades.localSettings.Floats.TryGetValue(key, out float ret)) return ret;
+            if (SettingsOverrides.Floats.TryGetValue(key, out float ret)) return ret;
             else if (SkillUpgrades.globalSettings.Floats.TryGetValue(key, out ret)) return ret;
 
             SkillUpgrades.globalSettings.Floats[key] = @default; return @default;

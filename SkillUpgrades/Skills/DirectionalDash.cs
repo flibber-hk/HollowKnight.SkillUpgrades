@@ -11,8 +11,8 @@ namespace SkillUpgrades.Skills
 {
     internal class DirectionalDash : AbstractSkillUpgrade
     {
-        public bool AllowDownDiagonalDashes => GetBool(nameof(AllowDownDiagonalDashes), true);
-        public bool MaintainVerticalMomentum => GetBool(nameof(MaintainVerticalMomentum), true);
+        public bool AllowDownDiagonalDashes => GetBool(false);
+        public bool MaintainVerticalMomentum => GetBool(true);
 
         public override string Name => "Directional Dash";
         public override string Description => "Toggle whether dash can be used in all 8 directions.";
