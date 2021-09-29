@@ -11,8 +11,7 @@ namespace SkillUpgrades.Skills
 {
     internal class TripleJump : AbstractSkillUpgrade
     {
-        [SerializeToSetting]
-        public static int DoubleJumpMax = 2;
+        public int DoubleJumpMax => GetInt(nameof(DoubleJumpMax), 2);
 
         public override string Name => "Multiple Wings";
         public override string Description => "Toggle whether wings can be used more than once before landing.";

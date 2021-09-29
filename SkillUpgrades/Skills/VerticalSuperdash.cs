@@ -9,11 +9,8 @@ namespace SkillUpgrades.Skills
 {
     internal class VerticalSuperdash : AbstractSkillUpgrade
     {
-        [SerializeToSetting]
-        public static bool DiagonalSuperdash = true;
-
-        [SerializeToSetting]
-        public static bool BreakDiveFloorsFromBelow = false;
+        public bool DiagonalSuperdash => GetBool(nameof(DiagonalSuperdash), true);
+        public bool BreakDiveFloorsFromBelow => GetBool(nameof(BreakDiveFloorsFromBelow), false);
 
         public override string Name => "Vertical Cdash";
         public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";

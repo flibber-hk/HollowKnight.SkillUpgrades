@@ -11,10 +11,8 @@ namespace SkillUpgrades.Skills
 {
     internal class DirectionalDash : AbstractSkillUpgrade
     {
-        [SerializeToSetting]
-        public static bool AllowDownDiagonalDashes = true;
-        [SerializeToSetting]
-        public static bool MaintainVerticalMomentum = true;
+        public bool AllowDownDiagonalDashes => GetBool(nameof(AllowDownDiagonalDashes), true);
+        public bool MaintainVerticalMomentum => GetBool(nameof(MaintainVerticalMomentum), true);
 
         public override string Name => "Directional Dash";
         public override string Description => "Toggle whether dash can be used in all 8 directions.";
@@ -48,7 +46,7 @@ namespace SkillUpgrades.Skills
         }
 
         #region Maintaining vertical momentum out of an upward dash
-        private static void CancelPersistentMomentum(On.HeroController.orig_Update orig, HeroController self)
+        private void CancelPersistentMomentum(On.HeroController.orig_Update orig, HeroController self)
         {
             orig(self);
             if (self.current_velocity.y <= 0f && !self.cState.dashing)
@@ -57,7 +55,7 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        private static void MaintainMomentum(On.HeroController.orig_JumpReleased orig, HeroController self)
+        private void MaintainMomentum(On.HeroController.orig_JumpReleased orig, HeroController self)
         {
             if (Ref.HeroRigidBody.velocity.y > 0 && !self.inAcid && !self.cState.shroomBouncing 
                 && _maintainingVerticalDashMomentum && MaintainVerticalMomentum)
@@ -72,7 +70,7 @@ namespace SkillUpgrades.Skills
         }
         #endregion
 
-        private static bool CalculateDashVector()
+        private bool CalculateDashVector()
         {
             HeroActions ia = InputHandler.Instance.inputActions;
             HeroController hero = HeroController.instance;
@@ -100,7 +98,7 @@ namespace SkillUpgrades.Skills
             return false;
         }
 
-        private static Vector2 OverrideDashVector(Vector2 arg)
+        private Vector2 OverrideDashVector(Vector2 arg)
         {
             HeroController hero = HeroController.instance;
 
@@ -153,7 +151,7 @@ namespace SkillUpgrades.Skills
             return _lastDashVector;
         }
 
-        private static void ModifyPrefabDirection(On.HeroController.orig_HeroDash orig, HeroController self)
+        private void ModifyPrefabDirection(On.HeroController.orig_HeroDash orig, HeroController self)
         {
             orig(self);
 
@@ -169,7 +167,7 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        private static float GetPrefabDirection(DashDirection direction)
+        private float GetPrefabDirection(DashDirection direction)
         {
             bool facingRight = HeroController.instance.cState.facingRight;
 

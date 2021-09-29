@@ -11,7 +11,7 @@ namespace SkillUpgrades
     public class SkillUpgrades : Mod, IGlobalSettings<GlobalSettings>, ILocalSettings<LocalSettings>, IMenuMod
     {
         internal static SkillUpgrades instance;
-        private static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new Dictionary<string, AbstractSkillUpgrade>();
+        internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new Dictionary<string, AbstractSkillUpgrade>();
 
         #region Global Settings
         public static GlobalSettings globalSettings { get; set; } = new GlobalSettings();
@@ -44,13 +44,14 @@ namespace SkillUpgrades
             foreach (Type t in Assembly.GetAssembly(typeof(SkillUpgrades)).GetTypes().Where(x => x.IsSubclassOf(typeof(AbstractSkillUpgrade))))
             {
                 AbstractSkillUpgrade skill = (AbstractSkillUpgrade)Activator.CreateInstance(t);
+                if (!localSettings.EnabledSkills.ContainsKey(skill.Name)) localSettings.EnabledSkills[skill.Name] = null;
 
                 if (!globalSettings.EnabledSkills.TryGetValue(skill.Name, out bool? enabled))
                 {
                     enabled = true;
                     globalSettings.EnabledSkills[skill.Name] = enabled;
                 }
-                
+
                 if (enabled == null && skill.IsUnloadable)
                 {
                     enabled = false;
@@ -125,6 +126,8 @@ namespace SkillUpgrades
                 return;
             }
 
+            if (!localSettings.EnabledSkills.ContainsKey(name)) localSettings.EnabledSkills[name] = null;
+
             bool shouldEnable = localSettings?.EnabledSkills[name]
                 ?? globalSettings.EnabledSkills[name] ?? false;
             shouldEnable &= globalSettings.GlobalToggle;
@@ -158,7 +161,7 @@ namespace SkillUpgrades
 
         public override string GetVersion()
         {
-            return "0.3";
+            return "0.4";
         }
 
         public override int LoadPriority()

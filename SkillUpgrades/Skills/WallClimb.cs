@@ -9,9 +9,8 @@ namespace SkillUpgrades.Skills
 {
     internal class WallClimb : AbstractSkillUpgrade
     {
-        [SerializeToSetting]
-        public static float ClimbSpeed = 5.0f;
-        public static float ClimbSpeedConveyor = ClimbSpeed;
+        public float ClimbSpeed => GetFloat(nameof(ClimbSpeed), 5.0f);
+        public float ClimbSpeedConveyor => ClimbSpeed;
 
 
         public override string Name => "Wall Climb";
@@ -48,7 +47,7 @@ namespace SkillUpgrades.Skills
             On.HeroController.Start += SuperdashWallCancel;
         }
 
-        private static void Conveyor_MoveUpOrDown(ILContext il)
+        private void Conveyor_MoveUpOrDown(ILContext il)
         {
             ILCursor cursor = new ILCursor(il).Goto(0);
 

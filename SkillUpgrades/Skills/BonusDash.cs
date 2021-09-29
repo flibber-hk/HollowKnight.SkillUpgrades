@@ -12,8 +12,8 @@ namespace SkillUpgrades.Skills
 {
     internal class BonusDash : AbstractSkillUpgrade
     {
-        [SerializeToSetting]
-        public static int AirDashMax = 2;
+
+        public int AirDashMax => GetInt(nameof(AirDashMax), 2);
 
         public override string Name => "Multiple Air Dash";
         public override string Description => "Toggle whether dash can be used more than once before landing.";

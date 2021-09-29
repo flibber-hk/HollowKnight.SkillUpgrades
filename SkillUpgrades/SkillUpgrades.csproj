@@ -76,6 +76,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LocalOverrides.cs" />
+    <Compile Include="SkillUpgradeSettings.cs" />
     <Compile Include="LocalSettings.cs" />
     <Compile Include="Skills\AbstractSkillUpgrade.cs" />
     <Compile Include="Skills\DirectionalDash.cs" />

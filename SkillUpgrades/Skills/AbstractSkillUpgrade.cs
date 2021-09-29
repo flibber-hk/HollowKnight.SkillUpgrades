@@ -26,8 +26,37 @@ namespace SkillUpgrades.Skills
         /// </summary>
         public void ReInitialize() { if (IsUnloadable) Initialize(); }
 
-        public bool skillUpgradeActive = true;
+        protected internal bool skillUpgradeActive = true;
 
+        #region Adjustable Fields
+        protected bool GetBool(string name, bool @default)
+        {
+            string key = SkillUpgradeSettings.GetKey(Name, name);
+
+            if (SkillUpgrades.localSettings.Booleans.TryGetValue(key, out bool ret)) return ret;
+            else if (SkillUpgrades.globalSettings.Booleans.TryGetValue(key, out ret)) return ret;
+
+            SkillUpgrades.globalSettings.Booleans[key] = @default; return @default;
+        }
+        protected int GetInt(string name, int @default)
+        {
+            string key = SkillUpgradeSettings.GetKey(Name, name);
+
+            if (SkillUpgrades.localSettings.Integers.TryGetValue(key, out int ret)) return ret;
+            else if (SkillUpgrades.globalSettings.Integers.TryGetValue(key, out ret)) return ret;
+
+            SkillUpgrades.globalSettings.Integers[key] = @default; return @default;
+        }
+        protected float GetFloat(string name, float @default)
+        {
+            string key = SkillUpgradeSettings.GetKey(Name, name);
+
+            if (SkillUpgrades.localSettings.Floats.TryGetValue(key, out float ret)) return ret;
+            else if (SkillUpgrades.globalSettings.Floats.TryGetValue(key, out ret)) return ret;
+
+            SkillUpgrades.globalSettings.Floats[key] = @default; return @default;
+        }
+        #endregion
 
         #region Logging
         // It would be nice to be able to inherit from Loggable (or SimpleLogger IG) and be able to set the prefix, but we can't, so here we are
