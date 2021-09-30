@@ -12,7 +12,7 @@ namespace SkillUpgrades.Skills
         public bool DiagonalSuperdash => GetBool(true);
         public bool BreakDiveFloorsFromBelow => GetBool(false);
 
-        public override string Name => "Vertical Cdash";
+        public override string UIName => "Vertical Cdash";
         public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";
 
         public override bool InvolvesHeroRotation => true;

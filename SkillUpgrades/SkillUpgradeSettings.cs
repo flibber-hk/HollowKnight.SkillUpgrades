@@ -15,7 +15,8 @@ namespace SkillUpgrades
 
         public static string GetKey(string skillName, string fieldName)
         {
-            return $"{skillName}/{fieldName}";
+            if (skillName.Contains(" ")) skillName = skillName.Replace(" ", "");
+            return $"{skillName}:{fieldName}";
         }
     }
 }

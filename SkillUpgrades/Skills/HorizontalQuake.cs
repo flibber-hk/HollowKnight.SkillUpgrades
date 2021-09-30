@@ -10,7 +10,7 @@ namespace SkillUpgrades.Skills
 {
     internal class HorizontalQuake : AbstractSkillUpgrade
     {
-        public override string Name => "Horizontal Dive";
+        public override string UIName => "Horizontal Dive";
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
 
         public override bool InvolvesHeroRotation => true;

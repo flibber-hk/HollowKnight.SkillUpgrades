@@ -14,7 +14,7 @@ namespace SkillUpgrades.Skills
         public bool AllowDownDiagonalDashes => GetBool(false);
         public bool MaintainVerticalMomentum => GetBool(true);
 
-        public override string Name => "Directional Dash";
+        public override string UIName => "Directional Dash";
         public override string Description => "Toggle whether dash can be used in all 8 directions.";
 
 

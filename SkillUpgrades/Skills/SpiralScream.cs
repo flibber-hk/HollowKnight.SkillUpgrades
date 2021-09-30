@@ -7,7 +7,7 @@ namespace SkillUpgrades.Skills
 {
     internal class SpiralScream : AbstractSkillUpgrade
     {
-        public override string Name => "Spiral Scream";
+        public override string UIName => "Spiral Scream";
         public override string Description => "Toggle whether Howling Wraiths can sweep a circle around the knight";
 
         public override void Initialize()

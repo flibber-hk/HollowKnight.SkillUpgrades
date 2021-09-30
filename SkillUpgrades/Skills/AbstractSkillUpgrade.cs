@@ -15,7 +15,8 @@ namespace SkillUpgrades.Skills
         /// </summary>
         public virtual void Unload() { }
 
-        public abstract string Name { get; }
+        public abstract string UIName { get; }
+        public string Name => UIName.Replace(" ", string.Empty);
         public abstract string Description { get; }
 
 

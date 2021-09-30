@@ -15,7 +15,7 @@ namespace SkillUpgrades.Skills
 
         public int AirDashMax => GetInt(2);
 
-        public override string Name => "Multiple Air Dash";
+        public override string UIName => "Multiple Air Dash";
         public override string Description => "Toggle whether dash can be used more than once before landing.";
 
         public override void Initialize()

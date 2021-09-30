@@ -83,7 +83,7 @@ namespace SkillUpgrades
                 AbstractSkillUpgrade skill = kvp.Value;
                 IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
                 {
-                    Name = name,
+                    Name = skill.UIName,
                     Description = skill.Description,
                     Values = new string[] { "False", "True" },
                     Saver = opt => Toggle(name, opt == 1),

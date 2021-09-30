@@ -13,7 +13,7 @@ namespace SkillUpgrades.Skills
         public float ClimbSpeedConveyor => ClimbSpeed;
 
 
-        public override string Name => "Wall Climb";
+        public override string UIName => "Wall Climb";
         public override string Description => "Toggle whether claw can be used to climb up and down walls.";
         
         public override void Initialize()
