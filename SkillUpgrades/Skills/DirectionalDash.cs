@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using GlobalEnums;
 using Modding;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
