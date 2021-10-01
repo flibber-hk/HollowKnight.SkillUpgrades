@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using GlobalEnums;
 using Modding;
 using MonoMod.Cil;
@@ -11,7 +12,11 @@ namespace SkillUpgrades.Skills
 {
     internal class DirectionalDash : AbstractSkillUpgrade
     {
-        public bool AllowDownDiagonalDashes => GetBool(false);
+        /// <summary>
+        /// True: down dashes behave normal (i.e. no down diagonal, and down iff dashmaster equipped).
+        /// False: all 8 directions are allowed
+        /// </summary>
+        public bool OnlyUpDashes => GetBool(true);
         public bool MaintainVerticalMomentum => GetBool(true);
 
         public override string UIName => "Directional Dash";
@@ -20,8 +25,6 @@ namespace SkillUpgrades.Skills
 
         public override void Initialize()
         {
-            _dashEffect = typeof(HeroController).GetField("dashEffect", BindingFlags.NonPublic | BindingFlags.Instance);
-
             ModHooks.DashPressedHook += CalculateDashVector;
             ModHooks.DashVectorHook += OverrideDashVector;
             On.HeroController.HeroDash += ModifyPrefabDirection;
@@ -30,11 +33,14 @@ namespace SkillUpgrades.Skills
 
             On.HeroController.JumpReleased += MaintainMomentum;
             On.HeroController.Update += CancelPersistentMomentum;
+
+            if (ModHooks.GetMod("QoL") is Mod _)
+            {
+                DisableOldDashmaster();
+            }
         }
         public override void Unload()
         {
-            _dashEffect = null;
-
             ModHooks.DashPressedHook -= CalculateDashVector;
             ModHooks.DashVectorHook -= OverrideDashVector;
             On.HeroController.HeroDash -= ModifyPrefabDirection;
@@ -43,7 +49,25 @@ namespace SkillUpgrades.Skills
 
             On.HeroController.JumpReleased -= MaintainMomentum;
             On.HeroController.Update -= CancelPersistentMomentum;
+
+            if (ModHooks.GetMod("QoL") is Mod _)
+            {
+                RemoveOldDashmasterOverride();
+            }
         }
+
+        #region QoL interop
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void DisableOldDashmaster()
+        {
+            QoL.SettingsOverride.OverrideModuleToggle(nameof(QoL.Modules.OldDashmaster), false);
+        }
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void RemoveOldDashmasterOverride()
+        {
+            QoL.SettingsOverride.RemoveModuleOverride(nameof(QoL.Modules.OldDashmaster));
+        }
+        #endregion
 
         #region Maintaining vertical momentum out of an upward dash
         private void CancelPersistentMomentum(On.HeroController.orig_Update orig, HeroController self)
@@ -73,44 +97,36 @@ namespace SkillUpgrades.Skills
         private bool CalculateDashVector()
         {
             HeroActions ia = InputHandler.Instance.inputActions;
-            HeroController hero = HeroController.instance;
 
             DashDirection direction = DashDirection.None;
 
-            if (ia.up.IsPressed) direction |= DashDirection.Up;
-            else if (ia.down.IsPressed && !HeroController.instance.cState.onGround) direction |= DashDirection.Down;
-            if (ia.right.IsPressed) direction |= DashDirection.Right;
-            else if (ia.left.IsPressed) direction |= DashDirection.Left;
-            if (direction == DashDirection.None)
+            if (ia.up.IsPressed && !ia.down.IsPressed)
             {
-                if (hero.cState.facingRight) direction |= DashDirection.Right;
-                else direction |= DashDirection.Left;
+                direction |= DashDirection.Up;
+                if (ia.right.IsPressed) direction |= DashDirection.Right;
+                else if (ia.left.IsPressed) direction |= DashDirection.Left;
             }
-
-            if (!AllowDownDiagonalDashes && direction.HasFlag(DashDirection.Down))
+            else if (!OnlyUpDashes && ia.down.IsPressed && !ia.up.IsPressed && !HeroController.instance.cState.onGround)
             {
-                if (direction == (DashDirection.Down | DashDirection.Left)) direction = DashDirection.Left;
-                else if (direction == (DashDirection.Down | DashDirection.Right)) direction = DashDirection.Right;
+                direction |= DashDirection.Down;
+                if (ia.right.IsPressed) direction |= DashDirection.Right;
+                else if (ia.left.IsPressed) direction |= DashDirection.Left;
             }
 
             _dashDirection = direction;
-
             return false;
         }
 
-        private Vector2 OverrideDashVector(Vector2 arg)
+        private Vector2 OverrideDashVector(Vector2 orig)
         {
+            if (_dashDirection == DashDirection.None) return orig;
+
             HeroController hero = HeroController.instance;
 
-            float num;
-            if (PlayerData.instance.equippedCharm_16 && hero.cState.shadowDashing)
-            {
-                num = hero.DASH_SPEED_SHARP;
-            }
-            else
-            {
-                num = hero.DASH_SPEED;
-            }
+            float num = PlayerData.instance.GetBool(nameof(PlayerData.equippedCharm_16)) && hero.cState.shadowDashing
+                ? hero.DASH_SPEED_SHARP
+                : hero.DASH_SPEED;
+
 
             float x = 0f;
             float y = 0f;
@@ -121,14 +137,6 @@ namespace SkillUpgrades.Skills
             else if (_dashDirection.HasFlag(DashDirection.Down))
             {
                 y = -num;
-            }
-            if (y == 0)
-            {
-                CollisionSide collisonTest = HeroController.instance.cState.facingRight ? CollisionSide.right : CollisionSide.left;
-                if (hero.CheckForBump(collisonTest))
-                {
-                    y = hero.cState.onGround ? 4f : 5f;
-                }
             }
             if (_dashDirection.HasFlag(DashDirection.Right))
             {
@@ -146,16 +154,15 @@ namespace SkillUpgrades.Skills
                 y *= (float)(1 / Math.Sqrt(2));
             }
 
-            _lastDashVector = new Vector2(x, y);
             _maintainingVerticalDashMomentum = _dashDirection.HasFlag(DashDirection.Up);
-            return _lastDashVector;
+            return new Vector2(x, y);
         }
 
         private void ModifyPrefabDirection(On.HeroController.orig_HeroDash orig, HeroController self)
         {
-            orig(self);
+            orig(self); if (_dashDirection == DashDirection.None) return;
 
-            float z = GetPrefabDirection(_dashDirection);
+            float z = GetPrefabRotation(_dashDirection);
 
             self.dashBurst.transform.RotateAround(self.transform.position, Vector3.forward, z * self.transform.localScale.x);
 
@@ -163,11 +170,12 @@ namespace SkillUpgrades.Skills
             {
                 // The dash effect prefab is either the shadow dash trail or the ground smoke. If we're dashing diagonally from the ground, 
                 // we don't want to rotate the smoke or it won't appear.
-                ((GameObject)_dashEffect.GetValue(self))?.transform.RotateAround(self.transform.position, Vector3.forward, z * self.transform.localScale.x);
+                GameObject dashEffect = ReflectionHelper.GetField<HeroController, GameObject>(self, "dashEffect");
+                dashEffect?.transform.RotateAround(self.transform.position, Vector3.forward, z * self.transform.localScale.x);
             }
         }
 
-        private float GetPrefabDirection(DashDirection direction)
+        private float GetPrefabRotation(DashDirection direction)
         {
             bool facingRight = HeroController.instance.cState.facingRight;
 
@@ -204,36 +212,33 @@ namespace SkillUpgrades.Skills
             Down = 8
         }
 
-        // Consider dashmaster to be off for the purpose of downdashing - only replace the first instruction, the second refers to the cooldown timer.
-        // This isn't ideal, because the dash burst is a little off-center with the current rotation, but it looks good enough.
-        private static void ModifyDashmasterBool(ILContext il)
+        private void ModifyDashmasterBool(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
 
             if (cursor.TryGotoNext
             (
-                i => i.MatchLdstr("equippedCharm_31")
+                i => i.MatchLdstr(nameof(PlayerData.equippedCharm_31))
             ))
             {
                 cursor.Remove();
                 cursor.Emit(OpCodes.Ldstr, EnabledBool);
             }
         }
-
-        private static bool InterpretDashmasterBool(string name, bool orig)
+        private bool InterpretDashmasterBool(string name, bool orig)
         {
             if (name == EnabledBool)
             {
-                return false;
+                // If OnlyUpDashes is on, keep normal behaviour; if off, force the game to keep the downdashing field as false so we can implement our own
+                return orig && OnlyUpDashes;
             }
             return orig;
         }
 
-        private static DashDirection _dashDirection;
-        private static FieldInfo _dashEffect;
+        // The direction to dash, except return None if we're not overriding the normal behaviour
+        private DashDirection _dashDirection;
+        private bool _maintainingVerticalDashMomentum = false;
 
-        private static Vector2 _lastDashVector;
-        private static bool _maintainingVerticalDashMomentum = false;
-        private const string EnabledBool = "DirectionalDash_Dashmaster";
+        private const string EnabledBool = "DirectionalDash.EquippedDashmaster";
     }
 }
