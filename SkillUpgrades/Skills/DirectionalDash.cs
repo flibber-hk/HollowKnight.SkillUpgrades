@@ -32,7 +32,9 @@ namespace SkillUpgrades.Skills
             On.HeroController.JumpReleased += MaintainMomentum;
             On.HeroController.Update += CancelPersistentMomentum;
 
-            if (ModHooks.GetMod("QoL") is Mod _)
+            // This can fail if the OnlyUpDashes setting changes after the skill is initialized, but I think that's unlikely to happen - 
+            // particularly as OldDashmaster is disabled by default
+            if (ModHooks.GetMod("QoL") is Mod _ && !OnlyUpDashes)
             {
                 DisableOldDashmaster();
             }
