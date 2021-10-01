@@ -17,7 +17,7 @@ Also includes a global toggle - if this is off, all upgrades will be disabled. E
 
 ## Global settings
 Manually editing the global settings file (while the game is closed) can let the player tweak some of the properties of the skill upgrades. These options include:
-- AllowDownDiagonalDashes: if this is set to false, dashing down-diagonally is banned, and the player will dash in the direction they would if they had dashmaster on (so left/right usually, or down if down is held but neither left nor right)
+- UnmodifiedDownDashes: if this is set to true, down dashes will behave normally (so no down diagonal dashes, and down dashes require dashmaster to be equipped).
 - MaintainVerticalDashMomentum: By default, the knight will continue moving vertically after an upward or up-diagonal dash ends (slowed down by gravity); this behaviour can be disabled, to match how the knight stops moving horizontally with no left/right input after a regular dash
 - DiagonalSuperdash: If this is disabled, the knight will only be able to cdash upward or horizontally (no diagonal).
 - ClimbSpeed: The default climb speed is 5.0, but this can be modified.

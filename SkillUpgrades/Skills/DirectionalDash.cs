@@ -14,7 +14,7 @@ namespace SkillUpgrades.Skills
         /// True: down dashes behave normal (i.e. no down diagonal, and down iff dashmaster equipped).
         /// False: all 8 directions are allowed
         /// </summary>
-        public bool OnlyUpDashes => GetBool(true);
+        public bool UnmodifiedDownDashes => GetBool(false);
         public bool MaintainVerticalMomentum => GetBool(true);
 
         public override string UIName => "Directional Dash";
@@ -32,9 +32,9 @@ namespace SkillUpgrades.Skills
             On.HeroController.JumpReleased += MaintainMomentum;
             On.HeroController.Update += CancelPersistentMomentum;
 
-            // This can fail if the OnlyUpDashes setting changes after the skill is initialized, but I think that's unlikely to happen - 
+            // This can fail if the UnmodifiedDownDashes setting changes after the skill is initialized, but I think that's unlikely to happen - 
             // particularly as OldDashmaster is disabled by default
-            if (ModHooks.GetMod("QoL") is Mod _ && !OnlyUpDashes)
+            if (ModHooks.GetMod("QoL") is Mod _ && !UnmodifiedDownDashes)
             {
                 DisableOldDashmaster();
             }
@@ -106,7 +106,7 @@ namespace SkillUpgrades.Skills
                 if (ia.right.IsPressed) direction |= DashDirection.Right;
                 else if (ia.left.IsPressed) direction |= DashDirection.Left;
             }
-            else if (!OnlyUpDashes && ia.down.IsPressed && !ia.up.IsPressed && !HeroController.instance.cState.onGround)
+            else if (!UnmodifiedDownDashes && ia.down.IsPressed && !ia.up.IsPressed && !HeroController.instance.cState.onGround)
             {
                 direction |= DashDirection.Down;
                 if (ia.right.IsPressed) direction |= DashDirection.Right;
@@ -229,8 +229,8 @@ namespace SkillUpgrades.Skills
         {
             if (name == EnabledBool)
             {
-                // If OnlyUpDashes is on, keep normal behaviour; if off, force the game to keep the downdashing field as false so we can implement our own
-                return orig && OnlyUpDashes;
+                // If UnmodifiedDownDashes is on, keep normal behaviour; if off, force the game to keep the downdashing field as false so we can implement our own
+                return orig && UnmodifiedDownDashes;
             }
             return orig;
         }
