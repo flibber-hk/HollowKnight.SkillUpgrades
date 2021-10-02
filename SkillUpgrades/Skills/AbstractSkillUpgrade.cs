@@ -1,9 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using Modding;
-
-namespace SkillUpgrades.Skills
+﻿namespace SkillUpgrades.Skills
 {
-    public abstract class AbstractSkillUpgrade : Loggable
+    public abstract partial class AbstractSkillUpgrade
     {
         /// <summary>
         /// Initialize the skill upgrade
@@ -29,49 +26,5 @@ namespace SkillUpgrades.Skills
         public void ReInitialize() { if (IsUnloadable) Initialize(); }
 
         protected internal bool skillUpgradeActive = true;
-
-        #region Adjustable Fields
-        protected bool GetBool(bool @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-
-            if (SettingsOverrides.Booleans.TryGetValue(key, out bool ret)) return ret;
-            else if (SkillUpgrades.globalSettings.Booleans.TryGetValue(key, out ret)) return ret;
-
-            SkillUpgrades.globalSettings.Booleans[key] = @default; return @default;
-        }
-        protected int GetInt(int @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-
-            if (SettingsOverrides.Integers.TryGetValue(key, out int ret)) return ret;
-            else if (SkillUpgrades.globalSettings.Integers.TryGetValue(key, out ret)) return ret;
-
-            SkillUpgrades.globalSettings.Integers[key] = @default; return @default;
-        }
-        protected float GetFloat(float @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-
-            if (SettingsOverrides.Floats.TryGetValue(key, out float ret)) return ret;
-            else if (SkillUpgrades.globalSettings.Floats.TryGetValue(key, out ret)) return ret;
-
-            SkillUpgrades.globalSettings.Floats[key] = @default; return @default;
-        }
-        #endregion
-
-        protected AbstractSkillUpgrade()
-        {
-            Name = GetType().Name;
-
-            // It would be nice to be able to inherit from Loggable (or SimpleLogger IG) and be able to set the prefix, but we can't, so here we are
-            ReflectionHelper.SetField<Loggable, string>(this, "ClassName", $"SkillUpgrades]:[{Name}");
-        }
     }
 }

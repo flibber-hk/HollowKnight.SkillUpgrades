@@ -81,9 +81,10 @@
   <ItemGroup>
     <Compile Include="SettingsOverrides.cs" />
     <Compile Include="Skills\AbstractSkillUpgrade.cs" />
+    <Compile Include="Skills\AbstractSkillUpgrade.Methods.cs" />
     <Compile Include="Skills\DirectionalDash.cs" />
     <Compile Include="Skills\DownwardFireball.cs" />
-    <Compile Include="Skills\HorizontalQuake.cs" />
+    <Compile Include="Skills\HorizontalDive.cs" />
     <Compile Include="Skills\SpiralScream.cs" />
     <Compile Include="Skills\WallClimb.cs" />
     <Compile Include="Util\DecideToStopQuake.cs" />
@@ -93,7 +94,7 @@
     <Compile Include="Util\HeroRotation.cs" />
     <Compile Include="Util\PlaymakerExtensions.cs" />
     <Compile Include="SkillUpgradeSettings.cs" />
-    <Compile Include="Skills\BonusDash.cs" />
+    <Compile Include="Skills\ExtraAirDash.cs" />
     <Compile Include="Skills\TripleJump.cs" />
     <Compile Include="Skills\VerticalSuperdash.cs" />
     <Compile Include="SkillUpgrades.cs" />
