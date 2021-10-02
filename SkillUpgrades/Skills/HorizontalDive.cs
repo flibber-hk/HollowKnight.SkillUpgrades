@@ -1,4 +1,5 @@
 ﻿using System;
+using GlobalEnums;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using UnityEngine;
@@ -10,6 +11,9 @@ namespace SkillUpgrades.Skills
 {
     internal class HorizontalDive : AbstractSkillUpgrade
     {
+        // TODO - implement this
+        // public bool PersistThroughHorizontalTransitions => GetBool(false);
+
         public override string UIName => "Horizontal Dive";
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
 
@@ -35,8 +39,8 @@ namespace SkillUpgrades.Skills
 
         private IEnumerator DisableHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
-            GlobalEnums.GatePosition gatePosition = enterGate.GetGatePosition();
-            if (gatePosition == GlobalEnums.GatePosition.left || gatePosition == GlobalEnums.GatePosition.right || gatePosition == GlobalEnums.GatePosition.door)
+            GatePosition gatePosition = enterGate.GetGatePosition();
+            if (gatePosition == GatePosition.left || gatePosition == GatePosition.right || gatePosition == GatePosition.door)
             {
                 self.exitedQuake = false;
             }
@@ -86,6 +90,13 @@ namespace SkillUpgrades.Skills
                     fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = Math.Max(0.1f, quakeAnticSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180));
                 }
 
+                vSpeed.Value = -50f * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
+                hSpeed.Value = 50f * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
+            }));
+
+            // Fix horizontal quake into Cliffs_02[right1], Mines_34[left1]
+            fsm.GetState("Enter Quake").AddFirstAction(new ExecuteLambda(() =>
+            {
                 vSpeed.Value = -50f * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
                 hSpeed.Value = 50f * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
             }));
