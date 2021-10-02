@@ -16,7 +16,7 @@ namespace SkillUpgrades.Skills
         public virtual void Unload() { }
 
         public abstract string UIName { get; }
-        public string Name => UIName.Replace(" ", string.Empty);
+        public string Name { get; protected set; }
         public abstract string Description { get; }
 
 
@@ -66,12 +66,12 @@ namespace SkillUpgrades.Skills
         }
         #endregion
 
-        #region Logging
-        // It would be nice to be able to inherit from Loggable (or SimpleLogger IG) and be able to set the prefix, but we can't, so here we are
         protected AbstractSkillUpgrade()
         {
-            ReflectionHelper.SetField<Loggable, string>(this, "ClassName", $"SkillUpgrades]:[{GetType().Name}");
+            Name = GetType().Name;
+
+            // It would be nice to be able to inherit from Loggable (or SimpleLogger IG) and be able to set the prefix, but we can't, so here we are
+            ReflectionHelper.SetField<Loggable, string>(this, "ClassName", $"SkillUpgrades]:[{Name}");
         }
-        #endregion
     }
 }

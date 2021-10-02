@@ -13,7 +13,7 @@ namespace SkillUpgrades.Skills
     {
         public int DoubleJumpMax => GetInt(2);
 
-        public override string UIName => "Multiple Wings";
+        public override string UIName => "Triple Jump";
         public override string Description => "Toggle whether wings can be used more than once before landing.";
 
 

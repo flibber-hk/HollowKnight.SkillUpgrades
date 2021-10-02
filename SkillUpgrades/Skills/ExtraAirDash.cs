@@ -10,12 +10,12 @@ using UnityEngine;
 
 namespace SkillUpgrades.Skills
 {
-    internal class BonusDash : AbstractSkillUpgrade
+    internal class ExtraAirDash : AbstractSkillUpgrade
     {
 
         public int AirDashMax => GetInt(2);
 
-        public override string UIName => "Multiple Air Dash";
+        public override string UIName => "Extra Air Dash";
         public override string Description => "Toggle whether dash can be used more than once before landing.";
 
         public override void Initialize()

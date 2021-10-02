@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace SkillUpgrades.Skills
 {
-    internal class HorizontalQuake : AbstractSkillUpgrade
+    internal class HorizontalDive : AbstractSkillUpgrade
     {
         public override string UIName => "Horizontal Dive";
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
