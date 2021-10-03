@@ -90,9 +90,11 @@ namespace SkillUpgrades.Skills
             else if (gatePosition == GatePosition.door)
             {
                 self.exitedQuake = false;
+                ResetQuakeAngle();
             }
             else if (gatePosition == GatePosition.top)
             {
+                // Need to do this to fix hdive into Town[top1] or Mines_13[top1]
                 ResetQuakeAngle();
             }
 
