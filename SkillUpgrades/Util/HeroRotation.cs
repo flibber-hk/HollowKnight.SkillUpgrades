@@ -56,10 +56,15 @@ namespace SkillUpgrades.Util
         /// <param name="respectFacingDirection">If true, instead rotate clockwise when the hero is facing right</param>
         public static void RotateHero(this HeroController hero, float angle, bool respectFacingDirection = true)
         {
+            Transform t = HeroController.instance.vignette.transform.parent;
+            HeroController.instance.vignette.transform.SetParent(null);
+
             Vector2[] colliderBounds = HeroCollider.GetPath(0);
             float rotation = angle * (respectFacingDirection ? hero.transform.localScale.x : 1);
             hero.transform.Rotate(0, 0, rotation);
             HeroCollider.SetPath(0, ApplyRotationToPoints(colliderBounds, -rotation * hero.transform.localScale.x));
+
+            HeroController.instance.vignette.transform.SetParent(t);
         }
 
         /// <summary>
@@ -74,6 +79,7 @@ namespace SkillUpgrades.Util
             HeroCollider.offset = OriginalOffset;
 
             HeroController.instance.wallPuffPrefab.transform.rotation = Quaternion.identity;
+            HeroController.instance.vignette.transform.rotation = Quaternion.identity;
         }
 
         private static Vector2[] ApplyRotationToPoints(Vector2[] points, float rotation)
