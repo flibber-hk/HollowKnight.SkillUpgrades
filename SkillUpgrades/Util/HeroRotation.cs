@@ -33,10 +33,10 @@ namespace SkillUpgrades.Util
             PolygonCollider2D newCol2d =  self.gameObject.AddComponent<PolygonCollider2D>();
             OriginalPoints = new Vector2[]
             {
-                new Vector2(center.x + extents.x - heropos.x - OriginalOffset.x, center.y + extents.y - heropos.y - OriginalOffset.y),
-                new Vector2(center.x + extents.x - heropos.x - OriginalOffset.x, center.y - extents.y - heropos.y - OriginalOffset.y),
-                new Vector2(center.x - extents.x - heropos.x - OriginalOffset.x, center.y - extents.y - heropos.y - OriginalOffset.y),
-                new Vector2(center.x - extents.x - heropos.x - OriginalOffset.x, center.y + extents.y - heropos.y - OriginalOffset.y)
+                center + new Vector2(extents.x, extents.y) - heropos - OriginalOffset,
+                center + new Vector2(extents.x, -extents.y) - heropos - OriginalOffset,
+                center + new Vector2(-extents.x, -extents.y) - heropos - OriginalOffset,
+                center + new Vector2(-extents.x, extents.y) - heropos - OriginalOffset
             };
             newCol2d.SetPath(0, OriginalPoints);
             newCol2d.offset = OriginalOffset;
@@ -56,15 +56,10 @@ namespace SkillUpgrades.Util
         /// <param name="respectFacingDirection">If true, instead rotate clockwise when the hero is facing right</param>
         public static void RotateHero(this HeroController hero, float angle, bool respectFacingDirection = true)
         {
-            Transform t = hero.wallPuffPrefab.transform.parent;
-            hero.wallPuffPrefab.transform.parent = null;
-
             Vector2[] colliderBounds = HeroCollider.GetPath(0);
             float rotation = angle * (respectFacingDirection ? hero.transform.localScale.x : 1);
             hero.transform.Rotate(0, 0, rotation);
             HeroCollider.SetPath(0, ApplyRotationToPoints(colliderBounds, -rotation * hero.transform.localScale.x));
-
-            HeroController.instance.wallPuffPrefab.transform.parent = t;
         }
 
         /// <summary>
@@ -74,14 +69,11 @@ namespace SkillUpgrades.Util
         {
             if (HeroController.instance == null) return;
 
-            Transform t = HeroController.instance.wallPuffPrefab.transform.parent;
-            HeroController.instance.wallPuffPrefab.transform.parent = null;
-
             HeroController.instance.transform.rotation = Quaternion.identity;
             HeroCollider.SetPath(0, OriginalPoints);
             HeroCollider.offset = OriginalOffset;
 
-            HeroController.instance.wallPuffPrefab.transform.parent = t;
+            HeroController.instance.wallPuffPrefab.transform.rotation = Quaternion.identity;
         }
 
         private static Vector2[] ApplyRotationToPoints(Vector2[] points, float rotation)
