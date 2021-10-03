@@ -91,6 +91,10 @@ namespace SkillUpgrades.Skills
             {
                 self.exitedQuake = false;
             }
+            else if (gatePosition == GatePosition.top)
+            {
+                ResetQuakeAngle();
+            }
 
             return orig(self, enterGate, delayBeforeEnter);
         }
