@@ -13,20 +13,6 @@ namespace SkillUpgrades.Skills
         public override void Initialize()
         {
             On.HeroController.Start += HeroController_Start;
-            if (HeroController.instance is HeroController hero)
-            {
-                EnableSpiralScream(hero);
-            }
-        }
-
-        public override void Unload()
-        {
-            On.HeroController.Start -= HeroController_Start;
-            if (HeroController.instance is HeroController hero)
-            {
-                DisableSpiralScream(hero);
-            }
-            Circler.direction = 0;
         }
 
         private void HeroController_Start(On.HeroController.orig_Start orig, HeroController self)
@@ -67,19 +53,6 @@ namespace SkillUpgrades.Skills
                 else if (ia.left.IsPressed) Circler.direction = 1;
                 else Circler.direction = 0;
             }));
-        }
-
-        private void DisableSpiralScream(HeroController hero)
-        {
-            PlayMakerFSM fsm = hero.spellControl;
-
-            fsm.GetState("Init").RemoveActionsOfType<ExecuteLambda>();
-            fsm.GetState("Scream Get?").RemoveActionsOfType<ExecuteLambda>();
-
-            foreach (Circler c in Resources.FindObjectsOfTypeAll<Circler>())
-            {
-                UnityEngine.Object.Destroy(c);
-            }
         }
     }
 
