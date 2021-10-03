@@ -142,7 +142,7 @@ namespace SkillUpgrades.Skills
             {
                 HeroController.instance.RotateHero(SuperdashAngle);
                 if (BreakDiveFloorsFromBelow && SuperdashAngle <= -30) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
-            })); 
+            }));
             fsm.GetState("Right").AddAction(new ExecuteLambda(() =>
             {
                 HeroController.instance.RotateHero(SuperdashAngle);

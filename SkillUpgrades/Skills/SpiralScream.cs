@@ -27,7 +27,7 @@ namespace SkillUpgrades.Skills
             PlayMakerFSM fsm = hero.spellControl;
 
             FsmState init = fsm.GetState("Init");
-            init.AddAction(new ExecuteLambda(() => 
+            init.AddAction(new ExecuteLambda(() =>
             {
                 fsm.FsmVariables.GetFsmGameObject("Scr Heads").Value.AddComponent<Circler>();
                 fsm.FsmVariables.GetFsmGameObject("Scr Heads 2").Value.AddComponent<Circler>();
@@ -60,7 +60,7 @@ namespace SkillUpgrades.Skills
     {
         private bool circled;
         private float angle;
-        
+
         public static float cycleTime = 0.45f;
         /// <summary>
         /// 1 -> Counter-clockwise

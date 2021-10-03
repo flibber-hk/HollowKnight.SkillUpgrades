@@ -40,7 +40,12 @@ namespace SkillUpgrades
                     globalSettings.EnabledSkills[skill.Name] = enabled;
                 }
 
-                if (enabled != null)
+                if (!SettingsOverrides.SkillLoadOverrides.TryGetValue(skill.Name, out bool shouldInitializeSkill))
+                {
+                    shouldInitializeSkill = enabled != null;
+                }
+
+                if (shouldInitializeSkill)
                 {
                     _skills[skill.Name] = skill;
 
@@ -49,17 +54,18 @@ namespace SkillUpgrades
                     skill.Initialize();
                     skill.skillUpgradeActive = true;
 
-                    if (enabled == false || !globalSettings.GlobalToggle)
+                    if (!SettingsOverrides.SkillLoadOverrides.ContainsKey(skill.Name) && (enabled == false || !globalSettings.GlobalToggle))
                     {
                         skill.skillUpgradeActive = false;
                         skill.Unload();
                     }
-                }    
+                }
 
             }
 
             if (_skills.Values.Any(skill => skill.InvolvesHeroRotation)) HeroRotation.Hook();
 
+            SettingsOverrides.AlreadyLoadedSkills = true;
             Log("Initialization done!");
         }
 
@@ -80,6 +86,9 @@ namespace SkillUpgrades
             foreach (var kvp in _skills)
             {
                 string name = kvp.Key;
+
+                if (globalSettings.EnabledSkills[name] == null) continue;
+
                 AbstractSkillUpgrade skill = kvp.Value;
                 IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
                 {

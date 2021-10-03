@@ -12,7 +12,7 @@ namespace SkillUpgrades.Util
         }
 
         private static PolygonCollider2D HeroCollider;
-        
+
         // Data for resetting
         private static Vector2[] OriginalPoints;
         private static Vector2 OriginalOffset;
@@ -30,7 +30,7 @@ namespace SkillUpgrades.Util
             OriginalOffset = col2d.offset;
 
             // Set Data
-            PolygonCollider2D newCol2d =  self.gameObject.AddComponent<PolygonCollider2D>();
+            PolygonCollider2D newCol2d = self.gameObject.AddComponent<PolygonCollider2D>();
             OriginalPoints = new Vector2[]
             {
                 center + new Vector2(extents.x, extents.y) - heropos - OriginalOffset,
@@ -82,7 +82,7 @@ namespace SkillUpgrades.Util
 
             return points
                 .Select(v => v + OriginalOffset)
-                .Select(v => new Vector2(Mathf.Cos(radians)*v.x - Mathf.Sin(radians)*v.y, Mathf.Sin(radians) * v.x + Mathf.Cos(radians) * v.y))
+                .Select(v => new Vector2(Mathf.Cos(radians) * v.x - Mathf.Sin(radians) * v.y, Mathf.Sin(radians) * v.x + Mathf.Cos(radians) * v.y))
                 .Select(v => v - OriginalOffset)
                 .ToArray();
         }

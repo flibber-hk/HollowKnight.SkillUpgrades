@@ -7,10 +7,13 @@ namespace SkillUpgrades
     [PublicAPI]
     public static class SettingsOverrides
     {
+        internal static Dictionary<string, bool> SkillLoadOverrides { get; set; } = new Dictionary<string, bool>();
         internal static Dictionary<string, bool> EnabledSkills { get; set; } = new Dictionary<string, bool>();
         internal static Dictionary<string, bool> Booleans { get; set; } = new Dictionary<string, bool>();
         internal static Dictionary<string, float> Floats { get; set; } = new Dictionary<string, float>();
         internal static Dictionary<string, int> Integers { get; set; } = new Dictionary<string, int>();
+
+        public static bool AlreadyLoadedSkills { get; internal set; } = false;
 
         /// <summary>
         /// Set the value of whether a skill is active.
@@ -142,6 +145,20 @@ namespace SkillUpgrades
             foreach (var kvp in floatValues)
             {
                 SetFloat(kvp.Key.Item1, kvp.Key.Item2, kvp.Value);
+            }
+        }
+
+        /// <summary>
+        /// Force a skill to initialize, or not to
+        /// </summary>
+        /// <param name="name">The name of the skill</param>
+        /// <param name="initialize">Whether or not it should be initialized</param>
+        public static void SetSkillLoadState(string name, bool initialize)
+        {
+            SkillLoadOverrides[name] = initialize;
+            if (initialize)
+            {
+                EnabledSkills[name] = true;
             }
         }
 
