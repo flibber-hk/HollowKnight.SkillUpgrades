@@ -1,30 +1,40 @@
 ﻿using System;
+using System.Collections;
 using GlobalEnums;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using UnityEngine;
-using SkillUpgrades.Util;
 using UnityEngine.SceneManagement;
-using System.Collections;
+using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
     internal class HorizontalDive : AbstractSkillUpgrade
     {
-        // TODO - implement this
-        // public bool PersistThroughHorizontalTransitions => GetBool(false);
+        public bool PersistThroughHorizontalTransitions => GetBool(false);
 
         public override string UIName => "Horizontal Dive";
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
 
         public override bool InvolvesHeroRotation => true;
 
+
+        private ILHook _hook;
         public override void Initialize()
         {
             On.HeroController.EnterScene += DisableHorizontalQuakeEntry;
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetQuakeState;
 
             On.HeroController.Start += ModifyQuakeFSM;
+
+            _hook = new ILHook
+            (
+                typeof(HeroController).GetMethod(nameof(HeroController.EnterScene)).GetIterationMethod(),
+                AllowHorizontalQuakeEntry
+            );
         }
 
         /// <summary>
@@ -33,14 +43,51 @@ namespace SkillUpgrades.Skills
         internal float QuakeAngle { get; set; } = 0f;
         internal void ResetQuakeAngle()
         {
+            if (QuakeAngle == 0f) return;
+
             QuakeAngle = 0f;
             HeroRotation.ResetHero();
+        }
+
+
+        private void AllowHorizontalQuakeEntry(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+
+            // slightly cursed code, because more involved modifications to IL code are fairly cursed
+            while (cursor.TryGotoNext
+            (
+                MoveType.After,
+                i => i.MatchLdarg(0),
+                i => i.MatchLdcI4(-1),
+                i => i.Match(OpCodes.Stfld),
+                i => i.MatchLdloc(1),
+                i => i.MatchLdfld<HeroController>(nameof(HeroController.exitedSuperDashing))
+            ))
+            {
+                cursor.EmitDelegate<Func<bool, bool>>(b => b || (HeroController.instance.exitedQuake && PersistThroughHorizontalTransitions));
+            }
+
+            cursor.Goto(0);
+            while (cursor.TryGotoNext(MoveType.After, i => i.MatchLdstr("HeroCtrl-EnterSuperDash")))
+            {
+                cursor.EmitDelegate<Func<string, string>>(s =>
+                {
+                    if (!PersistThroughHorizontalTransitions) return s;
+                    if (HeroController.instance.exitedQuake) return "HeroCtrl-EnterQuake";
+                    return s;
+                });
+            }
         }
 
         private IEnumerator DisableHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
             GatePosition gatePosition = enterGate.GetGatePosition();
-            if (gatePosition == GatePosition.left || gatePosition == GatePosition.right || gatePosition == GatePosition.door)
+            if (gatePosition == GatePosition.left || gatePosition == GatePosition.right)
+            {
+                if (!PersistThroughHorizontalTransitions) self.exitedQuake = false;
+            }
+            else if (gatePosition == GatePosition.door)
             {
                 self.exitedQuake = false;
             }
@@ -50,7 +97,7 @@ namespace SkillUpgrades.Skills
 
         private void ResetQuakeState(Scene arg0, Scene arg1)
         {
-            ResetQuakeAngle();
+            if (!PersistThroughHorizontalTransitions) ResetQuakeAngle();
         }
 
         private void ModifyQuakeFSM(On.HeroController.orig_Start orig, HeroController self)
@@ -99,6 +146,12 @@ namespace SkillUpgrades.Skills
             {
                 vSpeed.Value = -50f * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
                 hSpeed.Value = 50f * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
+                if (Math.Abs(vSpeed.Value) < 0.1f)
+                {
+                    Vector3 vec = HeroController.instance.transform.position;
+                    vec += 0.1f * Vector3.up;
+                    HeroController.instance.transform.position = vec;
+                }
             }));
             #endregion
 

@@ -92,7 +92,7 @@
     <Compile Include="Util\ExecuteLambda.cs" />
     <Compile Include="Util\ExecuteLambdaEveryFrame.cs" />
     <Compile Include="Util\HeroRotation.cs" />
-    <Compile Include="Util\PlaymakerExtensions.cs" />
+    <Compile Include="Util\Extensions.cs" />
     <Compile Include="SkillUpgradeSettings.cs" />
     <Compile Include="Skills\ExtraAirDash.cs" />
     <Compile Include="Skills\TripleJump.cs" />

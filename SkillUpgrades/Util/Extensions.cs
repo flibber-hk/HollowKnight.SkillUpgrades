@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using Modding;
 
 namespace SkillUpgrades.Util
 {
-    public static class PlayMakerExtensions
+    public static class Extensions
     {
         public static void AddState(this PlayMakerFSM self, FsmState state)
         {
@@ -145,6 +147,14 @@ namespace SkillUpgrades.Util
             fsm.FsmVariables.BoolVariables = boolVariables;
 
             return newFsmBool;
+        }
+
+        public static MethodInfo GetIterationMethod(this MethodInfo method)
+        {
+            return method
+                .GetCustomAttribute<IteratorStateMachineAttribute>()
+                .StateMachineType
+                .GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance);
         }
     }
 }

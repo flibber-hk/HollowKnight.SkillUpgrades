@@ -32,6 +32,8 @@ namespace SkillUpgrades.Skills
 
         internal void ResetSuperdashAngle()
         {
+            if (SuperdashAngle == 0f) return;
+
             if (GameObject.Find("SD Burst") is GameObject burst)
             {
                 burst.transform.parent = HeroController.instance.gameObject.transform;
