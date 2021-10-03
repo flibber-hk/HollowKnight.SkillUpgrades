@@ -26,7 +26,7 @@ namespace SkillUpgrades.Skills
         public override void Initialize()
         {
             On.HeroController.EnterScene += DisableHorizontalQuakeEntry;
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetQuakeState;
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetQuakeStateThroughTransitions;
 
             On.HeroController.Start += ModifyQuakeFSM;
 
@@ -95,7 +95,7 @@ namespace SkillUpgrades.Skills
             return orig(self, enterGate, delayBeforeEnter);
         }
 
-        private void ResetQuakeState(Scene arg0, Scene arg1)
+        private void ResetQuakeStateThroughTransitions(Scene arg0, Scene arg1)
         {
             if (!PersistThroughHorizontalTransitions) ResetQuakeAngle();
         }
@@ -106,14 +106,9 @@ namespace SkillUpgrades.Skills
 
             PlayMakerFSM fsm = self.spellControl;
 
-            fsm.GetState("Quake Finish").AddFirstAction(new ExecuteLambda(() =>
-            {
-                ResetQuakeAngle();
-            }));
-            fsm.GetState("Reset Cam Zoom").AddFirstAction(new ExecuteLambda(() =>
-            {
-                ResetQuakeAngle();
-            }));
+            fsm.GetState("Quake Finish").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
+            fsm.GetState("Reset Cam Zoom").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
+            fsm.GetState("FSM Cancel").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
 
             #region Add FSM Variables
             FsmFloat vSpeed = fsm.AddFsmFloat("V Speed HQ");
