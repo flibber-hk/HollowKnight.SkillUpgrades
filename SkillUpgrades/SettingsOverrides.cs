@@ -153,13 +153,18 @@ namespace SkillUpgrades
         /// </summary>
         /// <param name="name">The name of the skill</param>
         /// <param name="initialize">Whether or not it should be initialized</param>
-        public static void SetSkillLoadState(string name, bool initialize)
+        /// <returns>Whether or not the set was successful</returns>
+        public static bool TrySetSkillLoadState(string name, bool initialize)
         {
+            if (AlreadyLoadedSkills) return false;
+
             SkillLoadOverrides[name] = initialize;
             if (initialize)
             {
                 EnabledSkills[name] = true;
             }
+
+            return true;
         }
 
         /// <summary>
