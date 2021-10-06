@@ -59,10 +59,12 @@ namespace SkillUpgrades.Util
             Transform t = HeroController.instance.vignette.transform.parent;
             HeroController.instance.vignette.transform.SetParent(null);
 
+            float scale = hero.cState.facingRight ? -1 : 1;
+
             Vector2[] colliderBounds = HeroCollider.GetPath(0);
-            float rotation = angle * (respectFacingDirection ? hero.transform.localScale.x : 1);
+            float rotation = angle * (respectFacingDirection ? scale : 1);
             hero.transform.Rotate(0, 0, rotation);
-            HeroCollider.SetPath(0, ApplyRotationToPoints(colliderBounds, -rotation * hero.transform.localScale.x));
+            HeroCollider.SetPath(0, ApplyRotationToPoints(colliderBounds, -rotation * scale));
 
             HeroController.instance.vignette.transform.SetParent(t);
         }
