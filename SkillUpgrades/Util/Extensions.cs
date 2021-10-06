@@ -118,7 +118,7 @@ namespace SkillUpgrades.Util
             FsmFloat newFsmFloat = new FsmFloat(name);
 
             FsmFloat[] floatVariables = new FsmFloat[fsm.FsmVariables.FloatVariables.Length + 1];
-            System.Array.Copy(fsm.FsmVariables.FloatVariables, floatVariables, fsm.FsmVariables.FloatVariables.Length);
+            Array.Copy(fsm.FsmVariables.FloatVariables, floatVariables, fsm.FsmVariables.FloatVariables.Length);
             floatVariables[fsm.FsmVariables.FloatVariables.Length] = newFsmFloat;
             fsm.FsmVariables.FloatVariables = floatVariables;
 
@@ -130,7 +130,7 @@ namespace SkillUpgrades.Util
             FsmInt newFsmInt = new FsmInt(name);
 
             FsmInt[] intVariables = new FsmInt[fsm.FsmVariables.IntVariables.Length + 1];
-            System.Array.Copy(fsm.FsmVariables.IntVariables, intVariables, fsm.FsmVariables.IntVariables.Length);
+            Array.Copy(fsm.FsmVariables.IntVariables, intVariables, fsm.FsmVariables.IntVariables.Length);
             intVariables[fsm.FsmVariables.IntVariables.Length] = newFsmInt;
             fsm.FsmVariables.IntVariables = intVariables;
 
@@ -142,19 +142,11 @@ namespace SkillUpgrades.Util
             FsmBool newFsmBool = new FsmBool(name);
 
             FsmBool[] boolVariables = new FsmBool[fsm.FsmVariables.BoolVariables.Length + 1];
-            System.Array.Copy(fsm.FsmVariables.BoolVariables, boolVariables, fsm.FsmVariables.BoolVariables.Length);
+            Array.Copy(fsm.FsmVariables.BoolVariables, boolVariables, fsm.FsmVariables.BoolVariables.Length);
             boolVariables[fsm.FsmVariables.BoolVariables.Length] = newFsmBool;
             fsm.FsmVariables.BoolVariables = boolVariables;
 
             return newFsmBool;
-        }
-
-        public static MethodInfo GetIterationMethod(this MethodInfo method)
-        {
-            return method
-                .GetCustomAttribute<IteratorStateMachineAttribute>()
-                .StateMachineType
-                .GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance);
         }
     }
 }

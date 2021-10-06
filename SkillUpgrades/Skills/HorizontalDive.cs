@@ -6,6 +6,7 @@ using HutongGames.PlayMaker.Actions;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
+using MonoMod.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using SkillUpgrades.Util;
@@ -32,7 +33,7 @@ namespace SkillUpgrades.Skills
 
             _hook = new ILHook
             (
-                typeof(HeroController).GetMethod(nameof(HeroController.EnterScene)).GetIterationMethod(),
+                typeof(HeroController).GetMethod(nameof(HeroController.EnterScene)).GetStateMachineTarget(),
                 AllowHorizontalQuakeEntry
             );
         }
