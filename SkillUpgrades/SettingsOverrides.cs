@@ -18,7 +18,7 @@ namespace SkillUpgrades
         /// <summary>
         /// Set the value of whether a skill is active.
         /// </summary>
-        /// <param name="skillName">The Name of the skill to set (note - not the type name)</param>
+        /// <param name="skillName">The Name of the skill to set</param>
         /// <param name="set">True or False to enable or disable the skill, null to revert to the global setting.</param>
         /// <returns>True if the skill was loaded, false otherwise.</returns>
         public static bool TrySetSkill(string skillName, bool? set)
@@ -50,13 +50,44 @@ namespace SkillUpgrades
         /// <summary>
         /// Set the value of an int field on a skill
         /// </summary>
-        /// <param name="skillName">The Name of the skill (note - not the type name)</param>
+        /// <param name="skillName">The Name of the skill</param>
         /// <param name="intName">The name of the int</param>
         /// <param name="set">The value of the int to set it to; null to remove the override</param>
         public static void SetInt(string skillName, string intName, int? set)
         {
             string key = SkillUpgradeSettings.GetKey(skillName, intName);
+            SetInt(key, set);
+        }
+        /// <summary>
+        /// Set the value of a bool field on a skill
+        /// </summary>
+        /// <param name="skillName">The Name of the skill</param>
+        /// <param name="boolName">The name of the bool</param>
+        /// <param name="set">The value of the bool to set it to; null to remove the override</param>
+        public static void SetBool(string skillName, string boolName, bool? set)
+        {
+            string key = SkillUpgradeSettings.GetKey(skillName, boolName);
+            SetBool(key, set);
+        }
+        /// <summary>
+        /// Set the value of a float field on a skill
+        /// </summary>
+        /// <param name="skillName">The Name of the skill</param>
+        /// <param name="floatName">The name of the float</param>
+        /// <param name="set">The value of the float to set it to; null to remove the override</param>
+        public static void SetFloat(string skillName, string floatName, float? set)
+        {
+            string key = SkillUpgradeSettings.GetKey(skillName, floatName);
+            SetFloat(key, set);
+        }
 
+        /// <summary>
+        /// Set the value of an int field on a skill
+        /// </summary>
+        /// <param name="key">The key of the field</param>
+        /// <param name="set">The value of the int to set it to; null to remove the override</param>
+        internal static void SetInt(string key, int? set)
+        {
             if (set == null)
             {
                 Integers.Remove(key);
@@ -69,13 +100,10 @@ namespace SkillUpgrades
         /// <summary>
         /// Set the value of a bool field on a skill
         /// </summary>
-        /// <param name="skillName">The Name of the skill (note - not the type name)</param>
-        /// <param name="boolName">The name of the bool</param>
+        /// <param name="key">The key of the field</param>
         /// <param name="set">The value of the bool to set it to; null to remove the override</param>
-        public static void SetBool(string skillName, string boolName, bool? set)
+        internal static void SetBool(string key, bool? set)
         {
-            string key = SkillUpgradeSettings.GetKey(skillName, boolName);
-
             if (set == null)
             {
                 Booleans.Remove(key);
@@ -88,13 +116,10 @@ namespace SkillUpgrades
         /// <summary>
         /// Set the value of a float field on a skill
         /// </summary>
-        /// <param name="skillName">The Name of the skill (note - not the type name)</param>
-        /// <param name="floatName">The name of the float</param>
+        /// <param name="key">The key of the field</param>
         /// <param name="set">The value of the float to set it to; null to remove the override</param>
-        public static void SetFloat(string skillName, string floatName, float? set)
+        internal static void SetFloat(string key, float? set)
         {
-            string key = SkillUpgradeSettings.GetKey(skillName, floatName);
-
             if (set == null)
             {
                 Floats.Remove(key);
@@ -102,49 +127,6 @@ namespace SkillUpgrades
             else
             {
                 Floats[key] = (float)set;
-            }
-        }
-
-        /// <summary>
-        /// Sets the values of all ints in the dictionary (keys given by (skillName, intName) pairs)
-        /// </summary>
-        /// <param name="intValues">
-        /// Key: (skillName, intName)
-        /// Value: The value of the int to set it to; null to remove the override
-        /// </param>
-        public static void SetInts(Dictionary<(string, string), int?> intValues)
-        {
-            foreach (var kvp in intValues)
-            {
-                SetInt(kvp.Key.Item1, kvp.Key.Item2, kvp.Value);
-            }
-        }
-        /// <summary>
-        /// Sets the values of all bools in the dictionary (keys given by (skillName, boolName) pairs)
-        /// </summary>
-        /// <param name="boolValues">
-        /// Key: (skillName, boolName)
-        /// Value: The value of the bool to set it to; null to remove the override
-        /// </param>
-        public static void SetBools(Dictionary<(string, string), bool?> boolValues)
-        {
-            foreach (var kvp in boolValues)
-            {
-                SetBool(kvp.Key.Item1, kvp.Key.Item2, kvp.Value);
-            }
-        }
-        /// <summary>
-        /// Sets the values of all floats in the dictionary (keys given by (skillName, floatName) pairs)
-        /// </summary>
-        /// <param name="floatValues">
-        /// Key: (skillName, floatName)
-        /// Value: The value of the float to set it to; null to remove the override
-        /// </param>
-        public static void SetFloats(Dictionary<(string, string), float?> floatValues)
-        {
-            foreach (var kvp in floatValues)
-            {
-                SetFloat(kvp.Key.Item1, kvp.Key.Item2, kvp.Value);
             }
         }
 

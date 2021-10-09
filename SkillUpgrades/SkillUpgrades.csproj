@@ -91,6 +91,7 @@
     <Compile Include="Skills\HorizontalDive.cs" />
     <Compile Include="Skills\SpiralScream.cs" />
     <Compile Include="Skills\WallClimb.cs" />
+    <Compile Include="SkillUpgradeSaveData.cs" />
     <Compile Include="Util\DecideToStopQuake.cs" />
     <Compile Include="Util\DecideToStopSuperdash.cs" />
     <Compile Include="Util\ExecuteLambda.cs" />
