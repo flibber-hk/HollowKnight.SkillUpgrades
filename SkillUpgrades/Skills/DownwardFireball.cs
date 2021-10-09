@@ -6,7 +6,7 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    internal class DownwardFireball : AbstractSkillUpgrade
+    public class DownwardFireball : AbstractSkillUpgrade
     {
         public override string UIName => "Downward Fireball";
         public override string Description => "Toggle whether Vengeful Spirit can be used downward.";

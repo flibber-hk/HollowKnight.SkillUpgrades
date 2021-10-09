@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 namespace SkillUpgrades.Skills
 {
-    internal class VerticalSuperdash : AbstractSkillUpgrade
+    public class VerticalSuperdash : AbstractSkillUpgrade
     {
         public bool DiagonalSuperdash => GetBool(true);
         public bool BreakDiveFloorsFromBelow => GetBool(false);

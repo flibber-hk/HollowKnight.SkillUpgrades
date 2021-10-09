@@ -7,7 +7,7 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    internal class WallClimb : AbstractSkillUpgrade
+    public class WallClimb : AbstractSkillUpgrade
     {
         public float ClimbSpeed => GetFloat(5.0f);
         public float ClimbSpeedConveyor => ClimbSpeed;

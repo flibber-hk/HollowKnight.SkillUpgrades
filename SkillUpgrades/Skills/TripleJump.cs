@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SkillUpgrades.Skills
 {
-    internal class TripleJump : AbstractSkillUpgrade
+    public class TripleJump : AbstractSkillUpgrade
     {
         public int DoubleJumpMax => GetInt(2);
 

@@ -8,7 +8,7 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    internal class DirectionalDash : AbstractSkillUpgrade
+    public class DirectionalDash : AbstractSkillUpgrade
     {
         /// <summary>
         /// True: down dashes behave normal (i.e. no down diagonal, and down iff dashmaster equipped).

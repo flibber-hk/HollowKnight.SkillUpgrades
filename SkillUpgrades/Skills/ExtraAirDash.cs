@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SkillUpgrades.Skills
 {
-    internal class ExtraAirDash : AbstractSkillUpgrade
+    public class ExtraAirDash : AbstractSkillUpgrade
     {
 
         public int AirDashMax => GetInt(2);

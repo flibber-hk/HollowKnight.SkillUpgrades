@@ -13,7 +13,7 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    internal class HorizontalDive : AbstractSkillUpgrade
+    public class HorizontalDive : AbstractSkillUpgrade
     {
         public bool PersistThroughHorizontalTransitions => GetBool(false);
 
