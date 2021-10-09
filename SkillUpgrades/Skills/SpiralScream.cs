@@ -42,7 +42,7 @@ namespace SkillUpgrades.Skills
             FsmState screamGet = fsm.GetState("Scream Get?");
             screamGet.AddFirstAction(new ExecuteLambda(() =>
             {
-                if (!skillUpgradeActive)
+                if (!SkillUpgradeActive)
                 {
                     Circler.direction = 0;
                     return;

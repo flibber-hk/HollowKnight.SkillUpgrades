@@ -12,7 +12,7 @@ namespace SkillUpgrades.Skills
 
             string key = SkillUpgradeSettings.GetKey(Name, name);
 
-            if (SettingsOverrides.Booleans.TryGetValue(key, out bool ret)) return ret;
+            if (SkillUpgrades.localOverrides.Booleans.TryGetValue(key, out bool ret)) return ret;
             else if (SkillUpgrades.globalSettings.Booleans.TryGetValue(key, out ret)) return ret;
 
             SkillUpgrades.globalSettings.Booleans[key] = @default; return @default;
@@ -23,7 +23,7 @@ namespace SkillUpgrades.Skills
 
             string key = SkillUpgradeSettings.GetKey(Name, name);
 
-            if (SettingsOverrides.Integers.TryGetValue(key, out int ret)) return ret;
+            if (SkillUpgrades.localOverrides.Integers.TryGetValue(key, out int ret)) return ret;
             else if (SkillUpgrades.globalSettings.Integers.TryGetValue(key, out ret)) return ret;
 
             SkillUpgrades.globalSettings.Integers[key] = @default; return @default;
@@ -34,7 +34,7 @@ namespace SkillUpgrades.Skills
 
             string key = SkillUpgradeSettings.GetKey(Name, name);
 
-            if (SettingsOverrides.Floats.TryGetValue(key, out float ret)) return ret;
+            if (SkillUpgrades.localOverrides.Floats.TryGetValue(key, out float ret)) return ret;
             else if (SkillUpgrades.globalSettings.Floats.TryGetValue(key, out ret)) return ret;
 
             SkillUpgrades.globalSettings.Floats[key] = @default; return @default;

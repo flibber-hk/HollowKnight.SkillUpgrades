@@ -125,7 +125,7 @@ namespace SkillUpgrades.Skills
             #region Set Direction Value
             fsm.GetState("Quake Antic").AddFirstAction(new ExecuteLambda(() =>
             {
-                if (skillUpgradeActive)
+                if (SkillUpgradeActive)
                 {
                     if (InputHandler.Instance.inputActions.right.IsPressed) QuakeAngle = 90;
                     else if (InputHandler.Instance.inputActions.left.IsPressed) QuakeAngle = -90;

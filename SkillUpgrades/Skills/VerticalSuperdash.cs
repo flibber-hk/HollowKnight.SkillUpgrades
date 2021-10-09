@@ -91,7 +91,7 @@ namespace SkillUpgrades.Skills
             {
                 bool shouldDiagonal = false;
                 bool shouldVertical = false;
-                if (DiagonalSuperdash && skillUpgradeActive)
+                if (DiagonalSuperdash && SkillUpgradeActive)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
@@ -105,7 +105,7 @@ namespace SkillUpgrades.Skills
                         }
                     }
                 }
-                if (skillUpgradeActive && !shouldDiagonal)
+                if (SkillUpgradeActive && !shouldDiagonal)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
@@ -125,7 +125,7 @@ namespace SkillUpgrades.Skills
 
             fsm.GetState("Direction Wall").AddFirstAction(new ExecuteLambda(() =>
             {
-                if (DiagonalSuperdash && skillUpgradeActive)
+                if (DiagonalSuperdash && SkillUpgradeActive)
                 {
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {

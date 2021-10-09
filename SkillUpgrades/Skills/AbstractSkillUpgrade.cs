@@ -25,6 +25,6 @@
         /// </summary>
         public void ReInitialize() { if (IsUnloadable) Initialize(); }
 
-        protected internal bool skillUpgradeActive = true;
+        public bool SkillUpgradeActive { get; set; } = true;
     }
 }

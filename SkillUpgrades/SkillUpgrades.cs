@@ -8,7 +8,7 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades
 {
-    public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, IMenuMod
+    public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, ILocalSettings<SkillUpgradeSaveData>, IMenuMod
     {
         internal static SkillUpgrades instance;
         internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new Dictionary<string, AbstractSkillUpgrade>();
@@ -17,6 +17,12 @@ namespace SkillUpgrades
         public static SkillUpgradeSettings globalSettings { get; set; } = new SkillUpgradeSettings();
         public void OnLoadGlobal(SkillUpgradeSettings s) => globalSettings = s;
         public SkillUpgradeSettings OnSaveGlobal() => globalSettings;
+        #endregion
+
+        #region Local Settings
+        public static SkillUpgradeSaveData localOverrides { get; set; } = new SkillUpgradeSaveData();
+        public void OnLoadLocal(SkillUpgradeSaveData s) => localOverrides = s;
+        public SkillUpgradeSaveData OnSaveLocal() => localOverrides;
         #endregion
 
         public override void Initialize()
@@ -52,13 +58,9 @@ namespace SkillUpgrades
                     skill.Log("Loading skill upgrade");
 
                     skill.Initialize();
-                    skill.skillUpgradeActive = true;
+                    skill.SkillUpgradeActive = true;
 
-                    if (!SettingsOverrides.SkillLoadOverrides.ContainsKey(skill.Name) && (enabled == false || !globalSettings.GlobalToggle))
-                    {
-                        skill.skillUpgradeActive = false;
-                        skill.Unload();
-                    }
+                    UpdateSkillState(skill.Name);
                 }
 
             }
@@ -118,7 +120,7 @@ namespace SkillUpgrades
             }
 
             bool shouldEnable;
-            if (SettingsOverrides.EnabledSkills.TryGetValue(name, out bool overrideValue))
+            if (localOverrides.EnabledSkills.TryGetValue(name, out bool overrideValue))
             {
                 shouldEnable = overrideValue;
             }
@@ -128,14 +130,14 @@ namespace SkillUpgrades
                 shouldEnable &= globalSettings.GlobalToggle;
             }
 
-            if (shouldEnable && !skill.skillUpgradeActive)
+            if (shouldEnable && !skill.SkillUpgradeActive)
             {
                 skill.ReInitialize();
-                skill.skillUpgradeActive = true;
+                skill.SkillUpgradeActive = true;
             }
-            else if (!shouldEnable && skill.skillUpgradeActive)
+            else if (!shouldEnable && skill.SkillUpgradeActive)
             {
-                skill.skillUpgradeActive = false;
+                skill.SkillUpgradeActive = false;
                 skill.Unload();
             }
         }

@@ -162,7 +162,7 @@ namespace SkillUpgrades.Skills
             #region Set/Unset down fireball bool
             fsm.GetState("Level Check").AddFirstAction(new ExecuteLambda(() =>
             {
-                if (skillUpgradeActive && !InputHandler.Instance.inputActions.left.IsPressed && !InputHandler.Instance.inputActions.right.IsPressed)
+                if (SkillUpgradeActive && !InputHandler.Instance.inputActions.left.IsPressed && !InputHandler.Instance.inputActions.right.IsPressed)
                 {
                     FireballDown = true;
                 }

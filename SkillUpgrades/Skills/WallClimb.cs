@@ -84,7 +84,7 @@ namespace SkillUpgrades.Skills
             {
                 wallCancel.Actions[2] = new ExecuteLambda(() =>
                 {
-                    if (!skillUpgradeActive)
+                    if (!SkillUpgradeActive)
                     {
                         HeroController.instance.AffectedByGravity(true);
                     }
@@ -96,7 +96,7 @@ namespace SkillUpgrades.Skills
             {
                 regainControl.Actions[5] = new ExecuteLambda(() =>
                 {
-                    if (!skillUpgradeActive || !HeroController.instance.cState.wallSliding)
+                    if (!SkillUpgradeActive || !HeroController.instance.cState.wallSliding)
                     {
                         HeroController.instance.AffectedByGravity(true);
                     }
@@ -117,7 +117,7 @@ namespace SkillUpgrades.Skills
                 i => i.MatchCallvirt<InControl.OneAxisInputControl>("get_WasPressed")
             ))
             {
-                cursor.EmitDelegate<Func<bool, bool>>(pressed => pressed && !skillUpgradeActive);
+                cursor.EmitDelegate<Func<bool, bool>>(pressed => pressed && !SkillUpgradeActive);
             }
         }
 
@@ -132,7 +132,7 @@ namespace SkillUpgrades.Skills
                 i => i.MatchLdfld<HeroController>(nameof(HeroController.WALLSLIDE_SPEED))
             ))
             {
-                cursor.EmitDelegate<Func<float, float>>((s) => skillUpgradeActive ? 0 : s);
+                cursor.EmitDelegate<Func<float, float>>((s) => SkillUpgradeActive ? 0 : s);
             }
         }
 
@@ -140,7 +140,7 @@ namespace SkillUpgrades.Skills
         {
             orig(self);
 
-            if (skillUpgradeActive && self.cState.wallSliding && Ref.HeroRigidBody.gravityScale <= Mathf.Epsilon && !self.cState.onConveyorV)
+            if (SkillUpgradeActive && self.cState.wallSliding && Ref.HeroRigidBody.gravityScale <= Mathf.Epsilon && !self.cState.onConveyorV)
             {
                 Vector2 pos = HeroController.instance.transform.position;
 
@@ -162,7 +162,7 @@ namespace SkillUpgrades.Skills
 
         private void HeroController_ResetState(On.HeroController.orig_ResetState orig, HeroController self)
         {
-            if (self.cState.wallSliding && skillUpgradeActive) HeroController.instance.AffectedByGravity(true);
+            if (self.cState.wallSliding && SkillUpgradeActive) HeroController.instance.AffectedByGravity(true);
             orig(self);
         }
 
@@ -183,10 +183,10 @@ namespace SkillUpgrades.Skills
                 switch (matchedBool)
                 {
                     case 0:
-                        cursor.EmitDelegate<Action>(() => { if (skillUpgradeActive) HeroController.instance.AffectedByGravity(true); });
+                        cursor.EmitDelegate<Action>(() => { if (SkillUpgradeActive) HeroController.instance.AffectedByGravity(true); });
                         break;
                     case 1:
-                        cursor.EmitDelegate<Action>(() => { if (skillUpgradeActive) HeroController.instance.AffectedByGravity(false); });
+                        cursor.EmitDelegate<Action>(() => { if (SkillUpgradeActive) HeroController.instance.AffectedByGravity(false); });
                         break;
                     default:
                         break;
