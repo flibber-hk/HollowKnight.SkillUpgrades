@@ -164,14 +164,15 @@ namespace SkillUpgrades.Skills
 
             float z = GetPrefabRotation(_dashDirection);
 
-            self.dashBurst.transform.RotateAround(self.transform.position, Vector3.forward, z * self.transform.localScale.x);
+            float scale = self.cState.facingRight ? -1 : 1;
+            self.dashBurst.transform.RotateAround(self.transform.position, Vector3.forward, z * scale);
 
             if (_dashDirection == DashDirection.Up || self.cState.shadowDashing)
             {
                 // The dash effect prefab is either the shadow dash trail or the ground smoke. If we're dashing diagonally from the ground, 
                 // we don't want to rotate the smoke or it won't appear.
                 GameObject dashEffect = ReflectionHelper.GetField<HeroController, GameObject>(self, "dashEffect");
-                dashEffect?.transform.RotateAround(self.transform.position, Vector3.forward, z * self.transform.localScale.x);
+                dashEffect?.transform.RotateAround(self.transform.position, Vector3.forward, z * scale);
             }
         }
 

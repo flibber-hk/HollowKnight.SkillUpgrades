@@ -176,12 +176,14 @@ namespace SkillUpgrades.Skills
             #region Rotate fireball on emit
             ExecuteLambda doRotate = new ExecuteLambda(() =>
             {
-                if (FireballDown) HeroController.instance.transform.Rotate(0, 0, 90 * HeroController.instance.transform.localScale.x);
+                float scale = HeroController.instance.cState.facingRight ? -1 : 1;
+                if (FireballDown) HeroController.instance.transform.Rotate(0, 0, 90 * scale);
             });
 
             ExecuteLambda unRotate = new ExecuteLambda(() =>
             {
-                if (FireballDown) HeroController.instance.transform.Rotate(0, 0, -90 * HeroController.instance.transform.localScale.x);
+                float scale = HeroController.instance.cState.facingRight ? -1 : 1;
+                if (FireballDown) HeroController.instance.transform.Rotate(0, 0, -90 * scale);
             });
 
             ExecuteLambda spawnSpirit = new ExecuteLambda(() =>
@@ -254,16 +256,16 @@ namespace SkillUpgrades.Skills
             ExecuteLambda setParams = new ExecuteLambda(() =>
             {
                 float val = fsm.FsmVariables.GetFsmFloat("Fireball Recoil Distance").Value;
-                val *= HeroController.instance.transform.localScale.x;
+                val *= HeroController.instance.cState.facingRight ? -1 : 1;
                 if (FireballDown)
                 {
-                    fsm.FsmVariables.GetFsmVector3("Fireball Recoil Vector").Value = new UnityEngine.Vector3(0, Math.Abs(val), 0);
+                    fsm.FsmVariables.GetFsmVector3("Fireball Recoil Vector").Value = new Vector3(0, Math.Abs(val), 0);
                     yRecoil.Value = 2 * Math.Abs(val);
                     fsm.FsmVariables.GetFsmFloat("Fireball Recoil Current").Value = 0f;
                 }
                 else
                 {
-                    fsm.FsmVariables.GetFsmVector3("Fireball Recoil Vector").Value = new UnityEngine.Vector3(val, 0, 0);
+                    fsm.FsmVariables.GetFsmVector3("Fireball Recoil Vector").Value = new Vector3(val, 0, 0);
                     fsm.FsmVariables.GetFsmFloat("Fireball Recoil Current").Value = 2 * val;
                     yRecoil.Value = 0f;
                 }
