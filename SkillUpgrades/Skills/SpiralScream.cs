@@ -7,6 +7,10 @@ namespace SkillUpgrades.Skills
 {
     public class SpiralScream : AbstractSkillUpgrade
     {
+        public bool LeftSpiralScreamAllowed => GetBool(true);
+        public bool RightSpiralScreamAllowed => GetBool(true);
+
+
         public override string UIName => "Spiral Scream";
         public override string Description => "Toggle whether Howling Wraiths can sweep a circle around the knight";
 
@@ -49,8 +53,8 @@ namespace SkillUpgrades.Skills
                 }
 
                 HeroActions ia = InputHandler.Instance.inputActions;
-                if (ia.right.IsPressed) Circler.direction = -1;
-                else if (ia.left.IsPressed) Circler.direction = 1;
+                if (ia.right.IsPressed && RightSpiralScreamAllowed) Circler.direction = -1;
+                else if (ia.left.IsPressed && LeftSpiralScreamAllowed) Circler.direction = 1;
                 else Circler.direction = 0;
             }));
         }

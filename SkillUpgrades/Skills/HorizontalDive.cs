@@ -15,7 +15,9 @@ namespace SkillUpgrades.Skills
 {
     public class HorizontalDive : AbstractSkillUpgrade
     {
-        public bool PersistThroughHorizontalTransitions => GetBool(false);
+        public bool PersistThroughHorizontalTransitions => GetBool(true);
+        public bool LeftwardDiveAllowed => GetBool(true);
+        public bool RightwardDiveAllowed => GetBool(true);
 
         public override string UIName => "Horizontal Dive";
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
@@ -127,8 +129,8 @@ namespace SkillUpgrades.Skills
             {
                 if (SkillUpgradeActive)
                 {
-                    if (InputHandler.Instance.inputActions.right.IsPressed) QuakeAngle = 90;
-                    else if (InputHandler.Instance.inputActions.left.IsPressed) QuakeAngle = -90;
+                    if (InputHandler.Instance.inputActions.right.IsPressed && RightwardDiveAllowed) QuakeAngle = 90;
+                    else if (InputHandler.Instance.inputActions.left.IsPressed && LeftwardDiveAllowed) QuakeAngle = -90;
                     HeroController.instance.RotateHero(QuakeAngle, respectFacingDirection: false);
                 }
 
