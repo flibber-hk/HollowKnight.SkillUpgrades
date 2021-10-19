@@ -17,11 +17,10 @@ namespace SkillUpgrades.Skills
         public bool UnmodifiedDownDashes => GetBool(false);
         public bool MaintainVerticalMomentum => GetBool(true);
 
-        public override string UIName => "Directional Dash";
         public override string Description => "Toggle whether dash can be used in all 8 directions.";
 
 
-        public override void Initialize()
+        protected override void RepeatableInitialize()
         {
             ModHooks.DashPressedHook += CalculateDashVector;
             ModHooks.DashVectorHook += OverrideDashVector;
@@ -39,7 +38,7 @@ namespace SkillUpgrades.Skills
                 DisableOldDashmaster();
             }
         }
-        public override void Unload()
+        protected override void Unload()
         {
             ModHooks.DashPressedHook -= CalculateDashVector;
             ModHooks.DashVectorHook -= OverrideDashVector;

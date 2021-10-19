@@ -83,9 +83,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SettingsOverrides.cs" />
+    <Compile Include="SkillSettingOverrides.cs" />
     <Compile Include="Skills\AbstractSkillUpgrade.cs" />
-    <Compile Include="Skills\AbstractSkillUpgrade.Methods.cs" />
     <Compile Include="Skills\DirectionalDash.cs" />
     <Compile Include="Skills\DownwardFireball.cs" />
     <Compile Include="Skills\HorizontalDive.cs" />
@@ -97,7 +96,7 @@
     <Compile Include="Util\ExecuteLambda.cs" />
     <Compile Include="Util\ExecuteLambdaEveryFrame.cs" />
     <Compile Include="Util\HeroRotation.cs" />
-    <Compile Include="Util\Extensions.cs" />
+    <Compile Include="Util\FsmExtensions.cs" />
     <Compile Include="SkillUpgradeSettings.cs" />
     <Compile Include="Skills\ExtraAirDash.cs" />
     <Compile Include="Skills\TripleJump.cs" />

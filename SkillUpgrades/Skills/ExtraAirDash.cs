@@ -14,17 +14,22 @@ namespace SkillUpgrades.Skills
     {
 
         public int AirDashMax => GetInt(2);
+        public int LocalExtraDashes
+        {
+            get => GetIntLocal(0);
+            set => SetIntLocal(value);
+        }
 
-        public override string UIName => "Extra Air Dash";
         public override string Description => "Toggle whether dash can be used more than once before landing.";
 
-        public override void Initialize()
+        protected override void RepeatableInitialize()
         {
+            airDashCount = 0;
             AddRefreshHooks();
             On.HeroController.HeroDash += AllowExtraAirDash;
         }
 
-        public override void Unload()
+        protected override void Unload()
         {
             RemoveRefreshHooks();
             On.HeroController.HeroDash -= AllowExtraAirDash;
@@ -44,6 +49,11 @@ namespace SkillUpgrades.Skills
 
                 if (airDashCount < AirDashMax || AirDashMax == -1)
                 {
+                    GameManager.instance.StartCoroutine(RefreshDashInAir());
+                }
+                else if (LocalExtraDashes > 0)
+                {
+                    LocalExtraDashes -= 1;
                     GameManager.instance.StartCoroutine(RefreshDashInAir());
                 }
             }

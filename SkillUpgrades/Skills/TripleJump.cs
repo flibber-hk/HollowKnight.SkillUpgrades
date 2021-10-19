@@ -12,18 +12,22 @@ namespace SkillUpgrades.Skills
     public class TripleJump : AbstractSkillUpgrade
     {
         public int DoubleJumpMax => GetInt(2);
+        public int LocalExtraJumps
+        {
+            get => GetIntLocal(0);
+            set => SetIntLocal(value);
+        }
 
-        public override string UIName => "Triple Jump";
         public override string Description => "Toggle whether wings can be used more than once before landing.";
 
 
-        public override void Initialize()
+        protected override void RepeatableInitialize()
         {
             doubleJumpCount = 0;
             AddRefreshHooks();
             On.HeroController.DoDoubleJump += AllowTripleJump;
         }
-        public override void Unload()
+        protected override void Unload()
         {
             RemoveRefreshHooks();
             On.HeroController.DoDoubleJump -= AllowTripleJump;
@@ -46,6 +50,11 @@ namespace SkillUpgrades.Skills
 
             if (doubleJumpCount < DoubleJumpMax || DoubleJumpMax == -1)
             {
+                GameManager.instance.StartCoroutine(RefreshWingsInAir());
+            }
+            else if (LocalExtraJumps > 0)
+            {
+                LocalExtraJumps -= 1;
                 GameManager.instance.StartCoroutine(RefreshWingsInAir());
             }
         }

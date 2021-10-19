@@ -12,12 +12,11 @@ namespace SkillUpgrades.Skills
         public bool DiagonalSuperdash => GetBool(true);
         public bool BreakDiveFloorsFromBelow => GetBool(false);
 
-        public override string UIName => "Vertical Superdash";
         public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";
 
         public override bool InvolvesHeroRotation => true;
 
-        public override void Initialize()
+        protected override void StartUpInitialize()
         {
             On.CameraTarget.Update += FixVerticalCamera;
             On.GameManager.FinishedEnteringScene += DisableUpwardOneways;

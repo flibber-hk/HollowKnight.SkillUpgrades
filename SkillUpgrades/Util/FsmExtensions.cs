@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using Modding;
 
 namespace SkillUpgrades.Util
 {
-    public static class Extensions
+    public static class FsmExtensions
     {
         public static void AddState(this PlayMakerFSM self, FsmState state)
         {

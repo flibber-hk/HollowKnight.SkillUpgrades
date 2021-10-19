@@ -8,10 +8,9 @@ namespace SkillUpgrades.Skills
 {
     public class DownwardFireball : AbstractSkillUpgrade
     {
-        public override string UIName => "Downward Fireball";
         public override string Description => "Toggle whether Vengeful Spirit can be used downward.";
 
-        public override void Initialize()
+        protected override void StartUpInitialize()
         {
             On.HeroController.Start += ModifyFireballFSM;
         }

@@ -13,10 +13,9 @@ namespace SkillUpgrades.Skills
         public float ClimbSpeedConveyor => ClimbSpeed;
 
 
-        public override string UIName => "Wall Climb";
         public override string Description => "Toggle whether claw can be used to climb up and down walls.";
         
-        public override void Initialize()
+        protected override void StartUpInitialize()
         {
             // Replace WALLSLIDE_SPEED with 0 in the Fixed Update function, so the knight doesn't move down walls. 
             // Doing it like this allows the skill to be more easily toggled "live".

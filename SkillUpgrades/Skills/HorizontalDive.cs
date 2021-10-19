@@ -16,17 +16,16 @@ namespace SkillUpgrades.Skills
     public class HorizontalDive : AbstractSkillUpgrade
     {
         public bool PersistThroughHorizontalTransitions => GetBool(true);
-        public bool LeftwardDiveAllowed => GetBool(true);
-        public bool RightwardDiveAllowed => GetBool(true);
+        public bool LeftwardDiveAllowed => GetBoolLocal(true);
+        public bool RightwardDiveAllowed => GetBoolLocal(true);
 
-        public override string UIName => "Horizontal Dive";
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
 
         public override bool InvolvesHeroRotation => true;
 
 
         private ILHook _hook;
-        public override void Initialize()
+        protected override void StartUpInitialize()
         {
             On.HeroController.EnterScene += DisableHorizontalQuakeEntry;
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetQuakeStateThroughTransitions;

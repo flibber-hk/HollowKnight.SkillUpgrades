@@ -7,14 +7,13 @@ namespace SkillUpgrades.Skills
 {
     public class SpiralScream : AbstractSkillUpgrade
     {
-        public bool LeftSpiralScreamAllowed => GetBool(true);
-        public bool RightSpiralScreamAllowed => GetBool(true);
+        public bool LeftSpiralScreamAllowed => GetBoolLocal(true);
+        public bool RightSpiralScreamAllowed => GetBoolLocal(true);
 
 
-        public override string UIName => "Spiral Scream";
         public override string Description => "Toggle whether Howling Wraiths can sweep a circle around the knight";
 
-        public override void Initialize()
+        protected override void StartUpInitialize()
         {
             On.HeroController.Start += HeroController_Start;
         }
