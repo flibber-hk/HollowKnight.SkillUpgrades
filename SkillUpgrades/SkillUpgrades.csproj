@@ -91,10 +91,10 @@
     <Compile Include="Skills\SpiralScream.cs" />
     <Compile Include="Skills\WallClimb.cs" />
     <Compile Include="SkillUpgradeSaveData.cs" />
-    <Compile Include="Util\DecideToStopQuake.cs" />
-    <Compile Include="Util\DecideToStopSuperdash.cs" />
-    <Compile Include="Util\ExecuteLambda.cs" />
-    <Compile Include="Util\ExecuteLambdaEveryFrame.cs" />
+    <Compile Include="FsmStateActions\DecideToStopQuake.cs" />
+    <Compile Include="FsmStateActions\DecideToStopSuperdash.cs" />
+    <Compile Include="FsmStateActions\ExecuteLambda.cs" />
+    <Compile Include="FsmStateActions\ExecuteLambdaEveryFrame.cs" />
     <Compile Include="Util\HeroRotation.cs" />
     <Compile Include="Util\FsmExtensions.cs" />
     <Compile Include="SkillUpgradeSettings.cs" />

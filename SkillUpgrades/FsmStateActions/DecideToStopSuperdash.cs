@@ -3,17 +3,19 @@ using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using UnityEngine;
 
-namespace SkillUpgrades.Util
+namespace SkillUpgrades.FsmStateActions
 {
-    internal class DecideToStopQuake : ComponentAction<Rigidbody2D>
+    internal class DecideToStopSuperdash : ComponentAction<Rigidbody2D>
     {
         private readonly FsmFloat _hSpeed;
         private readonly FsmFloat _vSpeed;
+        private readonly FsmBool _zeroLast;
 
-        public DecideToStopQuake(FsmFloat hSpeed, FsmFloat vSpeed)
+        public DecideToStopSuperdash(FsmFloat hSpeed, FsmFloat vSpeed, FsmBool zeroLast)
         {
             _hSpeed = hSpeed;
             _vSpeed = vSpeed;
+            _zeroLast = zeroLast;
         }
 
 
@@ -25,7 +27,7 @@ namespace SkillUpgrades.Util
             }
             catch (Exception e)
             {
-                LogError("Error in DecideToStopQuake (OnEnter/UpdateCache):\n" + e);
+                LogError("Error in DecideToStopSuperdash (OnEnter/UpdateCache):\n" + e);
             }
 
             try
@@ -34,7 +36,7 @@ namespace SkillUpgrades.Util
             }
             catch (Exception e)
             {
-                LogError("Error in DecideToStopQuake (OnEnter):\n" + e);
+                LogError("Error in DecideToStopSuperdash (OnEnter):\n" + e);
             }
         }
 
@@ -46,27 +48,17 @@ namespace SkillUpgrades.Util
             }
             catch (Exception e)
             {
-                LogError("Error in DecideToStopQuake (OnUpdate):\n" + e);
+                LogError("Error in DecideToStopSuperdash (OnUpdate):\n" + e);
             }
         }
 
         private void DecideToStop()
         {
-            bool shouldStop = false;
-
-            // Check Collision Side
-            // The code for this is quite complicated so I'll just do some cursed modification of the CheckCollisionSide action
-
-            // GetVelocity
             Vector2 vector = rigidbody2d.velocity;
 
-            if (Math.Abs(_hSpeed.Value) >= 0.4f && Math.Abs(vector.x) < 0.2f) shouldStop = true;
-            if (Math.Abs(_vSpeed.Value) >= 0.4f && Math.Abs(vector.y) < 0.2f) shouldStop = true;
-
-            if (shouldStop)
-            {
-                Fsm.FsmComponent.SendEvent("HERO LANDED");
-            }
+            if (Math.Abs(_hSpeed.Value) >= 0.2f && Math.Abs(vector.x) < 0.1f) _zeroLast.Value = true;
+            else if (Math.Abs(_vSpeed.Value) >= 0.2f && Math.Abs(vector.y) < 0.1f) _zeroLast.Value = true;
+            else _zeroLast.Value = false;
         }
     }
 }

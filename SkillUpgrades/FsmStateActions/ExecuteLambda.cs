@@ -1,7 +1,7 @@
 ﻿using System;
 using HutongGames.PlayMaker;
 
-namespace SkillUpgrades.Util
+namespace SkillUpgrades.FsmStateActions
 {
     internal class ExecuteLambda : FsmStateAction
     {

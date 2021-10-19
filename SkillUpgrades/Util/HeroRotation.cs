@@ -70,6 +70,18 @@ namespace SkillUpgrades.Util
         }
 
         /// <summary>
+        /// Set the hero rotation to be angle degrees counterclockwise. Equivalent to ResetHero() followed by RotateHero()
+        /// </summary>
+        /// <param name="hero">HeroController.instnce</param>
+        /// <param name="angle">Angle to rotate</param>
+        /// <param name="respectFacingDirection">If this is true, instead set it to be a clockwise rotation when the hero is facing right</param>
+        public static void SetHeroRotation(this HeroController hero, float angle, bool respectFacingDirection = true)
+        {
+            ResetHero();
+            hero.RotateHero(angle, respectFacingDirection);
+        }
+
+        /// <summary>
         /// Reset the knight's rotation
         /// </summary>
         public static void ResetHero()

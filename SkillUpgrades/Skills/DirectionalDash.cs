@@ -15,7 +15,16 @@ namespace SkillUpgrades.Skills
         /// False: all 8 directions are allowed
         /// </summary>
         public bool UnmodifiedDownDashes => GetBool(false);
+        /// <summary>
+        /// True: after a vertical dash, continue moving upwards (affected by gravity)
+        /// False: after a vertical dash, stop moving immediately
+        /// </summary>
         public bool MaintainVerticalMomentum => GetBool(true);
+        /// <summary>
+        /// Straight up dashes get multiplied by this number
+        /// </summary>
+        public float UpdashPenalty => GetFloat(1f/(float)Math.Pow(2, 1f/3f));
+
 
         public override string Description => "Toggle whether dash can be used in all 8 directions.";
 
@@ -151,6 +160,10 @@ namespace SkillUpgrades.Skills
             {
                 x *= (float)(1 / Math.Sqrt(2));
                 y *= (float)(1 / Math.Sqrt(2));
+            }
+            else if (_dashDirection == DashDirection.Up)
+            {
+                y *= Mathf.Clamp(UpdashPenalty, 0, 1);
             }
 
             _maintainingVerticalDashMomentum = _dashDirection.HasFlag(DashDirection.Up);
