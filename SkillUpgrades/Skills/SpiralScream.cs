@@ -16,6 +16,7 @@ namespace SkillUpgrades.Skills
 
         protected override void StartUpInitialize()
         {
+            Circler.SetDirection = SetCirclerDirection;
             On.HeroController.Start += HeroController_Start;
         }
 
@@ -44,19 +45,20 @@ namespace SkillUpgrades.Skills
             }
 
             FsmState screamGet = fsm.GetState("Scream Get?");
-            screamGet.AddFirstAction(new ExecuteLambda(() =>
-            {
-                if (!SkillUpgradeActive)
-                {
-                    Circler.direction = 0;
-                    return;
-                }
+        }
 
-                HeroActions ia = InputHandler.Instance.inputActions;
-                if (ia.right.IsPressed && RightSpiralScreamAllowed) Circler.direction = -1;
-                else if (ia.left.IsPressed && LeftSpiralScreamAllowed) Circler.direction = 1;
-                else Circler.direction = 0;
-            }));
+        public void SetCirclerDirection()
+        {
+            if (!SkillUpgradeActive)
+            {
+                Circler.direction = 0;
+                return;
+            }
+
+            HeroActions ia = InputHandler.Instance.inputActions;
+            if (ia.right.IsPressed && RightSpiralScreamAllowed) Circler.direction = -1;
+            else if (ia.left.IsPressed && LeftSpiralScreamAllowed) Circler.direction = 1;
+            else Circler.direction = 0;
         }
     }
 
@@ -64,6 +66,10 @@ namespace SkillUpgrades.Skills
     {
         private bool circled;
         private float angle;
+
+        // It's kinda bad that we have to do an action like this but I want the code to run in Circler.OnEnable but depend on the
+        // particular Spiral Scream instance (without having a static SpiralScream.instance or whatever)
+        public static Action SetDirection;
 
         public static float cycleTime = 0.45f;
         /// <summary>
@@ -78,6 +84,7 @@ namespace SkillUpgrades.Skills
             ResetRotation();
             angle = 0f;
             circled = false;
+            SetDirection();
         }
 
         public void Update()
