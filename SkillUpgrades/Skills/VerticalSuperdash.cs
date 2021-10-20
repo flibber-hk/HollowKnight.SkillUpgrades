@@ -2,7 +2,6 @@
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
 
@@ -23,7 +22,6 @@ namespace SkillUpgrades.Skills
         {
             On.CameraTarget.Update += FixVerticalCamera;
             On.GameManager.FinishedEnteringScene += DisableUpwardOneways;
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetSuperdashState;
             On.HeroController.Start += ModifySuperdashFsm;
         }
 
@@ -35,8 +33,15 @@ namespace SkillUpgrades.Skills
         private GameObject burst;
         internal void ResetSuperdashAngle()
         {
+            if (!HeroController.instance.cState.superDashing)
+            {
+                return;
+            }
+
             SuperdashAngle = 0f;
             HeroRotation.ResetHero();
+
+            if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL END");
 
             if (burst != null)
             {
@@ -44,11 +49,9 @@ namespace SkillUpgrades.Skills
                 burst.transform.rotation = Quaternion.identity;
                 burst.SetActive(false);
             }
-
-            if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL END");
         }
 
-
+        // This function is slightly broken :(
         private void FixVerticalCamera(On.CameraTarget.orig_Update orig, CameraTarget self)
         {
             orig(self);
@@ -72,10 +75,6 @@ namespace SkillUpgrades.Skills
                         topTransition.SetActive(false);
                     break;
             }
-        }
-        private void ResetSuperdashState(Scene arg0, Scene arg1)
-        {
-            ResetSuperdashAngle();
         }
 
         private void ModifySuperdashFsm(On.HeroController.orig_Start orig, HeroController self)
