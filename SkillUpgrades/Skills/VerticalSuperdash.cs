@@ -169,7 +169,7 @@ namespace SkillUpgrades.Skills
 
             void monitorDirectionalInputs()
             {
-                if (!ChangeDirectionInMidair) return;
+                if (!ChangeDirectionInMidair || !SkillUpgradeActive) return;
 
                 // If any button was pressed this frame, we need to update for sure.
                 // Otherwise, if any button was released, we only update if there's something being pressed (so they let go of up, and still go up).
