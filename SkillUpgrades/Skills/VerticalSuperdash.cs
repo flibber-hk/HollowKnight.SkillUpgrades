@@ -211,7 +211,7 @@ namespace SkillUpgrades.Skills
                     verticalPressed = true;
                 }
 
-                if (horizontalPressed) newSuperdashAngle /= 2f;
+                if (horizontalPressed && DiagonalSuperdash) newSuperdashAngle /= 2f;
 
                 if (horizontalPressed || verticalPressed)
                 {
