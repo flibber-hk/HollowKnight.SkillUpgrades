@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Modding;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using UnityEngine;
@@ -32,7 +33,27 @@ namespace SkillUpgrades.Skills
             RemoveRefreshHooks();
             On.HeroController.DoDoubleJump -= AllowTripleJump;
         }
-
+        public override void AddTogglesToMenu(List<IMenuMod.MenuEntry> entries)
+        {
+            string key = SkillUpgradeSettings.GetKey(nameof(TripleJump), nameof(DoubleJumpMax));
+            entries.Add(new IMenuMod.MenuEntry()
+            {
+                Name = "Infinite Double Jump",
+                Description = $"affects {nameof(TripleJump)}",
+                Values = new string[] { "True", "False" },
+                Saver = i =>
+                {
+                    _ = DoubleJumpMax;
+                    int orig = SkillUpgrades.GlobalSettings.Integers[key];
+                    SkillUpgrades.GlobalSettings.Integers[key] = Math.Abs(orig) * (i == 0 ? -1 : 1);
+                },
+                Loader = () =>
+                {
+                    _ = DoubleJumpMax;
+                    return SkillUpgrades.GlobalSettings.Integers[key] < 0 ? 0 : 1;
+                }
+            });
+        }
 
         private int doubleJumpCount;
 
@@ -48,7 +69,7 @@ namespace SkillUpgrades.Skills
             orig(self);
             doubleJumpCount++;
 
-            if (doubleJumpCount < DoubleJumpMax || DoubleJumpMax == -1)
+            if (doubleJumpCount < DoubleJumpMax || DoubleJumpMax < 0)
             {
                 GameManager.instance.StartCoroutine(RefreshWingsInAir());
             }

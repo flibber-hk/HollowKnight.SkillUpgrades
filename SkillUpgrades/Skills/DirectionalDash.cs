@@ -5,6 +5,7 @@ using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 using SkillUpgrades.Util;
+using System.Collections.Generic;
 
 namespace SkillUpgrades.Skills
 {
@@ -18,6 +19,7 @@ namespace SkillUpgrades.Skills
         /// <summary>
         /// True: after a vertical dash, continue moving upwards (affected by gravity)
         /// False: after a vertical dash, stop moving immediately
+        /// Deliberately not part of the menu
         /// </summary>
         public bool MaintainVerticalMomentum => GetBool(true);
         /// <summary>
@@ -25,6 +27,7 @@ namespace SkillUpgrades.Skills
         /// </summary>
         public float UpdashPenalty => GetFloat(1f/(float)Math.Pow(2, 1f/3f));
 
+        public override List<string> MenuBools => new List<string>() { nameof(UnmodifiedDownDashes) };
 
         public override string Description => "Toggle whether dash can be used in all 8 directions.";
 

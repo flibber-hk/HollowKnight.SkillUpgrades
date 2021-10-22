@@ -83,6 +83,12 @@ namespace SkillUpgrades
                 menuEntries.Add(entry);
             }
 
+            foreach (AbstractSkillUpgrade skill in _skills.Values)
+            {
+                if (!skill.SkillUpgradeInitialized) continue;
+                skill.AddTogglesToMenu(menuEntries);
+            }
+
             return menuEntries;
         }
 

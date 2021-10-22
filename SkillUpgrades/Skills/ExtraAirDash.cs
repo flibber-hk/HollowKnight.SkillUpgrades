@@ -34,6 +34,27 @@ namespace SkillUpgrades.Skills
             RemoveRefreshHooks();
             On.HeroController.HeroDash -= AllowExtraAirDash;
         }
+        public override void AddTogglesToMenu(List<IMenuMod.MenuEntry> entries)
+        {
+            string key = SkillUpgradeSettings.GetKey(nameof(ExtraAirDash), nameof(AirDashMax));
+            entries.Add(new IMenuMod.MenuEntry()
+            {
+                Name = "Infinite Air Dash",
+                Description = $"affects {nameof(ExtraAirDash)}",
+                Values = new string[] { "True", "False" },
+                Saver = i =>
+                {
+                    _ = AirDashMax;
+                    int orig = SkillUpgrades.GlobalSettings.Integers[key];
+                    SkillUpgrades.GlobalSettings.Integers[key] = Math.Abs(orig) * (i == 0 ? -1 : 1);
+                },
+                Loader = () =>
+                {
+                    _ = AirDashMax;
+                    return SkillUpgrades.GlobalSettings.Integers[key] < 0 ? 0 : 1;
+                }
+            });
+        }
 
 
         private int airDashCount;
@@ -47,7 +68,7 @@ namespace SkillUpgrades.Skills
             {
                 airDashCount++;
 
-                if (airDashCount < AirDashMax || AirDashMax == -1)
+                if (airDashCount < AirDashMax || AirDashMax < 0)
                 {
                     GameManager.instance.StartCoroutine(RefreshDashInAir());
                 }

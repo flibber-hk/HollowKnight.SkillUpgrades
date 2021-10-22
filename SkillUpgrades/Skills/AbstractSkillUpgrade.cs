@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Modding;
 
@@ -26,12 +28,38 @@ namespace SkillUpgrades.Skills
         /// <summary>
         /// The name to show in the menu
         /// </summary>
-        public virtual string UIName => Regex.Replace(Name, "([A-Z])", " $1").TrimEnd();
+        public virtual string UIName => Regex.Replace(Name, "([A-Z])", " $1").TrimStart(' ');
 
         /// <summary>
         /// The description to show in the menu
         /// </summary>
         public virtual string Description => string.Empty;
+
+        public virtual List<string> MenuBools => null;
+        public virtual void AddTogglesToMenu(List<IMenuMod.MenuEntry> entries)
+        {
+            if (MenuBools is null) return;
+            foreach (string boolName in MenuBools)
+            {
+                string key = SkillUpgradeSettings.GetKey(Name, boolName);
+                entries.Add(new IMenuMod.MenuEntry()
+                {
+                    Name = $"{boolName}",
+                    Description = $"affects {Name}",
+                    Values = new string[] { "True", "False" },
+                    Saver = i => SkillUpgrades.GlobalSettings.Booleans[key] = i == 0,
+                    Loader = () =>
+                    {
+                        if (SkillUpgrades.GlobalSettings.Booleans.TryGetValue(key, out bool val)) return val ? 0 : 1;
+                        _ = GetType().GetProperty(boolName)?.GetValue(this);
+                        if (SkillUpgrades.GlobalSettings.Booleans.TryGetValue(key, out val)) return val ? 0 : 1;
+                        return 0;
+                    }
+                });
+            }
+        }
+
+
 
         /// <summary>
         /// If this is true, ensures that the HeroRotation module is loaded, allowing the knight to rotate without moving its hitbox
@@ -49,7 +77,7 @@ namespace SkillUpgrades.Skills
             // Make sure skill is in dictionary
             if (!SkillUpgrades.GlobalSettings.EnabledSkills.ContainsKey(Name))
             {
-                SkillUpgrades.GlobalSettings.EnabledSkills[Name] = true;
+                SkillUpgrades.GlobalSettings.EnabledSkills[Name] = false;
             }
 
             if (SkillUpgradeInitialized)
@@ -82,7 +110,7 @@ namespace SkillUpgrades.Skills
             // Make sure skill is in dictionary
             if (!SkillUpgrades.GlobalSettings.EnabledSkills.ContainsKey(Name))
             {
-                SkillUpgrades.GlobalSettings.EnabledSkills[Name] = true;
+                SkillUpgrades.GlobalSettings.EnabledSkills[Name] = false;
             }
 
             if (SkillUpgrades.LocalSaveData.EnabledSkills.TryGetValue(Name, out bool shouldBeActive))

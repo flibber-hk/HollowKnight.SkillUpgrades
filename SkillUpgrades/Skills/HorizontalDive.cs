@@ -24,7 +24,6 @@ namespace SkillUpgrades.Skills
 
         public override bool InvolvesHeroRotation => true;
 
-
         private ILHook _hook;
         protected override void StartUpInitialize()
         {
