@@ -42,10 +42,10 @@ namespace SkillUpgrades.Skills
             foreach (string boolName in MenuBools)
             {
                 string key = SkillUpgradeSettings.GetKey(Name, boolName);
-                entries.Add(new IMenuMod.MenuEntry()
+                IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
                 {
-                    Name = $"{boolName}",
-                    Description = $"affects {Name}",
+                    Name = Regex.Replace(boolName, "([A-Z])", " $1").TrimStart(' '),
+                    Description = $"Affects {UIName}",
                     Values = new string[] { "True", "False" },
                     Saver = i => SkillUpgrades.GlobalSettings.Booleans[key] = i == 0,
                     Loader = () =>
@@ -55,7 +55,14 @@ namespace SkillUpgrades.Skills
                         if (SkillUpgrades.GlobalSettings.Booleans.TryGetValue(key, out val)) return val ? 0 : 1;
                         return 0;
                     }
-                });
+                };
+
+                if (SkillUpgrades.LocalSaveData.Booleans.ContainsKey(key))
+                {
+                    entry.Description = "Changes to this setting won't affect this save file";
+                }
+
+                entries.Add(entry);
             }
         }
 

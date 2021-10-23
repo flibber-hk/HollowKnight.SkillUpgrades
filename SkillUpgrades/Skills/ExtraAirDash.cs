@@ -37,10 +37,10 @@ namespace SkillUpgrades.Skills
         public override void AddTogglesToMenu(List<IMenuMod.MenuEntry> entries)
         {
             string key = SkillUpgradeSettings.GetKey(nameof(ExtraAirDash), nameof(AirDashMax));
-            entries.Add(new IMenuMod.MenuEntry()
+            IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
             {
                 Name = "Infinite Air Dash",
-                Description = $"affects {nameof(ExtraAirDash)}",
+                Description = $"Affects {UIName}",
                 Values = new string[] { "True", "False" },
                 Saver = i =>
                 {
@@ -53,7 +53,14 @@ namespace SkillUpgrades.Skills
                     _ = AirDashMax;
                     return SkillUpgrades.GlobalSettings.Integers[key] < 0 ? 0 : 1;
                 }
-            });
+            };
+
+            if (SkillUpgrades.LocalSaveData.Integers.ContainsKey(key))
+            {
+                entry.Description = "Changes to this setting won't affect this save file";
+            }
+
+            entries.Add(entry);
         }
 
 

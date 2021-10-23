@@ -36,10 +36,10 @@ namespace SkillUpgrades.Skills
         public override void AddTogglesToMenu(List<IMenuMod.MenuEntry> entries)
         {
             string key = SkillUpgradeSettings.GetKey(nameof(TripleJump), nameof(DoubleJumpMax));
-            entries.Add(new IMenuMod.MenuEntry()
+            IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
             {
                 Name = "Infinite Double Jump",
-                Description = $"affects {nameof(TripleJump)}",
+                Description = $"Affects {UIName}",
                 Values = new string[] { "True", "False" },
                 Saver = i =>
                 {
@@ -52,7 +52,14 @@ namespace SkillUpgrades.Skills
                     _ = DoubleJumpMax;
                     return SkillUpgrades.GlobalSettings.Integers[key] < 0 ? 0 : 1;
                 }
-            });
+            };
+
+            if (SkillUpgrades.LocalSaveData.Integers.ContainsKey(nameof(TripleJump)))
+            {
+                entry.Description = "Changes to this setting won't affect this save file";
+            }
+
+            entries.Add(entry);
         }
 
         private int doubleJumpCount;

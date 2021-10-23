@@ -11,16 +11,20 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
+using System.Collections.Generic;
 
 namespace SkillUpgrades.Skills
 {
     public class HorizontalDive : AbstractSkillUpgrade
     {
-        public bool PersistThroughHorizontalTransitions => GetBool(true);
+        public bool PersistDiveThroughHorizontalTransitions => GetBool(true);
         public bool LeftwardDiveAllowed => GetBoolLocal(true);
         public bool RightwardDiveAllowed => GetBoolLocal(true);
 
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
+
+        // Too long for the menu :/
+        // public override List<string> MenuBools => new List<string>() { nameof(MaintainDiveThroughTransitions) };
 
         public override bool InvolvesHeroRotation => true;
 
@@ -67,7 +71,7 @@ namespace SkillUpgrades.Skills
                 i => i.MatchLdfld<HeroController>(nameof(HeroController.exitedSuperDashing))
             ))
             {
-                cursor.EmitDelegate<Func<bool, bool>>(b => b || (HeroController.instance.exitedQuake && PersistThroughHorizontalTransitions));
+                cursor.EmitDelegate<Func<bool, bool>>(b => b || (HeroController.instance.exitedQuake && PersistDiveThroughHorizontalTransitions));
             }
 
             cursor.Goto(0);
@@ -75,7 +79,7 @@ namespace SkillUpgrades.Skills
             {
                 cursor.EmitDelegate<Func<string, string>>(s =>
                 {
-                    if (!PersistThroughHorizontalTransitions) return s;
+                    if (!PersistDiveThroughHorizontalTransitions) return s;
                     if (HeroController.instance.exitedQuake) return "HeroCtrl-EnterQuake";
                     return s;
                 });
@@ -87,7 +91,7 @@ namespace SkillUpgrades.Skills
             GatePosition gatePosition = enterGate.GetGatePosition();
             if (gatePosition == GatePosition.left || gatePosition == GatePosition.right)
             {
-                if (!PersistThroughHorizontalTransitions) self.exitedQuake = false;
+                if (!PersistDiveThroughHorizontalTransitions) self.exitedQuake = false;
             }
             else if (gatePosition == GatePosition.door)
             {
@@ -105,7 +109,7 @@ namespace SkillUpgrades.Skills
 
         private void ResetQuakeStateThroughTransitions(Scene arg0, Scene arg1)
         {
-            if (!PersistThroughHorizontalTransitions) ResetQuakeAngle();
+            if (!PersistDiveThroughHorizontalTransitions) ResetQuakeAngle();
         }
 
         private void ModifyQuakeFSM(On.HeroController.orig_Start orig, HeroController self)
