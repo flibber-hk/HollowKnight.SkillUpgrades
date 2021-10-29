@@ -3,20 +3,27 @@ using HutongGames.PlayMaker;
 
 namespace SkillUpgrades.FsmStateActions
 {
-    internal class ExecuteLambdaEveryFrame : FsmStateAction
+    public class ExecuteLambdaEveryFrame : FsmStateAction
     {
-        private readonly Action _method;
+        private readonly Action<bool> _method;
 
-        public ExecuteLambdaEveryFrame(Action method)
+        /// <summary>
+        /// FsmStateAction to execute the given method every frame. The method will be passed true the first frame, and false on subsequent frames.
+        /// </summary>
+        public ExecuteLambdaEveryFrame(Action<bool> method)
         {
             _method = method;
+        }
+        public ExecuteLambdaEveryFrame(Action method)
+        {
+            _method = (firstFrame) => method();
         }
 
         public override void OnEnter()
         {
             try
             {
-                _method();
+                _method(true);
             }
             catch (Exception e)
             {
@@ -28,7 +35,7 @@ namespace SkillUpgrades.FsmStateActions
         {
             try
             {
-                _method();
+                _method(false);
             }
             catch (Exception e)
             {

@@ -48,8 +48,14 @@ namespace SkillUpgrades.Skills
 
             if (burst != null)
             {
-                burst.transform.parent = HeroController.instance.gameObject.transform;
+                burst.transform.parent = HeroController.instance.transform;
                 burst.transform.rotation = Quaternion.identity;
+                Log($"{burst.transform.localScale} - {HeroController.instance.transform.localScale}");
+
+                Vector3 vec = burst.transform.localScale;
+                vec.x = Math.Abs(vec.x);
+                burst.transform.localScale = vec;
+
                 burst.SetActive(false);
             }
         }
@@ -170,17 +176,18 @@ namespace SkillUpgrades.Skills
                 hSpeed.Value = velComponent * Mathf.Cos(SuperdashAngle * Mathf.PI / 180) * (HeroController.instance.cState.facingRight ? 1 : -1);
             }
 
-            void monitorDirectionalInputs()
+            void monitorDirectionalInputs(bool firstFrame)
             {
                 if (!ChangeDirectionInMidair || !SkillUpgradeActive) return;
 
                 // If any button was pressed this frame, we need to update for sure.
                 // Otherwise, if any button was released, we only update if there's something being pressed (so they let go of up, and still go up).
-                // If no inputs changed, then we don't need to bother.
+                // If no inputs changed, then we don't need to bother, except on the first frame.
 
                 HeroActions ia = InputHandler.Instance.inputActions;
                 if (!(ia.left.WasPressed || ia.right.WasPressed || ia.up.WasPressed || ia.down.WasPressed
-                    || ia.left.WasReleased || ia.right.WasReleased || ia.up.WasReleased || ia.down.WasReleased)) return;
+                    || ia.left.WasReleased || ia.right.WasReleased || ia.up.WasReleased || ia.down.WasReleased
+                    || firstFrame)) return;
 
                 bool horizontalPressed = false;
                 bool verticalPressed = false;
