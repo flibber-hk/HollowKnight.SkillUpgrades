@@ -50,7 +50,6 @@ namespace SkillUpgrades.Skills
             {
                 burst.transform.parent = HeroController.instance.transform;
                 burst.transform.rotation = Quaternion.identity;
-                Log($"{burst.transform.localScale} - {HeroController.instance.transform.localScale}");
 
                 Vector3 vec = burst.transform.localScale;
                 vec.x = Math.Abs(vec.x);
