@@ -45,7 +45,7 @@ namespace SkillUpgrades.Skills
 
             // This can fail if the UnmodifiedDownDashes setting changes after the skill is initialized, but I think that's unlikely to happen - 
             // particularly as OldDashmaster is disabled by default
-            if (ModHooks.GetMod("QoL") is Mod _ && !UnmodifiedDownDashes)
+            if (ModHooks.GetMod("QoL") is Mod && !UnmodifiedDownDashes)
             {
                 DisableOldDashmaster();
             }
@@ -61,7 +61,7 @@ namespace SkillUpgrades.Skills
             On.HeroController.JumpReleased -= MaintainMomentum;
             On.HeroController.Update -= CancelPersistentMomentum;
 
-            if (ModHooks.GetMod("QoL") is Mod _)
+            if (ModHooks.GetMod("QoL") is Mod)
             {
                 RemoveOldDashmasterOverride();
             }
@@ -246,7 +246,7 @@ namespace SkillUpgrades.Skills
             if (name == EnabledBool)
             {
                 // If UnmodifiedDownDashes is on, keep normal behaviour; if off, force the game to keep the downdashing field as false so we can implement our own
-                return orig && UnmodifiedDownDashes;
+                return PlayerData.instance.GetBool(nameof(PlayerData.equippedCharm_31)) && UnmodifiedDownDashes;
             }
             return orig;
         }
