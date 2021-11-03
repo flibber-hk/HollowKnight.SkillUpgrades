@@ -31,9 +31,7 @@ namespace SkillUpgrades.Skills
         private ILHook _hook;
         protected override void StartUpInitialize()
         {
-            On.HeroController.EnterScene += DisableHorizontalQuakeEntry;
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ResetQuakeStateThroughTransitions;
-
+            On.HeroController.EnterScene += ModifyHorizontalQuakeEntry;
             On.HeroController.Start += ModifyQuakeFSM;
 
             _hook = new ILHook
@@ -71,6 +69,10 @@ namespace SkillUpgrades.Skills
                 i => i.MatchLdfld<HeroController>(nameof(HeroController.exitedSuperDashing))
             ))
             {
+                /* The only times in the function that it checks for exitedSuperdashing are in the left/right gate positions, when
+                 * it does the enter cdash stuff and then the coroutine finishes. We can use the same part of the code to implement
+                 * the hdive entry behaviour - so we branch off if either exitedQuake or exitedSuperDashing is true, and choose
+                 * the event to send to the ProxyFSM according to which is true. */
                 cursor.EmitDelegate<Func<bool, bool>>(b => b || (HeroController.instance.exitedQuake && PersistDiveThroughHorizontalTransitions));
             }
 
@@ -86,30 +88,55 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        private IEnumerator DisableHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
+        // Failsafe if they quake through a scene they've been in
+        private int Failsafe = 0;
+        private IEnumerator ModifyHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
-            GatePosition gatePosition = enterGate.GetGatePosition();
-            if (gatePosition == GatePosition.left || gatePosition == GatePosition.right)
+            if (Failsafe > 3)
             {
-                if (!PersistDiveThroughHorizontalTransitions) self.exitedQuake = false;
-            }
-            else if (gatePosition == GatePosition.door)
-            {
+                Failsafe = 0;
                 self.exitedQuake = false;
-                ResetQuakeAngle();
             }
-            else if (gatePosition == GatePosition.top)
+            else if (self.exitedQuake)
             {
-                // Need to do this to fix hdive into Town[top1] or Mines_13[top1]
-                ResetQuakeAngle();
+                Failsafe++;
+            }
+
+            if (!self.exitedQuake)
+            {
+                return orig(self, enterGate, delayBeforeEnter);
+            }
+
+            GatePosition gatePosition = enterGate.GetGatePosition();
+
+            switch (gatePosition)
+            {
+                case GatePosition.left when !PersistDiveThroughHorizontalTransitions:
+                case GatePosition.right when !PersistDiveThroughHorizontalTransitions:
+                    self.exitedQuake = false;
+                    ResetQuakeAngle();
+                    break;
+                case GatePosition.left when PersistDiveThroughHorizontalTransitions:
+                    QuakeAngle = 90;
+                    HeroController.instance.SetHeroRotation(QuakeAngle, respectFacingDirection: false);
+                    break;
+                case GatePosition.right when PersistDiveThroughHorizontalTransitions:
+                    QuakeAngle = -90;
+                    HeroController.instance.SetHeroRotation(QuakeAngle, respectFacingDirection: false);
+                    break;
+                case GatePosition.top:
+                    ResetQuakeAngle();
+                    break;
+                case GatePosition.door:
+                case GatePosition.bottom:
+                case GatePosition.unknown:
+                    // I think I don't mind banning hdive from below or doors for now
+                    self.exitedQuake = false;
+                    ResetQuakeAngle();
+                    break;
             }
 
             return orig(self, enterGate, delayBeforeEnter);
-        }
-
-        private void ResetQuakeStateThroughTransitions(Scene arg0, Scene arg1)
-        {
-            if (!PersistDiveThroughHorizontalTransitions) ResetQuakeAngle();
         }
 
         private void ModifyQuakeFSM(On.HeroController.orig_Start orig, HeroController self)
@@ -118,7 +145,8 @@ namespace SkillUpgrades.Skills
 
             PlayMakerFSM fsm = self.spellControl;
 
-            fsm.GetState("Quake Finish").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
+            // Clear the failsafe whenever a dive finishes
+            fsm.GetState("Quake Finish").AddFirstAction(new ExecuteLambda(() => { ResetQuakeAngle(); Failsafe = 0; }));
             fsm.GetState("Reset Cam Zoom").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
             fsm.GetState("FSM Cancel").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
 
@@ -141,7 +169,7 @@ namespace SkillUpgrades.Skills
                 if (QuakeAngle != 0f && quakeAnticSpeed != 0f)
                 {
                     // Very small Quake Antic Speed to move off the ground, so we don't stop quaking when hitting a seam
-                    fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = Math.Max(0.1f, quakeAnticSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180));
+                    fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = Math.Max(0.09f, quakeAnticSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180));
                 }
 
                 vSpeed.Value = -50f * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
@@ -155,8 +183,10 @@ namespace SkillUpgrades.Skills
                 hSpeed.Value = 50f * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
                 if (Math.Abs(vSpeed.Value) < 0.1f)
                 {
+                    // If we don't translate the hero up a little, the hdive just ends from the CheckCollisionSide action.
+                    // We need to translate by something slightly more than 0.08f.
                     Vector3 vec = HeroController.instance.transform.position;
-                    vec += 0.1f * Vector3.up;
+                    vec += 0.081f * Vector3.up;
                     HeroController.instance.transform.position = vec;
                 }
             }));
