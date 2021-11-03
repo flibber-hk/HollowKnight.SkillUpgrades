@@ -12,12 +12,11 @@ namespace SkillUpgrades.Skills
 {
     public class TripleJump : AbstractSkillUpgrade
     {
-        public int DoubleJumpMax => GetInt(2);
-        public int LocalExtraJumps
-        {
-            get => GetIntLocal(0);
-            set => SetIntLocal(value);
-        }
+        [DefaultIntValue(2)]
+        public static int DoubleJumpMax;
+        [DefaultIntValue(0)]
+        [NotSaved]
+        public static int LocalExtraJumps;
 
         public override string Description => "Toggle whether wings can be used more than once before landing.";
 
@@ -33,31 +32,24 @@ namespace SkillUpgrades.Skills
             RemoveRefreshHooks();
             On.HeroController.DoDoubleJump -= AllowTripleJump;
         }
-        public override void AddTogglesToMenu(List<IMenuMod.MenuEntry> entries)
+
+        public override void AddToMenuList(List<IMenuMod.MenuEntry> entries)
         {
-            string key = SkillUpgradeSettings.GetKey(nameof(TripleJump), nameof(DoubleJumpMax));
+            void saver(int opt)
+            {
+                int val = Math.Abs((int)SkillUpgrades.GS.GetDefaultValue(nameof(TripleJump), nameof(DoubleJumpMax)));
+                if (opt == 1) val *= -1;
+                SkillUpgrades.GS.SetValue(nameof(TripleJump), nameof(DoubleJumpMax), val, SkillFieldSetOptions.ApplyToGlobalSetting);
+            }
+
             IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
             {
                 Name = "Infinite Double Jump",
-                Description = $"Affects {UIName}",
-                Values = new string[] { "True", "False" },
-                Saver = i =>
-                {
-                    _ = DoubleJumpMax;
-                    int orig = SkillUpgrades.GlobalSettings.Integers[key];
-                    SkillUpgrades.GlobalSettings.Integers[key] = Math.Abs(orig) * (i == 0 ? -1 : 1);
-                },
-                Loader = () =>
-                {
-                    _ = DoubleJumpMax;
-                    return SkillUpgrades.GlobalSettings.Integers[key] < 0 ? 0 : 1;
-                }
+                Description = string.Empty,
+                Values = new string[] {"False", "True"},
+                Loader = () => (int)SkillUpgrades.GS.GetDefaultValue(nameof(TripleJump), nameof(DoubleJumpMax)) < 0 ? 1 : 0,
+                Saver = saver
             };
-
-            if (SkillUpgrades.LocalSaveData.Integers.ContainsKey(nameof(TripleJump)))
-            {
-                entry.Description = "Changes to this setting won't affect this save file";
-            }
 
             entries.Add(entry);
         }

@@ -83,18 +83,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SkillSettingOverrides.cs" />
+    <Compile Include="SkillFieldAttributes.cs" />
     <Compile Include="Skills\AbstractSkillUpgrade.cs" />
     <Compile Include="Skills\DirectionalDash.cs" />
     <Compile Include="Skills\DownwardFireball.cs" />
     <Compile Include="Skills\HorizontalDive.cs" />
     <Compile Include="Skills\SpiralScream.cs" />
     <Compile Include="Skills\WallClimb.cs" />
-    <Compile Include="SkillUpgradeSaveData.cs" />
     <Compile Include="FsmStateActions\DecideToStopQuake.cs" />
     <Compile Include="FsmStateActions\DecideToStopSuperdash.cs" />
     <Compile Include="FsmStateActions\ExecuteLambda.cs" />
     <Compile Include="FsmStateActions\ExecuteLambdaEveryFrame.cs" />
+    <Compile Include="Util\Extensions.cs" />
     <Compile Include="Util\HeroRotation.cs" />
     <Compile Include="Util\FsmExtensions.cs" />
     <Compile Include="SkillUpgradeSettings.cs" />

@@ -12,13 +12,12 @@ namespace SkillUpgrades.Skills
 {
     public class ExtraAirDash : AbstractSkillUpgrade
     {
+        [DefaultIntValue(2)]
+        public static int AirDashMax;
 
-        public int AirDashMax => GetInt(2);
-        public int LocalExtraDashes
-        {
-            get => GetIntLocal(0);
-            set => SetIntLocal(value);
-        }
+        [DefaultIntValue(0)]
+        [NotSaved]
+        public static int LocalExtraDashes;
 
         public override string Description => "Toggle whether dash can be used more than once before landing.";
 
@@ -34,35 +33,27 @@ namespace SkillUpgrades.Skills
             RemoveRefreshHooks();
             On.HeroController.HeroDash -= AllowExtraAirDash;
         }
-        public override void AddTogglesToMenu(List<IMenuMod.MenuEntry> entries)
+
+        public override void AddToMenuList(List<IMenuMod.MenuEntry> entries)
         {
-            string key = SkillUpgradeSettings.GetKey(nameof(ExtraAirDash), nameof(AirDashMax));
+            void saver(int opt)
+            {
+                int val = Math.Abs((int)SkillUpgrades.GS.GetDefaultValue(nameof(ExtraAirDash), nameof(AirDashMax)));
+                if (opt == 1) val *= -1;
+                SkillUpgrades.GS.SetValue(nameof(ExtraAirDash), nameof(AirDashMax), val, SkillFieldSetOptions.ApplyToGlobalSetting);
+            }
+
             IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
             {
                 Name = "Infinite Air Dash",
-                Description = $"Affects {UIName}",
-                Values = new string[] { "True", "False" },
-                Saver = i =>
-                {
-                    _ = AirDashMax;
-                    int orig = SkillUpgrades.GlobalSettings.Integers[key];
-                    SkillUpgrades.GlobalSettings.Integers[key] = Math.Abs(orig) * (i == 0 ? -1 : 1);
-                },
-                Loader = () =>
-                {
-                    _ = AirDashMax;
-                    return SkillUpgrades.GlobalSettings.Integers[key] < 0 ? 0 : 1;
-                }
+                Description = string.Empty,
+                Values = new string[] { "False", "True" },
+                Loader = () => (int)SkillUpgrades.GS.GetDefaultValue(nameof(ExtraAirDash), nameof(AirDashMax)) < 0 ? 1 : 0,
+                Saver = saver
             };
-
-            if (SkillUpgrades.LocalSaveData.Integers.ContainsKey(key))
-            {
-                entry.Description = "Changes to this setting won't affect this save file";
-            }
 
             entries.Add(entry);
         }
-
 
         private int airDashCount;
 

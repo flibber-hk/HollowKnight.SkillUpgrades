@@ -15,19 +15,21 @@ namespace SkillUpgrades.Skills
         /// True: down dashes behave normal (i.e. no down diagonal, and down iff dashmaster equipped).
         /// False: all 8 directions are allowed
         /// </summary>
-        public bool UnmodifiedDownDashes => GetBool(false);
+        [DefaultBoolValue(false)]
+        [MenuTogglable(desc = "Toggle whether down dashes behave as normal")]
+        public static bool UnmodifiedDownDashes;
         /// <summary>
         /// True: after a vertical dash, continue moving upwards (affected by gravity)
         /// False: after a vertical dash, stop moving immediately
         /// Deliberately not part of the menu
         /// </summary>
-        public bool MaintainVerticalMomentum => GetBool(true);
+        [DefaultBoolValue(true)]
+        public static bool MaintainVerticalMomentum;
         /// <summary>
         /// Straight up dashes get multiplied by this number
         /// </summary>
-        public float UpdashPenalty => GetFloat(1f/(float)Math.Pow(2, 1f/3f));
-
-        public override List<string> MenuBools => new List<string>() { nameof(UnmodifiedDownDashes) };
+        [DefaultFloatValue(0.7937005f)] // 2^(-1/3)
+        public static float UpdashPenalty;
 
         public override string Description => "Toggle whether dash can be used in all 8 directions.";
 

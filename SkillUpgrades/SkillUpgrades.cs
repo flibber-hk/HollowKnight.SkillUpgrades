@@ -8,21 +8,15 @@ using SkillUpgrades.Util;
 
 namespace SkillUpgrades
 {
-    public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, ILocalSettings<SkillUpgradeSaveData>, IMenuMod
+    public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, IMenuMod
     {
         internal static SkillUpgrades instance;
         internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new Dictionary<string, AbstractSkillUpgrade>();
 
         #region Global Settings
-        public static SkillUpgradeSettings GlobalSettings { get; set; } = new SkillUpgradeSettings();
-        public void OnLoadGlobal(SkillUpgradeSettings s) => GlobalSettings = s;
-        public SkillUpgradeSettings OnSaveGlobal() => GlobalSettings;
-        #endregion
-
-        #region Local Settings
-        public static SkillUpgradeSaveData LocalSaveData { get; set; } = new SkillUpgradeSaveData();
-        public void OnLoadLocal(SkillUpgradeSaveData s) => LocalSaveData = s;
-        public SkillUpgradeSaveData OnSaveLocal() => LocalSaveData;
+        public static SkillUpgradeSettings GS { get; set; } = new SkillUpgradeSettings();
+        public void OnLoadGlobal(SkillUpgradeSettings s) => GS = s;
+        public SkillUpgradeSettings OnSaveGlobal() => GS;
         #endregion
 
         public override void Initialize()
@@ -38,9 +32,7 @@ namespace SkillUpgrades
                 skill.UpdateSkillState();
             }
 
-            if (_skills.Values.Any(skill => skill.InvolvesHeroRotation && skill.SkillUpgradeInitialized)) HeroRotation.Hook();
-
-            SkillSettingOverrides.AlreadyLoadedSkills = true;
+            HeroRotation.Hook();
             Log("Initialization done!");
         }
 
@@ -55,38 +47,44 @@ namespace SkillUpgrades
                 Description = "Turn this setting off to deactivate all skill upgrades.",
                 Values = new string[] { "False", "True" },
                 Saver = opt => ApplyGlobalToggle(opt == 1),
-                Loader = () => GlobalSettings.GlobalToggle ? 1 : 0
+                Loader = () => GS.GlobalToggle ? 1 : 0
             };
-            if (_skills.Values.Where(x => x.SkillUpgradeInitialized).Where(x => LocalSaveData.EnabledSkills.TryGetValue(x.Name, out bool state) && !state).Any())
-            {
-                globalToggleEntry.Description = "Some skills might not be affected by the global toggle for this save file";
-            }
             menuEntries.Add(globalToggleEntry);
 
             foreach (AbstractSkillUpgrade skill in _skills.Values)
             {
-                if (!skill.SkillUpgradeInitialized) continue;
-
                 IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
                 {
                     Name = skill.UIName,
                     Description = skill.Description,
                     Values = new string[] { "False", "True" },
                     Saver = opt => Toggle(skill, opt == 1),
-                    Loader = () => GlobalSettings.EnabledSkills[skill.Name] == true ? 1 : 0
+                    Loader = () => GS.EnabledSkills[skill.Name] == true ? 1 : 0
                 };
-                if (LocalSaveData.EnabledSkills.ContainsKey(skill.Name))
-                {
-                    entry.Description = "Changes to this setting won't affect this save file";
-                }
 
                 menuEntries.Add(entry);
             }
 
+            foreach (var kvp in SkillUpgradeSettings.Fields)
+            {
+                if (kvp.Value.GetCustomAttribute<MenuTogglableAttribute>() is MenuTogglableAttribute mt && kvp.Value.FieldType == typeof(bool))
+                {
+                    IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
+                    {
+                        Name = mt.name ?? kvp.Value.Name.FromCamelCase(),
+                        Description = mt.desc,
+                        Values = new string[] { "False", "True" },
+                        Saver = opt => GS.SetValue(kvp.Key, opt == 1, SkillFieldSetOptions.ApplyToGlobalSetting),
+                        Loader = () => (bool)GS.GetDefaultValue(kvp.Key) ? 1 : 0,
+                    };
+
+                    menuEntries.Add(entry);
+                }
+            }
+
             foreach (AbstractSkillUpgrade skill in _skills.Values)
             {
-                if (!skill.SkillUpgradeInitialized) continue;
-                skill.AddTogglesToMenu(menuEntries);
+                skill.AddToMenuList(menuEntries);
             }
 
             return menuEntries;
@@ -97,7 +95,7 @@ namespace SkillUpgrades
 
         internal static void ApplyGlobalToggle(bool enable)
         {
-            GlobalSettings.GlobalToggle = enable;
+            GS.GlobalToggle = enable;
 
             foreach (AbstractSkillUpgrade skill in _skills.Values)
             {
@@ -106,13 +104,13 @@ namespace SkillUpgrades
         }
         internal static void Toggle(AbstractSkillUpgrade skill, bool enable)
         {
-            GlobalSettings.EnabledSkills[skill.Name] = enable;
+            GS.EnabledSkills[skill.Name] = enable;
             skill.UpdateSkillState();
         }
 
         public override string GetVersion()
         {
-            return "0.5";
+            return "0.6";
         }
 
         public override int LoadPriority()

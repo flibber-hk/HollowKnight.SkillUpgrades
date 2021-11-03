@@ -8,8 +8,12 @@ namespace SkillUpgrades.Skills
 {
     public class SpiralScream : AbstractSkillUpgrade
     {
-        public bool LeftSpiralScreamAllowed => GetBoolLocal(true);
-        public bool RightSpiralScreamAllowed => GetBoolLocal(true);
+        [DefaultBoolValue(true)]
+        [NotSaved]
+        public static bool LeftSpiralScreamAllowed;
+        [DefaultBoolValue(true)]
+        [NotSaved]
+        public static bool RightSpiralScreamAllowed;
 
 
         public override string Description => "Toggle whether Howling Wraiths can sweep a circle around the knight";

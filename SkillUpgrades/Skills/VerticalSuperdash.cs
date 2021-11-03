@@ -4,22 +4,22 @@ using HutongGames.PlayMaker.Actions;
 using UnityEngine;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
-using System.Collections.Generic;
 
 namespace SkillUpgrades.Skills
 {
     public class VerticalSuperdash : AbstractSkillUpgrade
     {
-        public bool DiagonalSuperdash => GetBool(true);
-        public bool BreakDiveFloorsFromBelow => GetBool(false);
-        public bool ChangeDirectionInMidair => GetBool(false);
-
-        public override List<string> MenuBools => new List<string> { nameof(DiagonalSuperdash), nameof(BreakDiveFloorsFromBelow), nameof(ChangeDirectionInMidair) };
-
+        [DefaultBoolValue(true)]
+        [MenuTogglable(desc: "Toggle whether diagonally superdashing is allowed")]
+        public static bool DiagonalSuperdash;
+        [DefaultBoolValue(false)]
+        [MenuTogglable(desc: "Only works on certain dive floors")]
+        public static bool BreakDiveFloorsFromBelow;
+        [DefaultBoolValue(false)]
+        [MenuTogglable]
+        public static bool ChangeDirectionInMidair;
 
         public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";
-
-        public override bool InvolvesHeroRotation => true;
 
         protected override void StartUpInitialize()
         {

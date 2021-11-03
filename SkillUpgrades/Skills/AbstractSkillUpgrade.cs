@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using Modding;
+using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
@@ -22,118 +20,47 @@ namespace SkillUpgrades.Skills
         protected virtual void Unload() { }
 
         /// <summary>
-        /// The name of the skill (by default, the type name)
+        /// The name of the skill (the type name)
         /// </summary>
-        public string Name { get; protected set; }
+        public string Name => GetType().Name;
         /// <summary>
         /// The name to show in the menu
         /// </summary>
-        public virtual string UIName => Regex.Replace(Name, "([A-Z])", " $1").TrimStart(' ');
+        public virtual string UIName => Name.FromCamelCase();
 
         /// <summary>
         /// The description to show in the menu
         /// </summary>
         public virtual string Description => string.Empty;
 
-        public virtual List<string> MenuBools => null;
-        public virtual void AddTogglesToMenu(List<IMenuMod.MenuEntry> entries)
-        {
-            if (MenuBools is null) return;
-            foreach (string boolName in MenuBools)
-            {
-                string key = SkillUpgradeSettings.GetKey(Name, boolName);
-                IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
-                {
-                    Name = Regex.Replace(boolName, "([A-Z])", " $1").TrimStart(' '),
-                    Description = $"Affects {UIName}",
-                    Values = new string[] { "True", "False" },
-                    Saver = i => SkillUpgrades.GlobalSettings.Booleans[key] = i == 0,
-                    Loader = () =>
-                    {
-                        if (SkillUpgrades.GlobalSettings.Booleans.TryGetValue(key, out bool val)) return val ? 0 : 1;
-                        _ = GetType().GetProperty(boolName)?.GetValue(this);
-                        if (SkillUpgrades.GlobalSettings.Booleans.TryGetValue(key, out val)) return val ? 0 : 1;
-                        return 0;
-                    }
-                };
-
-                if (SkillUpgrades.LocalSaveData.Booleans.ContainsKey(key))
-                {
-                    entry.Description = "Changes to this setting won't affect this save file";
-                }
-
-                entries.Add(entry);
-            }
-        }
-
-
-
         /// <summary>
-        /// If this is true, ensures that the HeroRotation module is loaded, allowing the knight to rotate without moving its hitbox
+        /// Any buttons the skill wants to add to the menu can be done here
         /// </summary>
-        public virtual bool InvolvesHeroRotation => false;
+        public virtual void AddToMenuList(List<IMenuMod.MenuEntry> entries) { }
 
         public bool SkillUpgradeActive { get; private set; } = true;
-        public bool SkillUpgradeInitialized { get; private set; } = false;
-
 
         #region Skill States
         // Initialize skill if it should be initialized
-        public void InitializeSkillUpgrade()
+        internal void InitializeSkillUpgrade()
         {
             // Make sure skill is in dictionary
-            if (!SkillUpgrades.GlobalSettings.EnabledSkills.ContainsKey(Name))
-            {
-                SkillUpgrades.GlobalSettings.EnabledSkills[Name] = false;
-            }
+            SkillUpgrades.GS.EnabledSkills.EnsureInDict(Name, false);
 
-            if (SkillUpgradeInitialized)
-            {
-                LogError("Skill Upgrade already initialized!");
-                return;
-            }
-
-            if (!SkillSettingOverrides.SkillLoadOverrides.TryGetValue(Name, out bool shouldInitialize))
-            {
-                shouldInitialize = SkillUpgrades.GlobalSettings.EnabledSkills[Name] != null;
-            }
-            if (shouldInitialize)
-            {
-                Log("Initializing skill");
-                StartUpInitialize();
-                RepeatableInitialize();
-                SkillUpgradeInitialized = true;
-            }
-            else
-            {
-                LogDebug("Not initializing skill");
-            }
+            Log("Initializing skill");
+            StartUpInitialize();
+            RepeatableInitialize();
         }
         public void UpdateSkillState()
         {
-            // Skills get one chance to initialize
-            if (!SkillUpgradeInitialized) return;
-
-            // Make sure skill is in dictionary
-            if (!SkillUpgrades.GlobalSettings.EnabledSkills.ContainsKey(Name))
-            {
-                SkillUpgrades.GlobalSettings.EnabledSkills[Name] = false;
-            }
-
-            if (SkillUpgrades.LocalSaveData.EnabledSkills.TryGetValue(Name, out bool shouldBeActive))
-            {
-                SetState(shouldBeActive);
-                return;
-            }
-            else if (!SkillUpgrades.GlobalSettings.GlobalToggle)
+            // Skill must be in dictionary at this point because it gets initialized first
+            if (!SkillUpgrades.GS.GlobalToggle)
             {
                 SetState(false);
-                return;
             }
             else
             {
-                SetState(SkillUpgrades.GlobalSettings.EnabledSkills[Name] ?? false);
-                return;
+                SetState(SkillUpgrades.GS.EnabledSkills[Name]);
             }
         }
         private void SetState(bool set)
@@ -150,95 +77,6 @@ namespace SkillUpgrades.Skills
             }
         }
         #endregion
-
-
-        #region Adjustable Fields
-        // Global settings with potential local overrides
-        protected bool GetBool(bool @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            if (!SkillUpgrades.GlobalSettings.Booleans.ContainsKey(key)) SkillUpgrades.GlobalSettings.Booleans[key] = @default;
-
-            if (SkillUpgrades.LocalSaveData.Booleans.TryGetValue(key, out bool ret)) return ret;
-            else return SkillUpgrades.GlobalSettings.Booleans[key];
-        }
-        protected int GetInt(int @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            if (!SkillUpgrades.GlobalSettings.Integers.ContainsKey(key)) SkillUpgrades.GlobalSettings.Integers[key] = @default;
-
-            if (SkillUpgrades.LocalSaveData.Integers.TryGetValue(key, out int ret)) return ret;
-            else return SkillUpgrades.GlobalSettings.Integers[key];
-        }
-        protected float GetFloat(float @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            if (!SkillUpgrades.GlobalSettings.Floats.ContainsKey(key)) SkillUpgrades.GlobalSettings.Floats[key] = @default;
-
-            if (SkillUpgrades.LocalSaveData.Floats.TryGetValue(key, out float ret)) return ret;
-            else return SkillUpgrades.GlobalSettings.Floats[key];
-        }
-
-        // Local-only settings
-        protected bool GetBoolLocal(bool @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            if (SkillUpgrades.LocalSaveData.Booleans.TryGetValue(key, out bool ret)) return ret;
-            else return @default;
-        }
-        protected int GetIntLocal(int @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            if (SkillUpgrades.LocalSaveData.Integers.TryGetValue(key, out int ret)) return ret;
-            else return @default;
-        }
-        protected float GetFloatLocal(float @default, [CallerMemberName] string name = null)
-        {
-            if (name == null) return default;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            if (SkillUpgrades.LocalSaveData.Floats.TryGetValue(key, out float ret)) return ret;
-            else return @default;
-        }
-
-        // Setters accessible to the skill upgrades
-        protected void SetBoolLocal(bool value, [CallerMemberName] string name = null)
-        {
-            if (name == null) return;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            SkillUpgrades.LocalSaveData.Booleans[key] = value;
-        }
-        protected void SetIntLocal(int value, [CallerMemberName] string name = null)
-        {
-            if (name == null) return;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            SkillUpgrades.LocalSaveData.Integers[key] = value;
-        }
-        protected void SetFloatLocal(float value, [CallerMemberName] string name = null)
-        {
-            if (name == null) return;
-
-            string key = SkillUpgradeSettings.GetKey(Name, name);
-            SkillUpgrades.LocalSaveData.Floats[key] = value;
-        }
-        #endregion
-
-        protected AbstractSkillUpgrade()
-        {
-            Name = GetType().Name;
-        }
 
         #region Logging
         // If they improve the access levels of the loggable class in the mapi then I don't need to do this garbage

@@ -10,8 +10,9 @@ namespace SkillUpgrades.Skills
 {
     public class WallClimb : AbstractSkillUpgrade
     {
-        public float ClimbSpeed => GetFloat(7.2f);
-        public float ClimbSpeedConveyor => ClimbSpeed;
+        [DefaultFloatValue(7.2f)]
+        public static float ClimbSpeed;
+        public static float ClimbSpeedConveyor => ClimbSpeed;
 
 
         public override string Description => "Toggle whether claw can be used to climb up and down walls.";
@@ -151,7 +152,7 @@ namespace SkillUpgrades.Skills
                 }
 
                 // Don't go up if touching ceiling
-                if (InputHandler.Instance.inputActions.up.IsPressed && !HeroCentreNearRoof(0.1f))
+                if (InputHandler.Instance.inputActions.up.IsPressed && !HeroNearRoof(0.1f))
                 {
                     pos.y += Time.deltaTime * ClimbSpeed;
                 }
@@ -194,21 +195,16 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        private bool HeroCentreNearRoof(float tol)
+        private bool HeroNearRoof(float tol, bool centreOnly = true)
         {
             Vector2 vec = new Vector2(Ref.HeroCollider.bounds.center.x, Ref.HeroCollider.bounds.max.y);
 
             RaycastHit2D raycastHit2D = Physics2D.Raycast(vec, Vector2.up, tol, 256);
-            return raycastHit2D.collider != null;
-        }
-
-        private bool HeroNearRoof(float tol)
-        {
-            Vector2 vec = new Vector2(Ref.HeroCollider.bounds.min.x, Ref.HeroCollider.bounds.max.y);
-            RaycastHit2D raycastHit2D = Physics2D.Raycast(vec, Vector2.up, tol, 256);
             if (raycastHit2D.collider != null) return true;
 
-            Vector2 vec2 = new Vector2(Ref.HeroCollider.bounds.center.x, Ref.HeroCollider.bounds.max.y);
+            if (centreOnly) return false;
+
+            Vector2 vec2 = new Vector2(Ref.HeroCollider.bounds.min.x, Ref.HeroCollider.bounds.max.y);
             RaycastHit2D raycastHit2D2 = Physics2D.Raycast(vec2, Vector2.up, tol, 256);
             if (raycastHit2D2.collider != null) return true;
 

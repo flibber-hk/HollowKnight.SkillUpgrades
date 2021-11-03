@@ -8,25 +8,24 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
-using System.Collections.Generic;
 
 namespace SkillUpgrades.Skills
 {
     public class HorizontalDive : AbstractSkillUpgrade
     {
-        public bool PersistDiveThroughHorizontalTransitions => GetBool(true);
-        public bool LeftwardDiveAllowed => GetBoolLocal(true);
-        public bool RightwardDiveAllowed => GetBoolLocal(true);
+        [DefaultBoolValue(true)]
+        [MenuTogglable(name: "Horizontal transition dives", desc: "Toggle whether to remain diving after leaving a horizontal transition")]
+        public static bool PersistDiveThroughHorizontalTransitions;
+        [DefaultBoolValue(true)]
+        [NotSaved]
+        public static bool LeftwardDiveAllowed;
+        [DefaultBoolValue(true)]
+        [NotSaved]
+        public static bool RightwardDiveAllowed;
 
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
-
-        // Too long for the menu :/
-        // public override List<string> MenuBools => new List<string>() { nameof(MaintainDiveThroughTransitions) };
-
-        public override bool InvolvesHeroRotation => true;
 
         private ILHook _hook;
         protected override void StartUpInitialize()
