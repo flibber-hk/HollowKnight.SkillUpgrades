@@ -25,6 +25,8 @@ namespace SkillUpgrades.Skills
         [NotSaved]
         public static bool RightwardDiveAllowed;
 
+        public const float DiveSpeed = 50f;
+
         public override string Description => "Toggle whether Desolate Dive can be used horizontally.";
 
         private ILHook _hook;
@@ -87,11 +89,11 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        // Failsafe if they quake through a scene they've been in
+        // Failsafe if they quake through enough scenes without landing
         private int Failsafe = 0;
         private IEnumerator ModifyHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
-            if (Failsafe > 3)
+            if (Failsafe > 6)
             {
                 Failsafe = 0;
                 self.exitedQuake = false;
@@ -171,15 +173,15 @@ namespace SkillUpgrades.Skills
                     fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value = Math.Max(0.09f, quakeAnticSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180));
                 }
 
-                vSpeed.Value = -50f * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
-                hSpeed.Value = 50f * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
+                vSpeed.Value = -DiveSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
+                hSpeed.Value = DiveSpeed * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
             }));
 
             // Fix horizontal quake into Cliffs_02[right1], Mines_34[left1]
             fsm.GetState("Enter Quake").AddFirstAction(new ExecuteLambda(() =>
             {
-                vSpeed.Value = -50f * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
-                hSpeed.Value = 50f * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
+                vSpeed.Value = -DiveSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
+                hSpeed.Value = DiveSpeed * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
                 if (Math.Abs(vSpeed.Value) < 0.1f)
                 {
                     // If we don't translate the hero up a little, the hdive just ends from the CheckCollisionSide action.
