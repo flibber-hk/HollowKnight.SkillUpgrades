@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 using SkillUpgrades.Skills;
 
 namespace SkillUpgrades
@@ -35,6 +36,7 @@ namespace SkillUpgrades
         /// ApplyToGlobalSetting: modify the global setting value, and modify the field value unless it's marked as modified.
         /// ApplyToFieldValue: modify the field value, and mark it as modified.
         /// </summary>
+        [PublicAPI]
         public void SetValue(string skillName, string fieldName, object value, SkillFieldSetOptions options = SkillFieldSetOptions.ApplyToFieldValue)
         {
             string key = GetKey(skillName, fieldName);

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using Modding;
 using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
 {
-    public abstract partial class AbstractSkillUpgrade : ILogger
+    public abstract class AbstractSkillUpgrade : ILogger
     {
         /// <summary>
         /// Initialization that is done once
@@ -39,6 +40,7 @@ namespace SkillUpgrades.Skills
         public virtual void AddToMenuList(List<IMenuMod.MenuEntry> entries) { }
 
         public bool SkillUpgradeActive { get; private set; } = true;
+        public bool MatchesGlobalSetting { get; private set; } = true;
 
         #region Skill States
         // Initialize skill if it should be initialized
@@ -53,6 +55,7 @@ namespace SkillUpgrades.Skills
         }
         public void UpdateSkillState()
         {
+            if (!MatchesGlobalSetting) return;
             // Skill must be in dictionary at this point because it gets initialized first
             if (!SkillUpgrades.GS.GlobalToggle)
             {
@@ -61,6 +64,38 @@ namespace SkillUpgrades.Skills
             else
             {
                 SetState(SkillUpgrades.GS.EnabledSkills[Name]);
+            }
+        }
+        /// <summary>
+        /// Set the skill state in such a way that the global setting is ignored
+        /// </summary>
+        /// <param name="state">True or false to set the state, or null to clear the override</param>
+        [PublicAPI]
+        public static void OverrideSkillState(string Name, bool? state)
+        {
+            if (!SkillUpgrades._skills.TryGetValue(Name, out AbstractSkillUpgrade skill))
+            {
+                SkillUpgrades.instance.LogWarn($"Could not find skill {Name}");
+                return;
+            }
+
+            skill.OverrideSkillState(state);
+        }
+        /// <summary>
+        /// Set the skill state in such a way that the global setting is ignored
+        /// </summary>
+        /// <param name="state">True or false to set the state, or null to clear the override</param>
+        internal void OverrideSkillState(bool? state)
+        {
+            if (state == null)
+            {
+                MatchesGlobalSetting = true;
+                UpdateSkillState();
+            }
+            else
+            {
+                MatchesGlobalSetting = false;
+                SetState((bool)state);
             }
         }
         private void SetState(bool set)

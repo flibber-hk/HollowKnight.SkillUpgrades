@@ -16,7 +16,7 @@ namespace SkillUpgrades.Skills
         [MenuTogglable(desc: "Only works on certain dive floors")]
         public static bool BreakDiveFloorsFromBelow;
         [DefaultBoolValue(false)]
-        [MenuTogglable]
+        [MenuTogglable(desc: "Affects Vertical Superdash")]
         public static bool ChangeDirectionInMidair;
 
         public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";
