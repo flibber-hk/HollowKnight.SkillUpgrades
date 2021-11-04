@@ -26,6 +26,12 @@ namespace SkillUpgrades.Skills
             On.CameraTarget.Update += FixVerticalCamera;
             On.GameManager.FinishedEnteringScene += DisableUpwardOneways;
             On.HeroController.Start += ModifySuperdashFsm;
+            On.HeroAnimationController.canPlayTurn += FixCdashAnimation;
+        }
+
+        private bool FixCdashAnimation(On.HeroAnimationController.orig_canPlayTurn orig, HeroAnimationController self)
+        {
+            return !HeroController.instance.cState.superDashing && orig(self);
         }
 
         /// <summary>
