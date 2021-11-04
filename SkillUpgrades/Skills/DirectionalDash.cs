@@ -5,7 +5,6 @@ using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 using SkillUpgrades.Util;
-using System.Collections.Generic;
 
 namespace SkillUpgrades.Skills
 {
