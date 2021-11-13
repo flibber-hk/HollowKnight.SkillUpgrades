@@ -34,12 +34,20 @@ namespace SkillUpgrades.Skills
         {
             On.HeroController.EnterScene += ModifyHorizontalQuakeEntry;
             On.HeroController.Start += ModifyQuakeFSM;
+            On.HeroController.Respawn += RepairOnWarp;
 
             _hook = new ILHook
             (
                 typeof(HeroController).GetMethod(nameof(HeroController.EnterScene)).GetStateMachineTarget(),
                 AllowHorizontalQuakeEntry
             );
+        }
+
+        private IEnumerator RepairOnWarp(On.HeroController.orig_Respawn orig, HeroController self)
+        {
+            // Unrotate the knight when they benchwarp while mid-dive
+            ResetQuakeAngle();
+            return orig(self);
         }
 
         /// <summary>
@@ -90,17 +98,17 @@ namespace SkillUpgrades.Skills
         }
 
         // Failsafe if they quake through enough scenes without landing
-        private int Failsafe = 0;
+        private int QuakedTransitions = 0;
         private IEnumerator ModifyHorizontalQuakeEntry(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
-            if (Failsafe > 6)
+            if (QuakedTransitions > 6)
             {
-                Failsafe = 0;
+                QuakedTransitions = 0;
                 self.exitedQuake = false;
             }
             else if (self.exitedQuake)
             {
-                Failsafe++;
+                QuakedTransitions++;
             }
 
             if (!self.exitedQuake)
@@ -147,7 +155,7 @@ namespace SkillUpgrades.Skills
             PlayMakerFSM fsm = self.spellControl;
 
             // Clear the failsafe whenever a dive finishes
-            fsm.GetState("Quake Finish").AddFirstAction(new ExecuteLambda(() => { ResetQuakeAngle(); Failsafe = 0; }));
+            fsm.GetState("Quake Finish").AddFirstAction(new ExecuteLambda(() => { ResetQuakeAngle(); QuakedTransitions = 0; }));
             fsm.GetState("Reset Cam Zoom").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
             fsm.GetState("FSM Cancel").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
 

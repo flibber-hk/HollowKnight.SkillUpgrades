@@ -42,7 +42,7 @@ namespace SkillUpgrades.Skills
         private GameObject burst;
         internal void ResetSuperdashAngle()
         {
-            if (!HeroController.instance.cState.superDashing)
+            if (!HeroController.instance.cState.superDashing && SuperdashAngle == 0f)
             {
                 return;
             }
@@ -278,6 +278,7 @@ namespace SkillUpgrades.Skills
             }));
             fsm.GetState("Cancel").AddFirstAction(new ExecuteLambda(() =>
             {
+                // Called on scene change
                 ResetSuperdashAngle();
             }));
             fsm.GetState("Hit Wall").AddFirstAction(new ExecuteLambda(() =>
