@@ -53,6 +53,9 @@ namespace SkillUpgrades
     [AttributeUsage(AttributeTargets.Field)]
     public class NotSavedAttribute : Attribute { }
 
+    /// <summary>
+    /// Skill fields with this attribute will receive a toggle in the mod menu
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class MenuTogglableAttribute : Attribute
     {

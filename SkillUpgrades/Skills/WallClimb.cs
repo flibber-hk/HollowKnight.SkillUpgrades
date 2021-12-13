@@ -48,6 +48,24 @@ namespace SkillUpgrades.Skills
             On.HeroController.Start += SuperdashWallCancel;
         }
 
+        protected override void RepeatableInitialize()
+        {
+            if (HeroController.instance != null && HeroController.instance.cState.wallSliding)
+            {
+                // If they toggle it on while wallsliding, then we need to fix the gravity
+                HeroController.instance.AffectedByGravity(false);
+            }
+        }
+
+        protected override void Unload()
+        {
+            if (HeroController.instance != null && HeroController.instance.cState.wallSliding)
+            {
+                // If they toggle it off while wallsliding, then we need to fix the gravity
+                HeroController.instance.AffectedByGravity(true);
+            }
+        }
+
         private void Conveyor_MoveUpOrDown(ILContext il)
         {
             ILCursor cursor = new ILCursor(il).Goto(0);

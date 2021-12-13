@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Modding;
+using MonoMod.ModInterop;
+using SkillUpgrades.Menu;
 using SkillUpgrades.Skills;
 using SkillUpgrades.Util;
 
 namespace SkillUpgrades
 {
-    public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, IMenuMod
+    public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, ICustomMenuMod
     {
         internal static SkillUpgrades instance;
         internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new Dictionary<string, AbstractSkillUpgrade>();
@@ -19,9 +21,15 @@ namespace SkillUpgrades
         public SkillUpgradeSettings OnSaveGlobal() => GS;
         #endregion
 
-        public override void Initialize()
+        public SkillUpgrades() : base(null)
         {
             instance = this;
+            typeof(Export).ModInterop();
+        }
+
+
+        public override void Initialize()
+        {
             instance.Log("Initializing");
 
             foreach (Type t in Assembly.GetAssembly(typeof(SkillUpgrades)).GetTypes().Where(x => x.IsSubclassOf(typeof(AbstractSkillUpgrade))))
@@ -30,6 +38,7 @@ namespace SkillUpgrades
                 _skills.Add(skill.Name, skill);
                 skill.InitializeSkillUpgrade();
                 skill.UpdateSkillState();
+                DebugMod.AddActionToKeyBindList(() => Toggle(skill), skill.Name, "SkillUpgrades");
             }
 
             HeroRotation.Hook();
@@ -37,20 +46,30 @@ namespace SkillUpgrades
         }
 
         #region Menu
-        public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? toggleButtonEntry)
+        internal static Action RefreshSkillMenu = null;
+        internal static Action RefreshSkillSettingMenu = null;
+        /// <summary>
+        /// Force each menu to refresh
+        /// </summary>
+        internal static void RefreshAllMenus()
         {
-            List<IMenuMod.MenuEntry> menuEntries = new List<IMenuMod.MenuEntry>();
+            RefreshSkillMenu?.Invoke();
+            RefreshSkillSettingMenu?.Invoke();
+        }
 
-            IMenuMod.MenuEntry globalToggleEntry = new IMenuMod.MenuEntry()
+        public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates)
+        {
+            ModMenuScreenBuilder builder = new(Name, modListMenu);
+            builder.AddHorizontalOption(new IMenuMod.MenuEntry()
             {
                 Name = "Global Toggle",
                 Description = "Turn this setting off to deactivate all skill upgrades.",
                 Values = new string[] { "False", "True" },
                 Saver = opt => ApplyGlobalToggle(opt == 1),
                 Loader = () => GS.GlobalToggle ? 1 : 0
-            };
-            menuEntries.Add(globalToggleEntry);
+            });
 
+            List<IMenuMod.MenuEntry> skillMenuEntries = new();
             foreach (AbstractSkillUpgrade skill in _skills.Values)
             {
                 IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
@@ -62,9 +81,11 @@ namespace SkillUpgrades
                     Loader = () => GS.EnabledSkills[skill.Name] == true ? 1 : 0
                 };
 
-                menuEntries.Add(entry);
+                skillMenuEntries.Add(entry);
             }
+            builder.AddSubpage("Enabled Skills", "Enable and disable skill upgrades", skillMenuEntries, out RefreshSkillMenu);
 
+            List<IMenuMod.MenuEntry> skillSettingEntries = new();
             foreach (var kvp in SkillUpgradeSettings.Fields)
             {
                 if (kvp.Value.GetCustomAttribute<MenuTogglableAttribute>() is MenuTogglableAttribute mt && kvp.Value.FieldType == typeof(bool))
@@ -78,16 +99,17 @@ namespace SkillUpgrades
                         Loader = () => (bool)GS.GetDefaultValue(kvp.Key) ? 1 : 0,
                     };
 
-                    menuEntries.Add(entry);
+                    skillSettingEntries.Add(entry);
                 }
             }
 
             foreach (AbstractSkillUpgrade skill in _skills.Values)
             {
-                skill.AddToMenuList(menuEntries);
+                skill.AddToMenuList(skillSettingEntries);
             }
+            builder.AddSubpage("Skill Preferences", "Toggle settings specific to each skill", skillSettingEntries, out RefreshSkillSettingMenu);
 
-            return menuEntries;
+            return builder.CreateMenuScreen();
         }
 
         public bool ToggleButtonInsideMenu => false;
@@ -102,6 +124,13 @@ namespace SkillUpgrades
                 skill.UpdateSkillState();
             }
         }
+        // Used when toggling the skill upgrade outside the menu
+        internal static void Toggle(AbstractSkillUpgrade skill)
+        {
+            Toggle(skill, !GS.EnabledSkills[skill.Name]);
+            RefreshSkillMenu?.Invoke();
+            DebugMod.LogToConsole((GS.EnabledSkills[skill.Name] ? "Enabled " : "Disabled ") + skill.Name);
+        }
         internal static void Toggle(AbstractSkillUpgrade skill, bool enable)
         {
             GS.EnabledSkills[skill.Name] = enable;
@@ -110,7 +139,7 @@ namespace SkillUpgrades
 
         public override string GetVersion()
         {
-            return "0.6";
+            return "0.7";
         }
 
         public override int LoadPriority()

@@ -22,5 +22,3 @@ Manually editing the global settings file (while the game is closed) can let the
 - DiagonalSuperdash: If this is disabled, the knight will only be able to cdash upward or horizontally (no diagonal).
 - ClimbSpeed: The default climb speed is 5.0, but this can be modified.
 - AirDashMax, DoubleJumpMax: The number of times the knight can air dash or double jump can be changed - setting this value to -1 will cause it to be treated as infinite.
-
-Some of the skill upgrades require substantial changes to some of the knight's components to function, and these changes can't easily be reversed. In order not to conflict with other mods, it is possible to prevent those upgrades from loading entirely by setting the value in the EnabledModules section of the global settings to `null`. Any such skill upgrade disabled in this way will not be able to be toggled in-game.

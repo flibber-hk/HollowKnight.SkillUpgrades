@@ -91,7 +91,6 @@ namespace SkillUpgrades
         #endregion
 
 
-
         internal static Dictionary<string, FieldInfo> Fields;
         static SkillUpgradeSettings()
         {

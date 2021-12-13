@@ -4,14 +4,17 @@
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>SkillUpgrades</RootNamespace>
     <AssemblyTitle>SkillUpgrades</AssemblyTitle>
-	<AssemblyVersion>0.6.0</AssemblyVersion>
+    <AssemblyVersion>0.7.0</AssemblyVersion>
     <Deterministic>true</Deterministic>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+  
   <PropertyGroup>
-	<HollowKnightRefs>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed</HollowKnightRefs>
-  </PropertyGroup>  <ItemGroup>
+    <HollowKnightRefs>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed</HollowKnightRefs>
+  </PropertyGroup>
+  
+  <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -27,7 +30,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(HollowKnightRefs)\MMHOOK_PlayMaker.dll</HintPath>
     </Reference>
-	<Reference Include="Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
+    <Reference Include="Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
       <HintPath>$(HollowKnightRefs)\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour, Version=21.4.29.1, Culture=neutral, PublicKeyToken=null">
@@ -36,7 +39,7 @@
     <Reference Include="MonoMod.Utils, Version=21.4.29.1, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\MonoMod.Utils.dll</HintPath>
     </Reference>
-	<Reference Include="QoL">
+    <Reference Include="QoL">
       <HintPath>$(HollowKnightRefs)\Mods\QoL\QoL.dll</HintPath>
     </Reference>
     <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
@@ -55,7 +58,7 @@
     <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\UnityEngine.JSONSerializeModule.dll</HintPath>
     </Reference>
-	<Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
