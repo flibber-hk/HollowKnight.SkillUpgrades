@@ -11,7 +11,7 @@ namespace ...
         {
             public static Action<string, bool?> OverrideSkillState = null;
             public static Action<string, string, object> OverrideFieldValue = null;
-			public static Action<string, string> ClearFieldOverride = null;
+            public static Action<string, string> ClearFieldOverride = null;
         }
         static SkillUpgrades()
         {
