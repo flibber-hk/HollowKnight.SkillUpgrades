@@ -69,6 +69,7 @@ namespace SkillUpgrades.Skills
         /// <summary>
         /// Set the skill state in such a way that the global setting is ignored
         /// </summary>
+        /// <param name="Name">The name of the skill</param>
         /// <param name="state">True or false to set the state, or null to clear the override</param>
         [PublicAPI]
         public static void OverrideSkillState(string Name, bool? state)

@@ -79,6 +79,8 @@ namespace SkillUpgrades.Skills
                 cursor.GotoNext();
                 cursor.EmitDelegate<Func<float, float>>(ySpeed =>
                 {
+                    if (!SkillUpgradeActive) return ySpeed;
+
                     if (InputHandler.Instance.inputActions.down.IsPressed && !HeroController.instance.CheckTouchingGround())
                     {
                         ySpeed -= ClimbSpeedConveyor;

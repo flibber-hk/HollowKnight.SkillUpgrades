@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Modding;
 using MonoMod.ModInterop;
+using UnityEngine.UI;
 using SkillUpgrades.Menu;
 using SkillUpgrades.Skills;
 using SkillUpgrades.Util;
@@ -31,6 +32,7 @@ namespace SkillUpgrades
         public override void Initialize()
         {
             instance.Log("Initializing");
+            DebugMod.AddActionToKeyBindList(() => { ApplyGlobalToggle(!GS.GlobalToggle); RefreshMainMenu(); }, "Global Toggle", "SkillUpgrades");
 
             foreach (Type t in Assembly.GetAssembly(typeof(SkillUpgrades)).GetTypes().Where(x => x.IsSubclassOf(typeof(AbstractSkillUpgrade))))
             {
@@ -53,6 +55,7 @@ namespace SkillUpgrades
         /// </summary>
         internal static void RefreshAllMenus()
         {
+            instance.RefreshMainMenu();
             RefreshSkillMenu?.Invoke();
             RefreshSkillSettingMenu?.Invoke();
         }
@@ -113,6 +116,18 @@ namespace SkillUpgrades
         }
 
         public bool ToggleButtonInsideMenu => false;
+
+        public void RefreshMainMenu()
+        {
+            MenuScreen screen = ModHooks.BuiltModMenuScreens[this];
+            if (screen != null)
+            {
+                foreach (MenuOptionHorizontal option in screen.GetComponentsInChildren<MenuOptionHorizontal>())
+                {
+                    option.menuSetting.RefreshValueFromGameSettings();
+                }
+            }
+        }
         #endregion
 
         internal static void ApplyGlobalToggle(bool enable)
@@ -139,12 +154,12 @@ namespace SkillUpgrades
 
         public override string GetVersion()
         {
-            return "0.7";
+            return GetType().Assembly.GetName().Version.ToString();
         }
 
         public override int LoadPriority()
         {
-            return 1000;
+            return 0;
         }
 
     }
