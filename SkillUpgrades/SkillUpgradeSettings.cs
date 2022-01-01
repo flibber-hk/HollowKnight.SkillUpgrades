@@ -28,6 +28,8 @@ namespace SkillUpgrades
     [Serializable]
     public class SkillUpgradeSettings
     {
+        public RM.RandoSettings RandoSettings = new();
+
         #region API
 
         /// <summary>

@@ -44,6 +44,20 @@ namespace SkillUpgrades
             }
 
             HeroRotation.Hook();
+
+            // All ItemChanger/Randomizer dependence should be kept to the IC and RM namespaces
+            // ItemChanger Interop
+            if (ModHooks.GetMod("ItemChangerMod") is Mod)
+            {
+                Log("Hooking ItemChanger");
+                IC.ItemChangerInterop.HookItemChanger();
+            }
+            // Rando Interop
+            if (ModHooks.GetMod("Randomizer 4") is Mod)
+            {
+                RM.RandomizerInterop.HookRandomizer();
+            }
+
             Log("Initialization done!");
         }
 

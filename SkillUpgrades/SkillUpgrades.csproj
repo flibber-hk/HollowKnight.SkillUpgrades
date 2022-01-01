@@ -67,6 +67,9 @@
     <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\PlayMaker.dll</HintPath>
     </Reference>
+    <Reference Include="RandomizerCore">
+      <HintPath>$(HollowKnightRefs)\Mods\RandomizerCore\RandomizerCore.dll</HintPath>
+    </Reference>
     <Reference Include="RandomizerMod">
       <HintPath>$(HollowKnightRefs)\Mods\RandomizerMod\RandomizerMod.dll</HintPath>
     </Reference>
