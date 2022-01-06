@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using RandomizerMod.RandomizerData;
 using RandomizerMod.RC;
 
 namespace SkillUpgrades.RM
@@ -22,6 +23,17 @@ namespace SkillUpgrades.RM
                 .Select(x => x.Name))
             {
                 rb.MainItemGroup.Items.Add(skillName);
+
+                rb.EditItemRequest(skillName, info =>
+                {
+                    info.getItemDef = () => new ItemDef()
+                    {
+                        Name = skillName,
+                        Pool = "SkillUpgrades",
+                        MajorItem = false, // true if progressive
+                        PriceCap = 500,
+                    };
+                });
             }
         }
     }
