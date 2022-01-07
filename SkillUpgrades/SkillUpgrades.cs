@@ -53,7 +53,8 @@ namespace SkillUpgrades
                 IC.ItemChangerInterop.HookItemChanger();
             }
             // Rando Interop
-            if (ModHooks.GetMod("Randomizer 4") is Mod)
+            if (ModHooks.GetMod("Randomizer 4") is Mod
+                && ModHooks.GetMod("MenuChanger") is Mod)
             {
                 RM.RandomizerInterop.HookRandomizer();
             }
