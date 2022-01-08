@@ -21,13 +21,15 @@ Manually editing the global settings file (while the game is closed) can let the
 - MaintainVerticalDashMomentum: By default, the knight will continue moving vertically after an upward or up-diagonal dash ends (slowed down by gravity); this behaviour can be disabled, to match how the knight stops moving horizontally with no left/right input after a regular dash
 - DiagonalSuperdash: If this is disabled, the knight will only be able to cdash upward or horizontally (no diagonal).
 - ClimbSpeed: The default climb speed is 5.0, but this can be modified.
-- AirDashMax, DoubleJumpMax: The number of times the knight can air dash or double jump can be changed - setting this value to -1 will cause it to be treated as infinite.
+- AirDashMax, DoubleJumpMax: The number of times the knight can air dash or double jump can be changed - setting this value to be negative will cause it to be treated as infinite.
+Some of these can be modified in the mod menu.
 
 ## DebugMod interop
 With DebugMod installed, each skill upgrade, as well as the global toggle, can be toggled in the debug mod keybinds menu (and these toggles can be bound to keys like with normal DebugMod methods).
 
-## Randomizer connection
+## Randomizer interop
 Each of the Skill Upgrades can be randomized in Randomizer 4's Connections page. However, this is limited:
-- Skill upgrades are not progressive (so e.g. it is possible to find a useless extra air dash before finding any dash)
+- Skill upgrades are not progressive (so e.g. it is possible to find a useless extra air dash before finding any dash).
 - Skill upgrades unlock the ability to toggle in the menu (so finding wall climb will have no effect if it is turned off in the mod menu).
-- Skill upgrades do not give specialized logic access
+- Skill upgrades do not give specialized logic access.
+Unrandomized skill upgrades will behave according to the global setting - so they will be available as soon as the base skill is unlocked if the skill upgrade is active in the mod menu.
