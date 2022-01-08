@@ -1,4 +1,5 @@
-﻿using MenuChanger;
+﻿using System.Collections.Generic;
+using MenuChanger;
 using MenuChanger.MenuElements;
 using MenuChanger.MenuPanels;
 using MenuChanger.Extensions;
@@ -10,7 +11,7 @@ namespace SkillUpgrades.RM
     public class MenuHolder
     {
         internal MenuPage MainPage;
-        internal MenuElementFactory<RandoSettings> suMEF;
+        internal List<IValueElement> suElements;
         internal VerticalItemPanel suVIP;
 
         internal SmallButton JumpToDRPage;
@@ -40,8 +41,17 @@ namespace SkillUpgrades.RM
         private void ConstructMenu(MenuPage landingPage)
         {
             MainPage = new MenuPage("SkillUpgrades", landingPage);
-            suMEF = new(MainPage, SkillUpgrades.GS.RandoSettings);
-            suVIP = new(MainPage, new(0, 300), 50f, false, suMEF.Elements);
+            
+            suElements = new();
+            foreach (var kvp in RandomizerInterop.RandoSettings.SkillSettings)
+            {
+                ToggleButton button = new(MainPage, kvp.Key);
+                button.SetValue(kvp.Value);
+                button.SelfChanged += b => RandomizerInterop.RandoSettings.SkillSettings[kvp.Key] = (bool)b.Value;
+                suElements.Add(button);
+            }
+
+            suVIP = new(MainPage, new(0, 300), 50f, false, suElements.ToArray());
         }
     }
 }

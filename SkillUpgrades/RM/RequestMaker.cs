@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using RandomizerMod.RandomizerData;
@@ -17,12 +18,15 @@ namespace SkillUpgrades.RM
         {
             if (!RandomizerInterop.RandoSettings.Any) return;
 
-            foreach (string skillName in typeof(RandoSettings)
-                .GetFields()
-                .Where(fi => fi.FieldType == typeof(bool) && (bool)fi.GetValue(RandomizerInterop.RandoSettings))
-                .Select(x => x.Name))
+            ItemGroupBuilder skillGroup = rb.GetItemGroupFor(ItemChanger.ItemNames.Mothwing_Cloak);
+            List<string> randomizedSkillUpgrades = new();
+
+            foreach (string skillName in RandomizerInterop.RandoSettings.SkillSettings
+                .Where(kvp => kvp.Value)
+                .Select(kvp => kvp.Key))
             {
-                rb.MainItemGroup.Items.Add(skillName);
+                skillGroup.Items.Add(skillName);
+                randomizedSkillUpgrades.Add(skillName);
 
                 rb.EditItemRequest(skillName, info =>
                 {
@@ -34,6 +38,22 @@ namespace SkillUpgrades.RM
                         PriceCap = 500,
                     };
                 });
+            }
+
+            rb.OnGetGroupFor.Subscribe(0.8f, MatchSkillUpgrades);
+
+            bool MatchSkillUpgrades(RequestBuilder rb, string item, RequestBuilder.ElementType type, out GroupBuilder gb)
+            {
+                if (type == RequestBuilder.ElementType.Item || type == RequestBuilder.ElementType.Unknown)
+                {
+                    if (randomizedSkillUpgrades.Contains(item))
+                    {
+                        gb = skillGroup;
+                        return true;
+                    }
+                }
+                gb = default;
+                return false;
             }
         }
     }

@@ -1,25 +1,13 @@
-﻿namespace SkillUpgrades.RM
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace SkillUpgrades.RM
 {
     public class RandoSettings
     {
-        public bool ExtraAirDash;
-        public bool DirectionalDash;
-        public bool WallClimb;
-        public bool VerticalSuperdash;
-        public bool TripleJump;
-        public bool DownwardFireball;
-        public bool HorizontalDive;
-        public bool SpiralScream;
+        public Dictionary<string, bool> SkillSettings = SkillUpgrades.GS.EnabledSkills.ToDictionary(kvp => kvp.Key, kvp => false);
 
         [Newtonsoft.Json.JsonIgnore]
-        public bool Any =>
-            ExtraAirDash
-            || DirectionalDash
-            || WallClimb
-            || VerticalSuperdash
-            || TripleJump
-            || DownwardFireball
-            || HorizontalDive
-            || SpiralScream;
+        public bool Any => SkillSettings.Values.Any();
     }
 }
