@@ -32,4 +32,4 @@ Each of the Skill Upgrades can be randomized in Randomizer 4's Connections page.
 - Skill upgrades are not progressive (so e.g. it is possible to find a useless extra air dash before finding any dash).
 - Skill upgrades unlock the ability to toggle in the menu (so finding wall climb will have no effect if it is turned off in the mod menu).
 - Skill upgrades do not give specialized logic access.
-Unrandomized skill upgrades will behave according to the global setting - so they will be available as soon as the base skill is unlocked if the skill upgrade is active in the mod menu.
+- Unrandomized skill upgrades will behave according to the global setting - so they will be available as soon as the base skill is unlocked if the skill upgrade is active in the mod menu.
