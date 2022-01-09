@@ -14,7 +14,7 @@ namespace SkillUpgrades
     public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, ICustomMenuMod
     {
         internal static SkillUpgrades instance;
-        internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new Dictionary<string, AbstractSkillUpgrade>();
+        internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new();
 
         #region Global Settings
         public static SkillUpgradeSettings GS { get; set; } = new SkillUpgradeSettings();
@@ -90,7 +90,7 @@ namespace SkillUpgrades
             List<IMenuMod.MenuEntry> skillMenuEntries = new();
             foreach (AbstractSkillUpgrade skill in _skills.Values)
             {
-                IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
+                IMenuMod.MenuEntry entry = new()
                 {
                     Name = skill.UIName,
                     Description = skill.Description,
@@ -108,7 +108,7 @@ namespace SkillUpgrades
             {
                 if (kvp.Value.GetCustomAttribute<MenuTogglableAttribute>() is MenuTogglableAttribute mt && kvp.Value.FieldType == typeof(bool))
                 {
-                    IMenuMod.MenuEntry entry = new IMenuMod.MenuEntry()
+                    IMenuMod.MenuEntry entry = new()
                     {
                         Name = mt.name ?? kvp.Value.Name.FromCamelCase(),
                         Description = mt.desc,

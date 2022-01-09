@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
+using Modding;
 using SkillUpgrades.Skills;
 
 namespace SkillUpgrades
@@ -58,7 +59,7 @@ namespace SkillUpgrades
 
             else if (options == SkillFieldSetOptions.ApplyToGlobalSetting)
             {
-                if (fi.GetCustomAttribute<NotSavedAttribute>() is NotSavedAttribute) return;
+                if (fi.GetCustomAttribute<NotSavedAttribute>() is not null) return;
 
                 if (fi.FieldType == typeof(int)) Integers[key] = (int)value;
                 else if (fi.FieldType == typeof(bool)) Booleans[key] = (bool)value;
@@ -96,7 +97,7 @@ namespace SkillUpgrades
         {
             Fields = new Dictionary<string, FieldInfo>();
 
-            foreach (Type t in typeof(SkillUpgradeSettings).Assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(AbstractSkillUpgrade)) && !t.IsAbstract))
+            foreach (Type t in typeof(SkillUpgradeSettings).Assembly.GetTypesSafely().Where(t => t.IsSubclassOf(typeof(AbstractSkillUpgrade)) && !t.IsAbstract))
             {
                 foreach (FieldInfo fi in t.GetFields(BindingFlags.Public | BindingFlags.Static))
                 {
@@ -149,7 +150,7 @@ namespace SkillUpgrades
         {
             foreach (var kvp in Fields)
             {
-                if (kvp.Value.GetCustomAttribute<NotSavedAttribute>() is NotSavedAttribute) continue;
+                if (kvp.Value.GetCustomAttribute<NotSavedAttribute>() is not null) continue;
 
                 if (kvp.Value.FieldType == typeof(int))
                 {
