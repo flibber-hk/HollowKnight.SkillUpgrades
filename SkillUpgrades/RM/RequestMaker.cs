@@ -9,25 +9,24 @@ namespace SkillUpgrades.RM
 {
     public static class RequestMaker
     {
-        public static void Hook()
+        public static void HookRequestBuilder()
         {
+            // Early hook; do not mutate state, simply make the info about the items and their group available
+            RequestBuilder.OnUpdate.Subscribe(-499.2f, SetupRefs);
+
+            // Late-ish hook (shortly after base rando adds regular items); randomized items are added to the
+            // randomization group we set earlier
             RequestBuilder.OnUpdate.Subscribe(0.8f, AddSkillUpgradesToPool);
         }
 
-        private static void AddSkillUpgradesToPool(RequestBuilder rb)
+        private static void SetupRefs(RequestBuilder rb)
         {
             if (!RandomizerInterop.RandoSettings.Any) return;
-
-            ItemGroupBuilder skillGroup = rb.GetItemGroupFor(ItemChanger.ItemNames.Mothwing_Cloak);
-            List<string> randomizedSkillUpgrades = new();
 
             foreach (string skillName in RandomizerInterop.RandoSettings.SkillSettings
                 .Where(kvp => kvp.Value)
                 .Select(kvp => kvp.Key))
             {
-                skillGroup.Items.Add(skillName);
-                randomizedSkillUpgrades.Add(skillName);
-
                 rb.EditItemRequest(skillName, info =>
                 {
                     info.getItemDef = () => new ItemDef()
@@ -41,19 +40,30 @@ namespace SkillUpgrades.RM
             }
 
             rb.OnGetGroupFor.Subscribe(0.8f, MatchSkillUpgrades);
-
-            bool MatchSkillUpgrades(RequestBuilder rb, string item, RequestBuilder.ElementType type, out GroupBuilder gb)
+            static bool MatchSkillUpgrades(RequestBuilder rb, string item, RequestBuilder.ElementType type, out GroupBuilder gb)
             {
                 if (type == RequestBuilder.ElementType.Item || type == RequestBuilder.ElementType.Unknown)
                 {
-                    if (randomizedSkillUpgrades.Contains(item))
+                    if (RandomizerInterop.RandoSettings.SkillSettings.Keys.Contains(item))
                     {
-                        gb = skillGroup;
+                        gb = rb.GetItemGroupFor(ItemChanger.ItemNames.Mothwing_Cloak);
                         return true;
                     }
                 }
                 gb = default;
                 return false;
+            }
+        }
+
+        private static void AddSkillUpgradesToPool(RequestBuilder rb)
+        {
+            if (!RandomizerInterop.RandoSettings.Any) return;
+
+            foreach (string skillName in RandomizerInterop.RandoSettings.SkillSettings
+                .Where(kvp => kvp.Value)
+                .Select(kvp => kvp.Key))
+            {
+                rb.AddItemByName(skillName);
             }
         }
     }

@@ -23,7 +23,7 @@ namespace SkillUpgrades.RM
         {
             MenuHolder.Hook();
             LogicPatcher.Hook();
-            RequestMaker.Hook();
+            RequestMaker.HookRequestBuilder();
         }
     }
 }
