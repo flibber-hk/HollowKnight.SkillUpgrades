@@ -97,7 +97,7 @@ namespace SkillUpgrades
         {
             Fields = new Dictionary<string, FieldInfo>();
 
-            foreach (Type t in typeof(SkillUpgradeSettings).Assembly.GetTypesSafely().Where(t => t.IsSubclassOf(typeof(AbstractSkillUpgrade)) && !t.IsAbstract))
+            foreach (Type t in AbstractSkillUpgrade.GetAvailableSkillUpgradeTypes())
             {
                 foreach (FieldInfo fi in t.GetFields(BindingFlags.Public | BindingFlags.Static))
                 {

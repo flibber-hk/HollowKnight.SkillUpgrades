@@ -34,7 +34,7 @@ namespace SkillUpgrades
             instance.Log("Initializing");
             DebugMod.AddActionToKeyBindList(() => { ApplyGlobalToggle(!GS.GlobalToggle); RefreshMainMenu(); }, "Global Toggle", "SkillUpgrades");
 
-            foreach (Type t in typeof(SkillUpgrades).Assembly.GetTypesSafely().Where(x => x.IsSubclassOf(typeof(AbstractSkillUpgrade))))
+            foreach (Type t in AbstractSkillUpgrade.GetAvailableSkillUpgradeTypes())
             {
                 AbstractSkillUpgrade skill = (AbstractSkillUpgrade)Activator.CreateInstance(t);
                 _skills.Add(skill.Name, skill);
