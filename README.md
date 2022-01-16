@@ -22,6 +22,7 @@ Manually editing the global settings file (while the game is closed) can let the
 - DiagonalSuperdash: If this is disabled, the knight will only be able to cdash upward or horizontally (no diagonal).
 - ClimbSpeed: The default climb speed is 5.0, but this can be modified.
 - AirDashMax, DoubleJumpMax: The number of times the knight can air dash or double jump can be changed - setting this value to be negative will cause it to be treated as infinite.
+
 Some of these can be modified in the mod menu.
 
 ## DebugMod interop
@@ -33,3 +34,5 @@ Each of the Skill Upgrades can be randomized in Randomizer 4's Connections page.
 - Skill upgrades unlock the ability to toggle in the menu (so finding wall climb will have no effect if it is turned off in the mod menu).
 - Skill upgrades do not give specialized logic access.
 - Unrandomized skill upgrades will behave according to the global setting - so they will be available as soon as the base skill is unlocked if the skill upgrade is active in the mod menu.
+
+Skill Upgrades will, by default, be placed in the same item group as Mothwing Cloak (even the upgrades not related to dash). Any Custom Group that affects skills differently to each other should match skill upgrades too, if intended.
