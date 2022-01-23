@@ -109,21 +109,6 @@ namespace SkillUpgrades.Skills
             {
                 upwardOneway.GetComponent<Collider2D>().enabled = true;
             }
-
-            switch (scene.name)
-            {
-                case ItemChanger.SceneNames.Mines_34:
-                    TransitionPoint tp = scene.GetRootGameObjects().First(x => x.name == "left1").GetComponent<TransitionPoint>();
-                    Vector2 v = tp.entryOffset;
-                    v.y = 50f;
-                    tp.entryOffset = v;
-                    Log("Set");
-                    break;
-                case ItemChanger.SceneNames.Cliffs_02:
-                    GameObject go2 = scene.GetRootGameObjects().First(x => x.name == "right1");
-                    Log($"{go2.GetComponent<TransitionPoint>().entryOffset} - {go2.transform.position}");
-                    break;
-            }
         }
 
         private bool FixCdashAnimation(On.HeroAnimationController.orig_canPlayTurn orig, HeroAnimationController self)
