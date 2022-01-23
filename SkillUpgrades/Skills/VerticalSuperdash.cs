@@ -38,14 +38,26 @@ namespace SkillUpgrades.Skills
             finishedEnteringScene.Invoke(hero, setHazardMarker, preventRunBob);
         }
 
+        // Jumping through hoops to avoid explicitly naming compiler generated types
+        private static readonly FieldInfo HeroEnterSceneIteratorState = typeof(HeroController)
+            .GetMethod(nameof(HeroController.EnterScene))
+            .GetStateMachineTarget()
+            .DeclaringType
+            .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .First(x => x.Name.Contains("state"));
+
         protected override void StartUpInitialize()
         {
             On.CameraTarget.Update += FixVerticalCamera;
             On.HeroController.Start += ModifySuperdashFsm;
-            On.HeroAnimationController.canPlayTurn += FixCdashAnimation;
-            On.HeroController.EnterScene += EnableTransitionCdash;
 
+            // 
+            On.HeroController.EnterScene += EnableTransitionCdash;
+            // The colliders of upward oneways are disabled (except for Tutorial_01[top1]) so we need to enable them
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ActivateUpwardOneways;
+
+            // Don't play weird animations when they should be cdashing
+            On.HeroAnimationController.canPlayTurn += FixCdashAnimation;
             On.HeroAnimationController.PlayFromFrame += DontPlaySuperdash;
         }
 
@@ -90,14 +102,15 @@ namespace SkillUpgrades.Skills
 
             bool exitedSuperdashing = self.exitedSuperDashing;
 
+            // This is like the approach to IEnumerator modification in ItemChanger.StartDef, except
+            // less flexible (we only accept if the original IEnumerator was not modified).
             if (e.GetType().Assembly != typeof(HeroController).Assembly)
             {
                 LogError("Transition Cdash edit blocked by a mod in assembly:\n" + e.GetType().Assembly.FullName);
                 yield return e;
             }
 
-            FieldInfo state = e.GetType().GetField("<>1__state", BindingFlags.Instance | BindingFlags.NonPublic);
-            int GetState() => (int)state.GetValue(e);
+            int GetState() => (int)HeroEnterSceneIteratorState.GetValue(e);
 
             while (e.MoveNext())
             {
