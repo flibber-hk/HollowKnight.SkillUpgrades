@@ -46,6 +46,8 @@ namespace SkillUpgrades.Skills
             .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .First(x => x.Name.Contains("state"));
 
+        private ILHook _hook;
+
         protected override void StartUpInitialize()
         {
             On.CameraTarget.Update += FixVerticalCamera;
@@ -59,6 +61,23 @@ namespace SkillUpgrades.Skills
             // Don't play weird animations when they should be cdashing
             On.HeroAnimationController.canPlayTurn += FixCdashAnimation;
             On.HeroAnimationController.PlayFromFrame += DontPlaySuperdash;
+
+            // We need to move the entry coordinates for non-vertical oneways (Mines_34, Cliffs_02), and the TransitionPoint.entryOffset
+            // is not used for horizontal transitions
+            _hook = new(typeof(HeroController).GetMethod(nameof(HeroController.EnterScene)).GetStateMachineTarget(), RepairHorizontalOneways);
+        }
+
+        private void RepairHorizontalOneways(ILContext il)
+        {
+            ILCursor cursor = new(il);
+
+            cursor.GotoNext(i => i.MatchLdfld<HeroController>(nameof(HeroController.gatePosition)), i => i.MatchLdcI4(2));
+            cursor.GotoNext(MoveType.After, i => i.MatchCallvirt<HeroController>("FindGroundPointY"));
+            cursor.EmitDelegate<Func<float, float>>(x => GameManager.instance.sceneName == ItemChanger.SceneNames.Mines_34 ? 54.4f : x);
+
+            cursor.GotoNext(i => i.MatchLdfld<HeroController>(nameof(HeroController.gatePosition)), i => i.MatchLdcI4(1));
+            cursor.GotoNext(MoveType.After, i => i.MatchCallvirt<HeroController>("FindGroundPointY"));
+            cursor.EmitDelegate<Func<float, float>>(x => GameManager.instance.sceneName == ItemChanger.SceneNames.Cliffs_02 ? 28.4f : x);
         }
 
         private void DontPlaySuperdash(On.HeroAnimationController.orig_PlayFromFrame orig, HeroAnimationController self, string clipName, int frame)
@@ -73,7 +92,7 @@ namespace SkillUpgrades.Skills
 
         private void ActivateUpwardOneways(Scene _, Scene scene)
         {
-            GameObject tp = scene.name switch
+            GameObject upwardOneway = scene.name switch
             {
                 ItemChanger.SceneNames.RestingGrounds_02 => scene.GetRootGameObjects().First(x => x.name == "top1"),
                 ItemChanger.SceneNames.Mines_13 => scene.GetRootGameObjects().First(x => x.name == "top1"),
@@ -86,9 +105,25 @@ namespace SkillUpgrades.Skills
                 _ => null
             };
 
-            if (tp == null) return;
+            if (upwardOneway != null)
+            {
+                upwardOneway.GetComponent<Collider2D>().enabled = true;
+            }
 
-            tp.GetComponent<Collider2D>().enabled = true;
+            switch (scene.name)
+            {
+                case ItemChanger.SceneNames.Mines_34:
+                    TransitionPoint tp = scene.GetRootGameObjects().First(x => x.name == "left1").GetComponent<TransitionPoint>();
+                    Vector2 v = tp.entryOffset;
+                    v.y = 50f;
+                    tp.entryOffset = v;
+                    Log("Set");
+                    break;
+                case ItemChanger.SceneNames.Cliffs_02:
+                    GameObject go2 = scene.GetRootGameObjects().First(x => x.name == "right1");
+                    Log($"{go2.GetComponent<TransitionPoint>().entryOffset} - {go2.transform.position}");
+                    break;
+            }
         }
 
         private bool FixCdashAnimation(On.HeroAnimationController.orig_canPlayTurn orig, HeroAnimationController self)
