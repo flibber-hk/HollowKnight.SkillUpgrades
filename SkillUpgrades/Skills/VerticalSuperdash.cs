@@ -38,13 +38,19 @@ namespace SkillUpgrades.Skills
             finishedEnteringScene.Invoke(hero, setHazardMarker, preventRunBob);
         }
 
-        // Jumping through hoops to avoid explicitly naming compiler generated types
-        private static readonly FieldInfo HeroEnterSceneIteratorState = typeof(HeroController)
+        #region Cached Compiler-Generated EnterScene related infos
+        private static readonly MethodInfo heroEnterSceneMethod = typeof(HeroController)
             .GetMethod(nameof(HeroController.EnterScene))
-            .GetStateMachineTarget()
-            .DeclaringType
+            .GetStateMachineTarget();
+
+        private static readonly Type heroEnterSceneIteratorType = heroEnterSceneMethod.DeclaringType;
+
+        private static readonly FieldInfo HeroEnterSceneIteratorStateField = typeof(HeroController)
             .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .First(x => x.Name.Contains("state"));
+
+        private static int GetEnterSceneState(IEnumerator e) => (int)HeroEnterSceneIteratorStateField.GetValue(e);
+        #endregion
 
         private ILHook _hook;
 
@@ -53,7 +59,7 @@ namespace SkillUpgrades.Skills
             On.CameraTarget.Update += FixVerticalCamera;
             On.HeroController.Start += ModifySuperdashFsm;
 
-            // 
+            // Complicated function to allow different behaviour when they enter scene from below with a cdash
             On.HeroController.EnterScene += EnableTransitionCdash;
             // The colliders of upward oneways are disabled (except for Tutorial_01[top1]) so we need to enable them
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ActivateUpwardOneways;
@@ -64,7 +70,7 @@ namespace SkillUpgrades.Skills
 
             // We need to move the entry coordinates for non-vertical oneways (Mines_34, Cliffs_02), and the TransitionPoint.entryOffset
             // is not used for horizontal transitions
-            _hook = new(typeof(HeroController).GetMethod(nameof(HeroController.EnterScene)).GetStateMachineTarget(), RepairHorizontalOneways);
+            _hook = new(heroEnterSceneMethod, RepairHorizontalOneways);
         }
 
         private void RepairHorizontalOneways(ILContext il)
@@ -120,23 +126,19 @@ namespace SkillUpgrades.Skills
         {
             IEnumerator e = orig(self, enterGate, delayBeforeEnter);
 
-            bool exitedSuperdashing = self.exitedSuperDashing;
-
-            // This is like the approach to IEnumerator modification in ItemChanger.StartDef, except
-            // less flexible (we only accept if the original IEnumerator was not modified).
-            if (e.GetType().Assembly != typeof(HeroController).Assembly)
+            if (e.GetType() != heroEnterSceneIteratorType)
             {
-                LogError("Transition Cdash edit blocked by a mod in assembly:\n" + e.GetType().Assembly.FullName);
+                LogWarn("Editing EnterScene blocked by a mod in assembly:\n" + e.GetType().Assembly.FullName);
                 yield return e;
             }
 
-            int GetState() => (int)HeroEnterSceneIteratorState.GetValue(e);
+            bool exitedSuperdashing = self.exitedSuperDashing;
 
             while (e.MoveNext())
             {
                 yield return e.Current;
 
-                if (GetState() == 10 && exitedSuperdashing)
+                if (GetEnterSceneState(e) == 10 && exitedSuperdashing)
                 {
                     if (enterGate.GetGatePosition() != GatePosition.bottom)
                     {

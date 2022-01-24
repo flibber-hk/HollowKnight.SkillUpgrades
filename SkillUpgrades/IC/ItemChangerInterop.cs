@@ -44,7 +44,7 @@ namespace SkillUpgrades.IC
         /// <summary>
         /// If x -> y is a one way, and the one way transitions are coupled, then also have y -> x.
         /// Check for coupled through the CompletionPercentOverride module; this is enabled in rando,
-        /// and 
+        /// and in non-rando we can expect users to override these transitions themselves if they want
         /// </summary>
         private static void ReflectOneways()
         {
