@@ -65,7 +65,7 @@ namespace SkillUpgrades.Skills
 
         private void AllowHorizontalQuakeEntry(ILContext il)
         {
-            ILCursor cursor = new ILCursor(il);
+            ILCursor cursor = new(il);
 
             // slightly cursed code, because more involved modifications to IL code are fairly cursed
             while (cursor.TryGotoNext
@@ -204,7 +204,7 @@ namespace SkillUpgrades.Skills
             #region Velocity values
             void ModifyQuakeDownState(FsmState s)
             {
-                ExecuteLambda setCCSevent = new ExecuteLambda(() =>
+                FsmStateAction setCCSevent = new ExecuteLambda(() =>
                 {
                     CheckCollisionSide ccs = s.GetActionOfType<CheckCollisionSide>();
                     FsmEvent heroLanded = FsmEvent.GetFsmEvent("HERO LANDED");
@@ -238,7 +238,7 @@ namespace SkillUpgrades.Skills
                 setvel.x = hSpeed;
                 setvel.y = vSpeed;
 
-                DecideToStopQuake decideToStop = new DecideToStopQuake(hSpeed, vSpeed);
+                FsmStateAction decideToStop = new DecideToStopQuake(hSpeed, vSpeed);
 
                 s.Actions = new FsmStateAction[]
                 {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GlobalEnums;
 using ItemChanger;
+using ItemChanger.Modules;
 using ItemChanger.UIDefs;
 using SkillUpgrades.IC.Items;
 
@@ -37,6 +38,45 @@ namespace SkillUpgrades.IC
         public static void HookItemChanger()
         {
             DefineSkillUpgradeUnlockItems();
+            Events.AfterStartNewGame += ReflectOneways;
+        }
+
+        /// <summary>
+        /// If x -> y is a one way, and the one way transitions are coupled, then also have y -> x.
+        /// Check for coupled through the CompletionPercentOverride module; this is enabled in rando,
+        /// and in non-rando we can expect users to override these transitions themselves if they want
+        /// </summary>
+        private static void ReflectOneways()
+        {
+            if (ItemChangerMod.Modules.Get<CompletionPercentOverride>() is CompletionPercentOverride cpo && cpo.CoupledTransitions)
+            {
+                List<(string scene, string gate)> OneWayTransitions = new()
+                {
+                    (SceneNames.Cliffs_02, "bot2"),
+                    (SceneNames.Cliffs_02, "right1"),
+                    (SceneNames.Mines_34, "bot2"),
+                    (SceneNames.Mines_34, "left1"),
+                    (SceneNames.Deepnest_East_07, "bot1"),
+                    (SceneNames.Fungus2_30, "bot1"),
+                    (SceneNames.Deepnest_01, "bot2"),
+                    (SceneNames.Mines_28, "bot1"),
+                };
+
+                foreach ((string scene, string gate) in OneWayTransitions)
+                {
+                    Transition source = new(scene, gate);
+
+                    if (ItemChanger.Internal.Ref.Settings.TransitionOverrides.TryGetValue(source, out ITransition t) 
+                        && t is Transition target
+                        && !ItemChanger.Internal.Ref.Settings.TransitionOverrides.ContainsKey(target))
+                    {
+                        ItemChangerMod.AddTransitionOverride(target, source);
+                        cpo.SetTransitionWeight(target, 0);
+                    }
+                }
+            }
+
+            
         }
 
         /// <summary>

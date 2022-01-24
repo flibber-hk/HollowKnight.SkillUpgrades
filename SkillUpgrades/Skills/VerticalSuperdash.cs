@@ -1,7 +1,15 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
+using System.Reflection;
+using GlobalEnums;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
+using MonoMod.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
 
@@ -21,17 +29,143 @@ namespace SkillUpgrades.Skills
 
         public override string Description => "Toggle whether Crystal Heart can be used in non-horizontal directions";
 
+        private static readonly FastReflectionDelegate finishedEnteringScene = typeof(HeroController)
+            .GetMethod("FinishedEnteringScene", BindingFlags.Instance | BindingFlags.NonPublic)
+            .CreateFastDelegate();
+        private static void FinishedEnteringScene(HeroController hero, bool setHazardMarker, bool preventRunBob)
+        {
+            finishedEnteringScene.Invoke(hero, setHazardMarker, preventRunBob);
+        }
+
+        #region Cached Compiler-Generated EnterScene related infos
+        private static readonly MethodInfo heroEnterSceneMethod = typeof(HeroController)
+            .GetMethod(nameof(HeroController.EnterScene))
+            .GetStateMachineTarget();
+
+        private static readonly Type heroEnterSceneIteratorType = heroEnterSceneMethod.DeclaringType;
+
+        private static readonly FieldInfo HeroEnterSceneIteratorStateField = heroEnterSceneIteratorType
+            .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .First(x => x.Name.Contains("state"));
+
+        private static int GetEnterSceneState(IEnumerator e) => (int)HeroEnterSceneIteratorStateField.GetValue(e);
+        #endregion
+
+        private ILHook _hook;
+
         protected override void StartUpInitialize()
         {
             On.CameraTarget.Update += FixVerticalCamera;
-            On.GameManager.FinishedEnteringScene += DisableUpwardOneways;
             On.HeroController.Start += ModifySuperdashFsm;
+
+            // Don't play weird animations when they should be cdashing
             On.HeroAnimationController.canPlayTurn += FixCdashAnimation;
+            On.HeroAnimationController.PlayFromFrame += DontPlaySuperdash;
+        }
+        protected override void RepeatableInitialize()
+        {
+            // We need to move the entry coordinates for non-vertical oneways (Mines_34, Cliffs_02), and the TransitionPoint.entryOffset
+            // is not used for horizontal transitions
+            _hook = new(heroEnterSceneMethod, RepairHorizontalOneways);
+            // The colliders of upward oneways are disabled (except for Tutorial_01[top1]) so we need to enable them
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ActivateUpwardOneways;
+            // Complicated function to allow different behaviour when they enter scene from below with a cdash
+            On.HeroController.EnterScene += EnableTransitionCdash;
+        }
+        protected override void Unload()
+        {
+            _hook?.Dispose();
+            _hook = null;
+
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= ActivateUpwardOneways;
+            On.HeroController.EnterScene -= EnableTransitionCdash;
+        }
+
+        private void RepairHorizontalOneways(ILContext il)
+        {
+            ILCursor cursor = new(il);
+
+            cursor.GotoNext(i => i.MatchLdfld<HeroController>(nameof(HeroController.gatePosition)), i => i.MatchLdcI4(2));
+            cursor.GotoNext(MoveType.After, i => i.MatchCallvirt<HeroController>("FindGroundPointY"));
+            cursor.EmitDelegate<Func<float, float>>(x => GameManager.instance.sceneName == ItemChanger.SceneNames.Mines_34 ? 54.4f : x);
+
+            cursor.GotoNext(i => i.MatchLdfld<HeroController>(nameof(HeroController.gatePosition)), i => i.MatchLdcI4(1));
+            cursor.GotoNext(MoveType.After, i => i.MatchCallvirt<HeroController>("FindGroundPointY"));
+            cursor.EmitDelegate<Func<float, float>>(x => GameManager.instance.sceneName == ItemChanger.SceneNames.Cliffs_02 ? 28.4f : x);
+        }
+
+        private void DontPlaySuperdash(On.HeroAnimationController.orig_PlayFromFrame orig, HeroAnimationController self, string clipName, int frame)
+        {
+            // This only matters when cdashing out of an upward transition, but there's no reason to play this anim anyway
+            if (clipName == "Airborne" && HeroController.instance.cState.superDashing)
+            {
+                return;
+            }
+            orig(self, clipName, frame);
+        }
+
+        private void ActivateUpwardOneways(Scene _, Scene scene)
+        {
+            GameObject upwardOneway = scene.name switch
+            {
+                ItemChanger.SceneNames.RestingGrounds_02 => scene.GetRootGameObjects().First(x => x.name == "top1"),
+                ItemChanger.SceneNames.Mines_13 => scene.GetRootGameObjects().First(x => x.name == "top1"),
+                ItemChanger.SceneNames.Mines_23 => scene.GetRootGameObjects().First(x => x.name == "top1"),
+                ItemChanger.SceneNames.Town => scene.GetRootGameObjects().First(x => x.name == "_Transition Gates").transform.Find("top1").gameObject,
+                ItemChanger.SceneNames.Tutorial_01 => scene.GetRootGameObjects().First(x => x.name == "_Transition Gates").transform.Find("top1").gameObject,
+                ItemChanger.SceneNames.Fungus2_25 => scene.GetRootGameObjects().First(x => x.name == "top2"),
+                ItemChanger.SceneNames.Deepnest_East_03 => scene.GetRootGameObjects().First(x => x.name == "top2"),
+                ItemChanger.SceneNames.Deepnest_01b => scene.GetRootGameObjects().First(x => x.name == "_Transition Gates").transform.Find("top2").gameObject,
+                _ => null
+            };
+
+            if (upwardOneway != null)
+            {
+                upwardOneway.GetComponent<Collider2D>().enabled = true;
+            }
         }
 
         private bool FixCdashAnimation(On.HeroAnimationController.orig_canPlayTurn orig, HeroAnimationController self)
         {
             return !HeroController.instance.cState.superDashing && orig(self);
+        }
+
+        private IEnumerator EnableTransitionCdash(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
+        {
+            IEnumerator e = orig(self, enterGate, delayBeforeEnter);
+
+            if (e.GetType() != heroEnterSceneIteratorType)
+            {
+                LogWarn("Editing EnterScene blocked by a mod in assembly:\n" + e.GetType().Assembly.FullName);
+                yield return e;
+            }
+
+            bool exitedSuperdashing = self.exitedSuperDashing;
+
+            while (e.MoveNext())
+            {
+                yield return e.Current;
+
+                if (GetEnterSceneState(e) == 10 && exitedSuperdashing)
+                {
+                    if (enterGate.GetGatePosition() != GatePosition.bottom)
+                    {
+                        LogError($"Unexpected Gate Position: {enterGate.GetGatePosition()}");
+                    }
+
+                    if (!enterGate.customFade)
+                    {
+                        GameManager.instance.FadeSceneIn();
+                    }
+
+                    self.exitedSuperDashing = true;
+                    self.IgnoreInput();
+                    self.proxyFSM.SendEvent("HeroCtrl-EnterSuperDash");
+                    yield return new WaitForSeconds(0.25f);
+                    FinishedEnteringScene(self, true, false);
+                    yield break;
+                }
+            }
         }
 
         /// <summary>
@@ -74,21 +208,6 @@ namespace SkillUpgrades.Skills
 
             self.cameraCtrl.lookOffset += Math.Abs(self.dashOffset) * Mathf.Sin(SuperdashAngle * Mathf.PI / 180);
             self.dashOffset *= Mathf.Cos(SuperdashAngle * Mathf.PI / 180);
-        }
-        // Deactivate upward oneway transitions after spawning in so the player doesn't accidentally
-        // softlock by vc-ing into them
-        private void DisableUpwardOneways(On.GameManager.orig_FinishedEnteringScene orig, GameManager self)
-        {
-            orig(self);
-
-            switch (self.sceneName)
-            {
-                // The KP top transition is the only one that needs to be disabled; the others have collision
-                case "Tutorial_01":
-                    if (GameObject.Find("top1") is GameObject topTransition)
-                        topTransition.SetActive(false);
-                    break;
-            }
         }
 
         private void ModifySuperdashFsm(On.HeroController.orig_Start orig, HeroController self)
@@ -203,7 +322,7 @@ namespace SkillUpgrades.Skills
                     {
                         HeroController.instance.FaceLeft();
                     }
-                    
+
                 }
                 else if (!ia.left.IsPressed && ia.right.IsPressed)
                 {
@@ -237,14 +356,14 @@ namespace SkillUpgrades.Skills
                 }
             }
 
-            ExecuteLambda setVelocityVariablesAction = new ExecuteLambda(setVelocityVariables);
+            FsmStateAction setVelocityVariablesAction = new ExecuteLambda(setVelocityVariables);
 
             SetVelocity2d setVel = dashing.GetActionOfType<SetVelocity2d>();
             setVel.x = hSpeed;
             setVel.y = vSpeed;
 
-            DecideToStopSuperdash decideToStop = new DecideToStopSuperdash(hSpeed, vSpeed, zeroLast);
-            ExecuteLambdaEveryFrame turnInMidair = new ExecuteLambdaEveryFrame(monitorDirectionalInputs);
+            FsmStateAction decideToStop = new DecideToStopSuperdash(hSpeed, vSpeed, zeroLast);
+            FsmStateAction turnInMidair = new ExecuteLambdaEveryFrame(monitorDirectionalInputs);
 
             dashing.Actions = new FsmStateAction[]
             {
@@ -268,6 +387,28 @@ namespace SkillUpgrades.Skills
                     cancelable.Actions[5], // Check if speed has been zero for long enough to stop
                     cancelable.Actions[6], // (same as above)
                     turnInMidair,
+            };
+
+            void SetSuperdashAngleOnEntry()
+            {
+                switch (HeroController.instance.sceneEntryGate.GetGatePosition())
+                {
+                    case GatePosition.bottom: SuperdashAngle = -90f; break;
+                    case GatePosition.top: SuperdashAngle = 90f; break;
+                }
+                HeroController.instance.RotateHero(SuperdashAngle);
+            }
+            fsm.GetState("Enter Velocity").Actions = new FsmStateAction[]
+            {
+                new ExecuteLambda(SetSuperdashAngleOnEntry),
+                new SetVelocity2d()
+                {
+                    gameObject = setVel.gameObject,
+                    vector = setVel.vector,
+                    x = setVel.x,
+                    y = setVel.y,
+                    everyFrame = false
+                }
             };
             #endregion
 
