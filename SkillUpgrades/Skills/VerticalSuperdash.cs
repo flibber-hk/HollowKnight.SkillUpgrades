@@ -10,6 +10,7 @@ using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using SkillUpgrades.Components;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
 
@@ -121,7 +122,7 @@ namespace SkillUpgrades.Skills
 
             if (upwardOneway != null)
             {
-                upwardOneway.GetComponent<Collider2D>().enabled = true;
+                upwardOneway.AddComponent<SuperdashMonitor>();
             }
         }
 
