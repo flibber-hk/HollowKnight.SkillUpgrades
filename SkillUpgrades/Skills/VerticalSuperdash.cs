@@ -5,7 +5,6 @@ using System.Reflection;
 using GlobalEnums;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
-using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
@@ -59,18 +58,27 @@ namespace SkillUpgrades.Skills
             On.CameraTarget.Update += FixVerticalCamera;
             On.HeroController.Start += ModifySuperdashFsm;
 
-            // Complicated function to allow different behaviour when they enter scene from below with a cdash
-            On.HeroController.EnterScene += EnableTransitionCdash;
-            // The colliders of upward oneways are disabled (except for Tutorial_01[top1]) so we need to enable them
-            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ActivateUpwardOneways;
-
             // Don't play weird animations when they should be cdashing
             On.HeroAnimationController.canPlayTurn += FixCdashAnimation;
             On.HeroAnimationController.PlayFromFrame += DontPlaySuperdash;
-
+        }
+        protected override void RepeatableInitialize()
+        {
             // We need to move the entry coordinates for non-vertical oneways (Mines_34, Cliffs_02), and the TransitionPoint.entryOffset
             // is not used for horizontal transitions
             _hook = new(heroEnterSceneMethod, RepairHorizontalOneways);
+            // The colliders of upward oneways are disabled (except for Tutorial_01[top1]) so we need to enable them
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += ActivateUpwardOneways;
+            // Complicated function to allow different behaviour when they enter scene from below with a cdash
+            On.HeroController.EnterScene += EnableTransitionCdash;
+        }
+        protected override void Unload()
+        {
+            _hook?.Dispose();
+            _hook = null;
+
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= ActivateUpwardOneways;
+            On.HeroController.EnterScene -= EnableTransitionCdash;
         }
 
         private void RepairHorizontalOneways(ILContext il)
