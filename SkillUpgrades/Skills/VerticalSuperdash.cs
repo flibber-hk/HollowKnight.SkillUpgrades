@@ -44,7 +44,7 @@ namespace SkillUpgrades.Skills
 
         private static readonly Type heroEnterSceneIteratorType = heroEnterSceneMethod.DeclaringType;
 
-        private static readonly FieldInfo HeroEnterSceneIteratorStateField = typeof(HeroController)
+        private static readonly FieldInfo HeroEnterSceneIteratorStateField = heroEnterSceneIteratorType
             .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
             .First(x => x.Name.Contains("state"));
 
