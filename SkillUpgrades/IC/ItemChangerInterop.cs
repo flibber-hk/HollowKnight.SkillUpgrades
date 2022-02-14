@@ -38,16 +38,17 @@ namespace SkillUpgrades.IC
         public static void HookItemChanger()
         {
             DefineSkillUpgradeUnlockItems();
-            Events.AfterStartNewGame += ReflectOneways;
+            Events.AfterStartNewGame += ItemChangerStartGame;
         }
 
-        /// <summary>
-        /// If x -> y is a one way, and the one way transitions are coupled, then also have y -> x.
-        /// Check for coupled through the CompletionPercentOverride module; this is enabled in rando,
-        /// and in non-rando we can expect users to override these transitions themselves if they want
-        /// </summary>
-        private static void ReflectOneways()
+        private static void ItemChangerStartGame()
         {
+            // HDive fixes this separately, even if disabled
+            ItemChangerMod.Modules.Remove<HorizontalTransitionQuakeCancel>();
+
+            // If x -> y is a one way, and the one way transitions are coupled, then also have y -> x.
+            // Check for coupled through the CompletionPercentOverride module; this is enabled in rando,
+            // and in non-rando we can expect users to override these transitions themselves if they want
             if (ItemChangerMod.Modules.Get<CompletionPercentOverride>() is CompletionPercentOverride cpo && cpo.CoupledTransitions)
             {
                 List<(string scene, string gate)> OneWayTransitions = new()

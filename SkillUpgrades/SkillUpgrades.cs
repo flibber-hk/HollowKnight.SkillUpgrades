@@ -171,11 +171,5 @@ namespace SkillUpgrades
         {
             return GetType().Assembly.GetName().Version.ToString();
         }
-
-        public override int LoadPriority()
-        {
-            return 0;
-        }
-
     }
 }
