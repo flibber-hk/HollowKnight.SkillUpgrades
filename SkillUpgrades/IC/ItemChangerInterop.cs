@@ -81,7 +81,7 @@ namespace SkillUpgrades.IC
         }
 
         /// <summary>
-        /// Define the skill upgrade unlock items. Tags will not be applied here, but rather through a
+        /// Define the skill upgrade unlock items. Item chain/tree tags will not be applied here, but rather through a
         /// subscriber to ItemChanger's Finder GetItem hook.
         /// </summary>
         public static void DefineSkillUpgradeUnlockItems()
@@ -109,13 +109,16 @@ namespace SkillUpgrades.IC
                 def.take = new LanguageString("Prompts", "GET_ITEM_INTRO1");
                 def.shopDesc = new BoxedString("This isn't in the vanilla game!");
 
-                items.Add(new SkillUpgradeItem()
+                AbstractItem item = new SkillUpgradeItem()
                 {
                     name = skillName,
                     SkillName = skillName,
                     AllowToggle = true,
                     UIDef = def
-                });
+                };
+
+                SupplementalMetadataTagFactory.AddTagToItem(item);
+                items.Add(item);
             }
 
             CreateSkillUpgrade(nameof(Skills.DirectionalDash), "Directional Dash", ItemNames.Mothwing_Cloak, HeroActionButton.DASH,
