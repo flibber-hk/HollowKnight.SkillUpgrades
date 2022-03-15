@@ -60,6 +60,12 @@ namespace SkillUpgrades
                 RM.RandomizerInterop.HookRandomizer();
             }
 
+            // HKMP Interop
+            if (ModHooks.GetMod("HKMP") is Mod)
+            {
+                HKMP.HkmpInterop.HookHkmp();
+            }
+
             Log("Initialization done!");
         }
 
@@ -168,9 +174,11 @@ namespace SkillUpgrades
             skill.UpdateSkillState();
         }
 
-        public override string GetVersion()
+        internal static string GetSkillUpgradesVersion()
         {
-            return GetType().Assembly.GetName().Version.ToString();
+            return typeof(SkillUpgrades).Assembly.GetName().Version.ToString();
         }
+
+        public override string GetVersion() => GetSkillUpgradesVersion();
     }
 }

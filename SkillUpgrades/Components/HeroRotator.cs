@@ -17,15 +17,13 @@ namespace SkillUpgrades.Components
         }
 
         /// <summary>
-        /// Event invoked when the hero's rotation is reset.
-        /// </summary>
-        public static event Action OnHeroResetRotation;
-        /// <summary>
         /// Event invoked when the hero is rotated. The total rotation angle (not the angle of this rotation) is passed in as the parameter.
         /// </summary>
         public static event Action<float> OnHeroRotate;
 
         public static HeroRotator Instance { get; private set; }
+
+        public float GetCurrentRotation() => transform.rotation.z;
 
         public override void Awake()
         {
@@ -46,7 +44,7 @@ namespace SkillUpgrades.Components
 
             HeroController.instance.vignette.transform.SetParent(t);
 
-            OnHeroRotate?.Invoke(transform.rotation.z);
+            OnHeroRotate?.Invoke(GetCurrentRotation());
         }
 
         public override void ResetRotation()
@@ -56,7 +54,7 @@ namespace SkillUpgrades.Components
             HeroController.instance.wallPuffPrefab.transform.rotation = Quaternion.identity;
             HeroController.instance.vignette.transform.rotation = Quaternion.identity;
 
-            OnHeroResetRotation?.Invoke();
+            OnHeroRotate?.Invoke(0);
         }
     }
 }

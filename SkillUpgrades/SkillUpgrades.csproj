@@ -14,6 +14,7 @@
   
   <PropertyGroup>
     <HollowKnightRefs>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed</HollowKnightRefs>
+    <HKMPRef>..\..\Assembly References\Mods</HKMPRef>
   </PropertyGroup>
 
   <!--Gitignored local build properties file to modify the HollowKnightRefs value without needing to change anything in the remote.-->
@@ -33,6 +34,9 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="HKMP">
+      <HintPath>$(HKMPRef)\HKMP.dll</HintPath>
     </Reference>
     <Reference Include="ItemChanger, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
