@@ -8,6 +8,7 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using UnityEngine;
+using SkillUpgrades.Components;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
 
@@ -59,7 +60,7 @@ namespace SkillUpgrades.Skills
             if (QuakeAngle == 0f) return;
 
             QuakeAngle = 0f;
-            HeroRotation.ResetHero();
+            HeroRotator.Instance.ResetRotation();
         }
 
 
@@ -127,11 +128,11 @@ namespace SkillUpgrades.Skills
                     break;
                 case GatePosition.left when PersistDiveThroughHorizontalTransitions:
                     QuakeAngle = 90;
-                    HeroController.instance.SetHeroRotation(QuakeAngle, respectFacingDirection: false);
+                    HeroRotator.Instance.SetRotation(QuakeAngle, respectFacingDirection: false);
                     break;
                 case GatePosition.right when PersistDiveThroughHorizontalTransitions:
                     QuakeAngle = -90;
-                    HeroController.instance.SetHeroRotation(QuakeAngle, respectFacingDirection: false);
+                    HeroRotator.Instance.SetRotation(QuakeAngle, respectFacingDirection: false);
                     break;
                 case GatePosition.top:
                     ResetQuakeAngle();
@@ -171,7 +172,7 @@ namespace SkillUpgrades.Skills
                 {
                     if (InputHandler.Instance.inputActions.right.IsPressed && RightwardDiveAllowed) QuakeAngle = 90;
                     else if (InputHandler.Instance.inputActions.left.IsPressed && LeftwardDiveAllowed) QuakeAngle = -90;
-                    HeroController.instance.RotateHero(QuakeAngle, respectFacingDirection: false);
+                    HeroRotator.Instance.Rotate(QuakeAngle, respectFacingDirection: false);
                 }
 
                 float quakeAnticSpeed = fsm.FsmVariables.FindFsmFloat("Quake Antic Speed").Value;

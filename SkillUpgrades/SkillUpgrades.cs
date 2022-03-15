@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Modding;
 using MonoMod.ModInterop;
 using UnityEngine.UI;
+using SkillUpgrades.Components;
 using SkillUpgrades.Menu;
 using SkillUpgrades.Skills;
 using SkillUpgrades.Util;
@@ -43,7 +43,8 @@ namespace SkillUpgrades
                 DebugMod.AddActionToKeyBindList(() => Toggle(skill), skill.Name, "SkillUpgrades");
             }
 
-            HeroRotation.Hook();
+            // HeroRotation.Hook();
+            HeroRotator.Hook();
 
             // All ItemChanger/Randomizer dependence should be kept to the IC and RM namespaces
             // ItemChanger Interop

@@ -183,7 +183,7 @@ namespace SkillUpgrades.Skills
             }
 
             SuperdashAngle = 0f;
-            HeroRotation.ResetHero();
+            HeroRotator.Instance.ResetRotation();
 
             if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL END");
 
@@ -277,12 +277,12 @@ namespace SkillUpgrades.Skills
 
             fsm.GetState("Left").AddAction(new ExecuteLambda(() =>
             {
-                HeroController.instance.RotateHero(SuperdashAngle);
+                HeroRotator.Instance.Rotate(SuperdashAngle);
                 if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
             }));
             fsm.GetState("Right").AddAction(new ExecuteLambda(() =>
             {
-                HeroController.instance.RotateHero(SuperdashAngle);
+                HeroRotator.Instance.Rotate(SuperdashAngle);
                 if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
             }));
             #endregion
@@ -350,7 +350,7 @@ namespace SkillUpgrades.Skills
 
                 if (horizontalPressed || verticalPressed)
                 {
-                    HeroController.instance.SetHeroRotation(newSuperdashAngle);
+                    HeroRotator.Instance.SetRotation(newSuperdashAngle);
                     SuperdashAngle = newSuperdashAngle;
                     zeroTimer.Value = 0f;
                     setVelocityVariables();
@@ -397,7 +397,7 @@ namespace SkillUpgrades.Skills
                     case GatePosition.bottom: SuperdashAngle = -90f; break;
                     case GatePosition.top: SuperdashAngle = 90f; break;
                 }
-                HeroController.instance.RotateHero(SuperdashAngle);
+                HeroRotator.Instance.Rotate(SuperdashAngle);
             }
             fsm.GetState("Enter Velocity").Actions = new FsmStateAction[]
             {
