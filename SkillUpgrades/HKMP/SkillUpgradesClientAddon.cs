@@ -19,9 +19,9 @@ namespace SkillUpgrades.HKMP
         {
             HeroRotationManager.Initialize(clientApi);
 
-            IClientAddonNetworkReceiver<PacketId> netReceiver = clientApi.NetClient.GetNetworkReceiver<PacketId>(this, SkillUpgradesPackets.Instantiator);
+            IClientAddonNetworkReceiver<PacketId.Enum> netReceiver = clientApi.NetClient.GetNetworkReceiver<PacketId.Enum>(this, PacketId.Instantiator);
 
-            netReceiver.RegisterPacketHandler<HeroRotationPacket>(PacketId.HeroRotation, RotateRemotePlayer);
+            netReceiver.RegisterPacketHandler<HeroRotationPacket>(PacketId.Enum.HeroRotation, RotateRemotePlayer);
         }
 
         private void RotateRemotePlayer(HeroRotationPacket packet)

@@ -32,8 +32,8 @@ namespace SkillUpgrades.HKMP.SkillManagers
         private static void SendRotation(float angle)
         {
             clientApi.NetClient
-                .GetNetworkSender<PacketId>(SkillUpgradesClientAddon.Instance)
-                .SendSingleData(PacketId.HeroRotation, new HeroRotationPacket() { Rotation = angle });
+                .GetNetworkSender<PacketId.Enum>(SkillUpgradesClientAddon.Instance)
+                .SendSingleData(PacketId.Enum.HeroRotation, new HeroRotationPacket() { Rotation = angle });
         }
     }
 }

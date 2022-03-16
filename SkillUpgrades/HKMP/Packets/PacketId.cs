@@ -3,17 +3,18 @@ using Hkmp.Networking.Packet;
 
 namespace SkillUpgrades.HKMP.Packets
 {
-    public enum PacketId
+    public static class PacketId
     {
-        HeroRotation,
-    }
-    public static class SkillUpgradesPackets
-    {
-        public static IPacketData Instantiator(PacketId packetId)
+        public enum Enum
+        {
+            HeroRotation,
+        }
+
+        public static IPacketData Instantiator(Enum packetId)
         {
             switch (packetId)
             {
-                case PacketId.HeroRotation:
+                case Enum.HeroRotation:
                     return new HeroRotationPacket();
 
                 default:

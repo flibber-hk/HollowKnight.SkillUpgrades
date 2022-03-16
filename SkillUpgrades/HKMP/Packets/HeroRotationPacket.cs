@@ -2,7 +2,7 @@
 
 namespace SkillUpgrades.HKMP.Packets
 {
-    public class HeroRotationPacket : IPacketData
+    public class HeroRotationPacket : IRebroadcastablePacketData
     {
         public ushort PlayerId { get; set; }
         public float Rotation { get; set; }

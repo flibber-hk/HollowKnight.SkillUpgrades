@@ -1,5 +1,8 @@
-﻿using Hkmp.Api.Server;
+﻿using System;
+using System.Linq;
+using Hkmp.Api.Server;
 using Hkmp.Api.Server.Networking;
+using Hkmp.Networking.Packet;
 using SkillUpgrades.HKMP.Packets;
 
 namespace SkillUpgrades.HKMP
@@ -13,16 +16,26 @@ namespace SkillUpgrades.HKMP
         public override bool NeedsNetwork => true;
         public override void Initialize(IServerApi serverApi)
         {
-            IServerAddonNetworkReceiver<PacketId> receiver = serverApi.NetServer.GetNetworkReceiver<PacketId>(this, SkillUpgradesPackets.Instantiator);
+            IServerAddonNetworkReceiver<PacketId.Enum> receiver = serverApi.NetServer.GetNetworkReceiver<PacketId.Enum>(this, PacketId.Instantiator);
 
-            receiver.RegisterPacketHandler<HeroRotationPacket>(PacketId.HeroRotation, Rebroadcast);
+            foreach (PacketId.Enum packetId in Enum.GetValues(typeof(PacketId)).Cast<PacketId.Enum>())
+            {
+                receiver.RegisterPacketHandler(packetId, GetRebroadcaster(packetId));
+            }
         }
 
-        public void Rebroadcast(ushort id, HeroRotationPacket packet)
+        // Any skill upgrades networking will be of the form "I want to broadcast the data for my relationship with this skill upgrade over the network".
+        // So our handler will just take the packet, add the player id and then send it to everyone.
+        public GenericServerPacketHandler<IRebroadcastablePacketData> GetRebroadcaster(PacketId.Enum packetId)
         {
-            packet.PlayerId = id;
+            void rebroadcast(ushort id, IRebroadcastablePacketData packet)
+            {
+                packet.PlayerId = id;
 
-            ServerApi.NetServer.GetNetworkSender<PacketId>(this).BroadcastSingleData(PacketId.HeroRotation, packet);
+                ServerApi.NetServer.GetNetworkSender<PacketId.Enum>(this).BroadcastSingleData(packetId, packet);
+            }
+
+            return rebroadcast;
         }
     }
 }
