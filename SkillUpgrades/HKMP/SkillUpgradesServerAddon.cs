@@ -18,7 +18,7 @@ namespace SkillUpgrades.HKMP
         {
             IServerAddonNetworkReceiver<PacketId.Enum> receiver = serverApi.NetServer.GetNetworkReceiver<PacketId.Enum>(this, PacketId.Instantiator);
 
-            foreach (PacketId.Enum packetId in Enum.GetValues(typeof(PacketId)).Cast<PacketId.Enum>())
+            foreach (PacketId.Enum packetId in Enum.GetValues(typeof(PacketId.Enum)).Cast<PacketId.Enum>())
             {
                 receiver.RegisterPacketHandler(packetId, GetRebroadcaster(packetId));
             }

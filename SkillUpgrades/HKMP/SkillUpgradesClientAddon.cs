@@ -17,19 +17,8 @@ namespace SkillUpgrades.HKMP
 
         public override void Initialize(IClientApi clientApi)
         {
-            HeroRotationManager.Initialize(clientApi);
-
             IClientAddonNetworkReceiver<PacketId.Enum> netReceiver = clientApi.NetClient.GetNetworkReceiver<PacketId.Enum>(this, PacketId.Instantiator);
-
-            netReceiver.RegisterPacketHandler<HeroRotationPacket>(PacketId.Enum.HeroRotation, RotateRemotePlayer);
-        }
-
-        private void RotateRemotePlayer(HeroRotationPacket packet)
-        {
-            if (ClientApi.ClientManager.TryGetPlayer(packet.PlayerId, out IClientPlayer player) && player.IsInLocalScene)
-            {
-                player.PlayerObject.GetOrAddComponent<StableRotator>().SetRotation(packet.Rotation);
-            }
+            new HeroRotationManager().Initialize(clientApi, netReceiver);
         }
     }
 }

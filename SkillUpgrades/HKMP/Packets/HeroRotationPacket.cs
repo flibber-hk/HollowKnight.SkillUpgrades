@@ -4,7 +4,7 @@ namespace SkillUpgrades.HKMP.Packets
 {
     public class HeroRotationPacket : IRebroadcastablePacketData
     {
-        public ushort PlayerId { get; set; }
+        public ushort PlayerId { get; set; } = ushort.MaxValue;
         public float Rotation { get; set; }
 
         public void WriteData(IPacket packet)
