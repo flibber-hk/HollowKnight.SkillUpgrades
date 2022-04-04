@@ -2,7 +2,7 @@
 using MonoMod.ModInterop;
 
 // Replace the namespace with your project's root namespace
-namespace SkillUpgrades
+namespace SkillUpgrades.Imports
 {
     internal static class DebugMod
     {

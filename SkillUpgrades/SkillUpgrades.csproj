@@ -61,9 +61,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(HollowKnightRefs)\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="QoL">
-      <HintPath>$(HollowKnightRefs)\Mods\QoL\QoL.dll</HintPath>
-    </Reference>
     <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\PlayMaker.dll</HintPath>
     </Reference>

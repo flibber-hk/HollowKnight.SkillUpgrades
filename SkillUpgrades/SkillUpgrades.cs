@@ -5,6 +5,7 @@ using Modding;
 using MonoMod.ModInterop;
 using UnityEngine.UI;
 using SkillUpgrades.Components;
+using SkillUpgrades.Imports;
 using SkillUpgrades.Menu;
 using SkillUpgrades.Skills;
 using SkillUpgrades.Util;

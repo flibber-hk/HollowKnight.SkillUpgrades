@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using Modding;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using UnityEngine;
+using SkillUpgrades.Imports;
 using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
@@ -46,10 +46,7 @@ namespace SkillUpgrades.Skills
 
             // This can fail if the UnmodifiedDownDashes setting changes after the skill is initialized, but I think that's unlikely to happen - 
             // particularly as OldDashmaster is disabled by default
-            if (ModHooks.GetMod("QoL") is Mod && !UnmodifiedDownDashes)
-            {
-                DisableOldDashmaster();
-            }
+            QoL.OverrideModuleToggle("OldDashmaster", false);
         }
         protected override void Unload()
         {
@@ -62,24 +59,8 @@ namespace SkillUpgrades.Skills
             On.HeroController.JumpReleased -= MaintainMomentum;
             On.HeroController.Update -= CancelPersistentMomentum;
 
-            if (ModHooks.GetMod("QoL") is Mod)
-            {
-                RemoveOldDashmasterOverride();
-            }
+            QoL.RemoveModuleOverride("OldDashmaster");
         }
-
-        #region QoL interop
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void DisableOldDashmaster()
-        {
-            QoL.SettingsOverride.OverrideModuleToggle(nameof(QoL.Modules.OldDashmaster), false);
-        }
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void RemoveOldDashmasterOverride()
-        {
-            QoL.SettingsOverride.RemoveModuleOverride(nameof(QoL.Modules.OldDashmaster));
-        }
-        #endregion
 
         #region Maintaining vertical momentum out of an upward dash
         private void CancelPersistentMomentum(On.HeroController.orig_Update orig, HeroController self)
