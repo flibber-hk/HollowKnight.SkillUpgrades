@@ -23,9 +23,7 @@ namespace SkillUpgrades.RM
         {
             if (!RandomizerInterop.RandoSettings.Any) return;
 
-            foreach (string skillName in RandomizerInterop.RandoSettings.SkillSettings
-                .Where(kvp => kvp.Value)
-                .Select(kvp => kvp.Key))
+            foreach (string skillName in GetActiveSettings())
             {
                 rb.EditItemRequest(skillName, info =>
                 {
@@ -59,12 +57,18 @@ namespace SkillUpgrades.RM
         {
             if (!RandomizerInterop.RandoSettings.Any) return;
 
-            foreach (string skillName in RandomizerInterop.RandoSettings.SkillSettings
-                .Where(kvp => kvp.Value)
-                .Select(kvp => kvp.Key))
+            foreach (string skillName in GetActiveSettings())
             {
                 rb.AddItemByName(skillName);
             }
+        }
+
+        internal static IEnumerable<string> GetActiveSettings()
+        {
+            return RandomizerInterop.RandoSettings.SkillSettings
+                .Where(kvp => kvp.Value)
+                .Select(kvp => kvp.Key)
+                .OrderBy(x => x);
         }
     }
 }
