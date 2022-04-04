@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using Modding;
+using Modding.Utils;
 using SkillUpgrades.Util;
 
 namespace SkillUpgrades.Skills
@@ -145,15 +145,7 @@ namespace SkillUpgrades.Skills
         public static IEnumerable<Type> GetAvailableSkillUpgradeTypes()
         {
             Assembly asm = typeof(AbstractSkillUpgrade).Assembly;
-            // TODO - take GetTypesSafely from MAPI when I can
-            try
-            {
-                return asm.GetTypes().Where(type => type.IsSubclassOf(typeof(AbstractSkillUpgrade)) && !type.IsAbstract);
-            }
-            catch (ReflectionTypeLoadException ex)
-            {
-                return ex.Types.Where(type => type is not null && type.IsSubclassOf(typeof(AbstractSkillUpgrade)) && !type.IsAbstract);
-            }
+            return asm.GetTypesSafely();
         }
     }
 }
