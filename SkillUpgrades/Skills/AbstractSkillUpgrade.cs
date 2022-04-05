@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using Modding;
@@ -145,7 +146,7 @@ namespace SkillUpgrades.Skills
         public static IEnumerable<Type> GetAvailableSkillUpgradeTypes()
         {
             Assembly asm = typeof(AbstractSkillUpgrade).Assembly;
-            return asm.GetTypesSafely();
+            return asm.GetTypesSafely().Where(type => type.IsSubclassOf(typeof(AbstractSkillUpgrade)) && !type.IsAbstract);
         }
     }
 }
