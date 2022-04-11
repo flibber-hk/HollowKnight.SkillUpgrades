@@ -90,14 +90,22 @@ namespace SkillUpgrades.IC
 
             IString ShopDesc = new BoxedString("This isn't in the vanilla game!");
 
-            void CreateSkillUpgrade(string skillName, string uiname, string template, HeroActionButton? action, string desc, string boolName, bool spell)
+            void CreateSkillUpgrade(string skillName, string uiname, string template, HeroActionButton? action, string desc, string boolName, bool spell, IString press = null)
             {
                 BigUIDef def = Finder.GetItem(template).UIDef.Clone() as BigUIDef;
                 def.name = new BoxedString(uiname);
                 if (action.HasValue)
                 {
                     def.buttonSkin = new HeroActionButtonSkin(action.Value);
-                    def.press ??= new LanguageString("Prompts", "BUTTON_DESC_PRESS");
+
+                    if (press is not null)
+                    {
+                        def.press = press;
+                    }
+                    else
+                    {
+                        def.press ??= new LanguageString("Prompts", "BUTTON_DESC_PRESS");
+                    }
                 }
                 else
                 {
@@ -137,6 +145,9 @@ namespace SkillUpgrades.IC
                 "while holding left or right to dive horizontally.", nameof(PlayerData.quakeLevel), true);
             CreateSkillUpgrade(nameof(Skills.SpiralScream), "Spiral Scream", ItemNames.Howling_Wraiths, HeroActionButton.QUICK_CAST,
                 "while holding left or right to scream in a circle.", nameof(PlayerData.screamLevel), true);
+            CreateSkillUpgrade(nameof(Skills.WingsGlide), "Wings Glide", ItemNames.Monarch_Wings, HeroActionButton.JUMP,
+                "after double jumping to glide downwards.", nameof(PlayerData.hasDoubleJump), false, new LanguageString("Prompts", "BUTTON_DESC_HOLD"));
+
 
             foreach (AbstractItem item in items)
             {
