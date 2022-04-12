@@ -20,7 +20,6 @@ namespace SkillUpgrades.Skills
         {
             ModHooks.HeroUpdateHook += MonitorGlideRelease;
             On.HeroController.DoDoubleJump += OnDoubleJump;
-            On.HeroController.BackOnGround += OnLand;
             IL.HeroController.FixedUpdate += SetGlideVelocity;
         }
 
@@ -28,9 +27,24 @@ namespace SkillUpgrades.Skills
         {
             ModHooks.HeroUpdateHook -= MonitorGlideRelease;
             On.HeroController.DoDoubleJump -= OnDoubleJump;
-            On.HeroController.BackOnGround -= OnLand;
             IL.HeroController.FixedUpdate -= SetGlideVelocity;
         }
+
+        private GameObject cachedDoubleJumpPrefab;
+        private GameObject doubleJumpPrefab
+        {
+            get
+            {
+                if (cachedDoubleJumpPrefab != null)
+                {
+                    return cachedDoubleJumpPrefab;
+                }
+                GameObject go = ReflectionHelper.GetField<HeroController, GameObject>(HeroController.instance, "dJumpWingsPrefab");
+                cachedDoubleJumpPrefab = go;
+                return go;
+            }
+        }
+            
 
         /// <summary>
         /// If this is true, then the player hasn't released jump since they last double jumped.
@@ -41,25 +55,28 @@ namespace SkillUpgrades.Skills
             orig(self);
             Glidable = true;
         }
+
+        private bool ShouldNotBeGlidable()
+        {
+            return !InputHandler.Instance.inputActions.jump.IsPressed 
+                || HeroController.instance.cState.onGround
+                || HeroController.instance.cState.wallSliding;
+        }
+
         private void MonitorGlideRelease()
         {
-            if (Glidable && !InputHandler.Instance.inputActions.jump.IsPressed)
+            if (Glidable && ShouldNotBeGlidable())
             {
                 Glidable = false;
             }
             else if (Glidable)
             {
-                GameObject dj = ReflectionHelper.GetField<HeroController, GameObject>(HeroController.instance, "dJumpWingsPrefab");
-                if (!dj.activeSelf)
+                
+                if (!doubleJumpPrefab.activeSelf)
                 {
-                    dj.SetActive(true);
+                    doubleJumpPrefab.SetActive(true);
                 }
             }
-        }
-        private void OnLand(On.HeroController.orig_BackOnGround orig, HeroController self)
-        {
-            Glidable = false;
-            orig(self);
         }
 
         private void SetGlideVelocity(ILContext il)
