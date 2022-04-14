@@ -28,17 +28,17 @@ namespace SkillUpgrades.Skills
             On.HeroController.ShouldHardLand -= ShouldHardLand;
         }
 
-        private GameObject cachedDoubleJumpPrefab;
-        private GameObject doubleJumpPrefab
+        private GameObject _doubleJumpPrefab;
+        private GameObject DoubleJumpPrefab
         {
             get
             {
-                if (cachedDoubleJumpPrefab != null)
+                if (_doubleJumpPrefab != null)
                 {
-                    return cachedDoubleJumpPrefab;
+                    return _doubleJumpPrefab;
                 }
                 GameObject go = ReflectionHelper.GetField<HeroController, GameObject>(HeroController.instance, "dJumpWingsPrefab");
-                cachedDoubleJumpPrefab = go;
+                _doubleJumpPrefab = go;
                 return go;
             }
         }
@@ -69,9 +69,9 @@ namespace SkillUpgrades.Skills
             }
             else if (Glidable)
             {
-                if (!doubleJumpPrefab.activeSelf)
+                if (!DoubleJumpPrefab.activeSelf)
                 {
-                    doubleJumpPrefab.SetActive(true);
+                    DoubleJumpPrefab.SetActive(true);
                 }
             }
         }
