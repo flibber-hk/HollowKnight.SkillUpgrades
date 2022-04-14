@@ -51,7 +51,7 @@ namespace SkillUpgrades.RM
                 suElements.Add(button);
             }
 
-            suVIP = new(MainPage, new(0, 300), 50f, false, suElements.ToArray());
+            suVIP = new(MainPage, new(0, 300), 50f, true, suElements.ToArray());
         }
     }
 }
