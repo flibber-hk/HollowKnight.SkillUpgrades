@@ -78,7 +78,7 @@ namespace SkillUpgrades.Skills
 
         private bool ShouldHardLand(On.HeroController.orig_ShouldHardLand orig, HeroController self, Collision2D collision)
         {
-            // Separately, never hard land if they're gliding
+            // Never hard land if they're gliding
             if (Glidable) return false;
             return orig(self, collision);
         }
