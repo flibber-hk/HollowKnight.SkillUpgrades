@@ -12,15 +12,12 @@ namespace SkillUpgrades.Skills
 
         public override string Description => "Toggle whether to glide when holding jump after a double jump";
 
-        protected override void StartUpInitialize()
-        {
-            base.StartUpInitialize();
-        }
         protected override void RepeatableInitialize()
         {
             ModHooks.HeroUpdateHook += MonitorGlideRelease;
             On.HeroController.DoDoubleJump += OnDoubleJump;
             IL.HeroController.FixedUpdate += SetGlideVelocity;
+            On.HeroController.ShouldHardLand += ShouldHardLand;
         }
 
         protected override void Unload()
@@ -28,6 +25,7 @@ namespace SkillUpgrades.Skills
             ModHooks.HeroUpdateHook -= MonitorGlideRelease;
             On.HeroController.DoDoubleJump -= OnDoubleJump;
             IL.HeroController.FixedUpdate -= SetGlideVelocity;
+            On.HeroController.ShouldHardLand -= ShouldHardLand;
         }
 
         private GameObject cachedDoubleJumpPrefab;
@@ -47,7 +45,7 @@ namespace SkillUpgrades.Skills
             
 
         /// <summary>
-        /// If this is true, then the player hasn't released jump since they last double jumped.
+        /// If this is true, then the player hasn't released jump since they last double jumped, and should glide.
         /// </summary>
         private bool Glidable = false;
         private void OnDoubleJump(On.HeroController.orig_DoDoubleJump orig, HeroController self)
@@ -71,12 +69,18 @@ namespace SkillUpgrades.Skills
             }
             else if (Glidable)
             {
-                
                 if (!doubleJumpPrefab.activeSelf)
                 {
                     doubleJumpPrefab.SetActive(true);
                 }
             }
+        }
+
+        private bool ShouldHardLand(On.HeroController.orig_ShouldHardLand orig, HeroController self, Collision2D collision)
+        {
+            // Separately, never hard land if they're gliding
+            if (Glidable) return false;
+            return orig(self, collision);
         }
 
         private void SetGlideVelocity(ILContext il)
