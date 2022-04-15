@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Modding;
 using MonoMod.Cil;
 using UnityEngine;
@@ -18,6 +19,8 @@ namespace SkillUpgrades.Skills
             On.HeroController.DoDoubleJump += OnDoubleJump;
             IL.HeroController.FixedUpdate += SetGlideVelocity;
             On.HeroController.ShouldHardLand += ShouldHardLand;
+
+            Glidable = false;
         }
 
         protected override void Unload()
@@ -26,6 +29,8 @@ namespace SkillUpgrades.Skills
             On.HeroController.DoDoubleJump -= OnDoubleJump;
             IL.HeroController.FixedUpdate -= SetGlideVelocity;
             On.HeroController.ShouldHardLand -= ShouldHardLand;
+
+            Glidable = false;
         }
 
         private GameObject _doubleJumpPrefab;
@@ -42,12 +47,23 @@ namespace SkillUpgrades.Skills
                 return go;
             }
         }
-            
 
+        private bool _glidable = false;
         /// <summary>
-        /// If this is true, then the player hasn't released jump since they last double jumped, and should glide.
+        /// If this is true, then the player hasn't released jump or landed since they last double jumped, and should glide.
+        /// Always returns false if the skill upgrade is not active.
         /// </summary>
-        private bool Glidable = false;
+        public bool Glidable
+        {
+            get
+            {
+                return SkillUpgradeActive && _glidable;
+            }
+            private set
+            {
+                _glidable = value;
+            }
+        }
         private void OnDoubleJump(On.HeroController.orig_DoDoubleJump orig, HeroController self)
         {
             orig(self);
@@ -69,6 +85,7 @@ namespace SkillUpgrades.Skills
             }
             else if (Glidable)
             {
+                // In this case they're gliding, so we replay the animation
                 if (!DoubleJumpPrefab.activeSelf)
                 {
                     DoubleJumpPrefab.SetActive(true);
@@ -87,6 +104,7 @@ namespace SkillUpgrades.Skills
         {
             ILCursor cursor = new(il);
 
+            // Replace all references to the terminal velocity with our own
             while (cursor.TryGotoNext(MoveType.After, i => i.MatchLdfld<HeroController>(nameof(HeroController.MAX_FALL_VELOCITY))))
             {
                 cursor.EmitDelegate<Func<float, float>>(vel =>
