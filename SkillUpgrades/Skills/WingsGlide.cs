@@ -20,7 +20,7 @@ namespace SkillUpgrades.Skills
             IL.HeroController.FixedUpdate += SetGlideVelocity;
             On.HeroController.ShouldHardLand += ShouldHardLand;
 
-            Glidable = false;
+            ResetState();
         }
 
         protected override void Unload()
@@ -30,7 +30,14 @@ namespace SkillUpgrades.Skills
             IL.HeroController.FixedUpdate -= SetGlideVelocity;
             On.HeroController.ShouldHardLand -= ShouldHardLand;
 
+            ResetState();
+        }
+
+        private void ResetState()
+        {
             Glidable = false;
+            TimeSinceFinishedGliding = 0f;
+            LoopedAnimation = false;
         }
 
         private GameObject _doubleJumpPrefab;
@@ -64,10 +71,22 @@ namespace SkillUpgrades.Skills
                 _glidable = value;
             }
         }
+
+        /// <summary>
+        /// Track time since finished gliding to modify the hard land condition
+        /// </summary>
+        public float TimeSinceFinishedGliding { get; private set; } = 0f;
+
+        /// <summary>
+        /// True if the wings animation has already been looped by us
+        /// </summary>
+        private bool LoopedAnimation { get; set; } = false;
+
         private void OnDoubleJump(On.HeroController.orig_DoDoubleJump orig, HeroController self)
         {
             orig(self);
             Glidable = true;
+            TimeSinceFinishedGliding = 0f;
         }
 
         private bool ShouldNotBeGlidable()
@@ -81,9 +100,20 @@ namespace SkillUpgrades.Skills
 
         private void MonitorGlideRelease()
         {
+            if (!Glidable)
+            {
+                TimeSinceFinishedGliding += Time.deltaTime;
+            }
+
             if (Glidable && ShouldNotBeGlidable())
             {
                 Glidable = false;
+                // Remove the wings animation if they stop gliding
+                if (DoubleJumpPrefab.activeSelf && LoopedAnimation)
+                {
+                    DoubleJumpPrefab.SetActive(false);
+                }
+                LoopedAnimation = false;
             }
             else if (Glidable)
             {
@@ -91,6 +121,7 @@ namespace SkillUpgrades.Skills
                 if (!DoubleJumpPrefab.activeSelf)
                 {
                     DoubleJumpPrefab.SetActive(true);
+                    LoopedAnimation = true;
                 }
             }
         }
@@ -99,6 +130,16 @@ namespace SkillUpgrades.Skills
         {
             // Never hard land if they're gliding
             if (Glidable) return false;
+            
+            // If they recently stopped gliding, prevent hardfall
+            // The computation here is crude, but has the property that if the fall speed multiplier is 1 (i.e. glide has no effect)
+            // then they don't change whether they hard fall when not gliding
+            // TODO - if Tg is the time to reach glide velocity, then the RHS should be BIG_FALL_TIME - Tg.
+            if (TimeSinceFinishedGliding < (1 - GlideFallSpeedMultiplier) * HeroController.instance.BIG_FALL_TIME)
+            {
+                return false;
+            }
+
             return orig(self, collision);
         }
 
