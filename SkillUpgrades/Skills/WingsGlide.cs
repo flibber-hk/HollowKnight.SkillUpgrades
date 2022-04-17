@@ -74,7 +74,9 @@ namespace SkillUpgrades.Skills
         {
             return !InputHandler.Instance.inputActions.jump.IsPressed 
                 || HeroController.instance.cState.onGround
-                || HeroController.instance.cState.wallSliding;
+                || HeroController.instance.cState.wallSliding
+                || HeroController.instance.cState.recoiling
+                || HeroController.instance.cState.hazardDeath;
         }
 
         private void MonitorGlideRelease()
