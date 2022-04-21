@@ -29,6 +29,13 @@ namespace SkillUpgrades.Components
 
         public override void Awake()
         {
+            // This component should only be added to the knight
+            if (GetComponent<HeroController>() != HeroController.instance)
+            {
+                Destroy(this);
+                return;
+            }
+
             Instance = this;
 
             base.Awake();
