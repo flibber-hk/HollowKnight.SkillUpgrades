@@ -23,7 +23,7 @@ namespace SkillUpgrades.RM
         {
             if (!RandomizerInterop.RandoSettings.Any) return;
 
-            foreach (string skillName in GetActiveSettings())
+            foreach (string skillName in SkillUpgrades._skills.Keys)
             {
                 rb.EditItemRequest(skillName, info =>
                 {
@@ -42,7 +42,7 @@ namespace SkillUpgrades.RM
             {
                 if (type == RequestBuilder.ElementType.Item || type == RequestBuilder.ElementType.Unknown)
                 {
-                    if (RandomizerInterop.RandoSettings.SkillSettings.Keys.Contains(item))
+                    if (SkillUpgrades._skills.Keys.Contains(item))
                     {
                         gb = rb.GetItemGroupFor(ItemChanger.ItemNames.Mothwing_Cloak);
                         return true;
@@ -57,18 +57,30 @@ namespace SkillUpgrades.RM
         {
             if (!RandomizerInterop.RandoSettings.Any) return;
 
-            foreach (string skillName in GetActiveSettings())
+            switch (RandomizerInterop.RandoSettings.MainSetting)
             {
-                rb.AddItemByName(skillName);
+                case MainSkillUpgradeRandoType.All:
+                    foreach (string skillName in SkillUpgrades._skills.Keys)
+                    {
+                        rb.AddItemByName(skillName);
+                    }
+                    break;
+                case MainSkillUpgradeRandoType.RandomSelection:
+                    foreach (string skillName in SkillUpgrades._skills.Keys)
+                    {
+                        if (rb.rng.NextDouble() < 0.666f) rb.AddItemByName(skillName);
+                    }
+                    break;
+                case MainSkillUpgradeRandoType.EnabledSkills:
+                    foreach (string skillName in SkillUpgrades._skills.Keys)
+                    {
+                        if (SkillUpgrades.GS.EnabledSkills.TryGetValue(skillName, out bool enabled) && enabled)
+                        {
+                            rb.AddItemByName(skillName);
+                        }
+                    }
+                    break;
             }
-        }
-
-        internal static IEnumerable<string> GetActiveSettings()
-        {
-            return RandomizerInterop.RandoSettings.SkillSettings
-                .Where(kvp => kvp.Value)
-                .Select(kvp => kvp.Key)
-                .OrderBy(x => x);
         }
     }
 }

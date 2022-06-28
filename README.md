@@ -31,7 +31,15 @@ Some of these can be modified in the mod menu.
 With DebugMod installed, each skill upgrade, as well as the global toggle, can be toggled in the debug mod keybinds menu (and these toggles can be bound to keys like with normal DebugMod methods).
 
 ## Randomizer interop
-Each of the Skill Upgrades can be randomized in Randomizer 4's Connections page. However, this is limited:
+Each of the Skill Upgrades can be randomized in Randomizer 4's Connections page. 
+
+There are four options:
+- None - no skill upgrades will be randomized, and they will be active if and only if they are active in the mod menu.
+- All - each skill upgrade will be placed.
+- RandomSelection - a random selection of skill upgrades will be placed.
+- EnabledSkills - the skill upgrades which are currently enabled in the mod menu will be placed. This setting ignores the global toggle.
+
+Limitations:
 - Skill upgrades are not progressive (so e.g. it is possible to find a useless extra air dash before finding any dash).
 - Skill upgrades unlock the ability to toggle in the menu (so finding wall climb will have no effect if it is turned off in the mod menu).
 - Skill upgrades do not give specialized logic access.

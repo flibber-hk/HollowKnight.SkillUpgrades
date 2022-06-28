@@ -1,18 +1,17 @@
-﻿using System.Collections.Generic;
-using MenuChanger;
+﻿using MenuChanger;
 using MenuChanger.MenuElements;
 using MenuChanger.MenuPanels;
 using MenuChanger.Extensions;
 using RandomizerMod.Menu;
-using UnityEngine.SceneManagement;
+using static RandomizerMod.Localization;
 
 namespace SkillUpgrades.RM
 {
     public class MenuHolder
     {
         internal MenuPage MainPage;
-        internal List<IValueElement> suElements;
         internal VerticalItemPanel suVIP;
+        internal MenuElementFactory<RandoSettings> suMEF;
 
         internal SmallButton JumpToDRPage;
 
@@ -41,17 +40,9 @@ namespace SkillUpgrades.RM
         private void ConstructMenu(MenuPage landingPage)
         {
             MainPage = new MenuPage("SkillUpgrades", landingPage);
-            
-            suElements = new();
-            foreach (var kvp in RandomizerInterop.RandoSettings.SkillSettings)
-            {
-                ToggleButton button = new(MainPage, kvp.Key);
-                button.SetValue(kvp.Value);
-                button.SelfChanged += b => RandomizerInterop.RandoSettings.SkillSettings[kvp.Key] = (bool)b.Value;
-                suElements.Add(button);
-            }
-
-            suVIP = new(MainPage, new(0, 300), 50f, true, suElements.ToArray());
+            suMEF = new(MainPage, RandomizerInterop.RandoSettings);
+            suVIP = new(MainPage, new(0, 300), 50f, true, suMEF.Elements);
+            Localize(suMEF);
         }
     }
 }

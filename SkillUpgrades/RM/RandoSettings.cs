@@ -3,11 +3,19 @@ using System.Linq;
 
 namespace SkillUpgrades.RM
 {
+    public enum MainSkillUpgradeRandoType
+    {
+        None,
+        All,
+        RandomSelection,
+        EnabledSkills,
+    }
+
     public class RandoSettings
     {
-        public Dictionary<string, bool> SkillSettings = SkillUpgrades.GS.EnabledSkills.ToDictionary(kvp => kvp.Key, kvp => false);
+        public MainSkillUpgradeRandoType MainSetting = MainSkillUpgradeRandoType.None;
 
         [Newtonsoft.Json.JsonIgnore]
-        public bool Any => SkillSettings.Values.Any();
+        public bool Any => MainSetting != MainSkillUpgradeRandoType.None;
     }
 }

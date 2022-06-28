@@ -61,7 +61,7 @@ namespace SkillUpgrades.RM
                 return;
             }
 
-            foreach (string skillName in RandomizerInterop.RandoSettings.SkillSettings.Keys)
+            foreach (string skillName in SkillUpgrades._skills.Keys)
             {
                 Term t = lmb.GetOrAddTerm("SKILLUPGRADE_" + skillName);
                 lmb.AddItem(new SingleItem(skillName, new(t, 1)));
