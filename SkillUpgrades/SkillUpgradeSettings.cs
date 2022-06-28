@@ -91,7 +91,6 @@ namespace SkillUpgrades
         }
         #endregion
 
-
         internal static Dictionary<string, FieldInfo> Fields;
         static SkillUpgradeSettings()
         {
@@ -126,6 +125,8 @@ namespace SkillUpgrades
         public Dictionary<string, bool> Booleans { get; set; } = new Dictionary<string, bool>();
         public Dictionary<string, float> Floats { get; set; } = new Dictionary<string, float>();
         public Dictionary<string, int> Integers { get; set; } = new Dictionary<string, int>();
+
+        public RM.RandoSettings RandoSettings { get; set; } = new();
 
         private IEnumerable<(string, object)> AllSkillData()
         {
