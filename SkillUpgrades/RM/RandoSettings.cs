@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace SkillUpgrades.RM
 {
@@ -13,9 +13,10 @@ namespace SkillUpgrades.RM
 
     public class RandoSettings
     {
+        [JsonConverter(typeof(StringEnumConverter))]
         public MainSkillUpgradeRandoType MainSetting = MainSkillUpgradeRandoType.None;
 
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public bool Any => MainSetting != MainSkillUpgradeRandoType.None;
     }
 }
