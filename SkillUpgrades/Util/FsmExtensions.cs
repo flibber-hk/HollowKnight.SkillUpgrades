@@ -93,6 +93,16 @@ namespace SkillUpgrades.Util
             self.Actions = actions;
         }
 
+        public static void InsertAction(this FsmState self, int position, FsmStateAction action)
+        {
+            FsmStateAction[] actions = new FsmStateAction[self.Actions.Length + 1];
+            Array.Copy(self.Actions, actions, position);
+            Array.Copy(self.Actions, position, actions, position+1, self.Actions.Length - position);
+            actions[position] = action;
+
+            self.Actions = actions;
+        }
+
         public static void SwapXandY(this GetVelocity2d self)
         {
             (self.x, self.y) = (self.y, self.x);

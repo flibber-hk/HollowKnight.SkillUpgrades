@@ -147,6 +147,8 @@ namespace SkillUpgrades.IC
                 "while holding left or right to scream in a circle.", nameof(PlayerData.screamLevel), true);
             CreateSkillUpgrade(nameof(Skills.WingsGlide), "Wings Glide", ItemNames.Monarch_Wings, HeroActionButton.JUMP,
                 "after double jumping to glide downwards.", nameof(PlayerData.hasDoubleJump), false, new LanguageString("Prompts", "BUTTON_DESC_HOLD"));
+            CreateSkillUpgrade(nameof(Skills.GreatSlashShockwave), "Great Slash Shockwave", ItemNames.Great_Slash, HeroActionButton.ATTACK,
+                "after charging the nail art to launch a shockwave.", nameof(PlayerData.hasDashSlash), false, new LanguageString("Prompts", "BUTTON_DESC_RELEASE"));
 
 
             foreach (AbstractItem item in items)
