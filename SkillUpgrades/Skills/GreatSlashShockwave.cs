@@ -56,36 +56,39 @@ namespace SkillUpgrades.Skills
             PlayMakerFSM nailArtFSM = self.gameObject.LocateMyFSM("Nail Arts");
 
             FsmState Spawn = nailArtFSM.GetState("G Slash");
-            Spawn.InsertAction(3, new ExecuteLambda(() => { if (this.SkillUpgradeActive) self.StartCoroutine(SpawnShockwave()); }));
+            Spawn.InsertAction(3, new ExecuteLambda(() => { if (this.SkillUpgradeActive) SpawnShockwave(); }));
         }
 
-        private IEnumerator SpawnShockwave()
+        private void SpawnShockwave()
         {
             GameObject clone = UObject.Instantiate(_greatSlashPrefab);
             clone.name = ShockwaveGameObjectName;
-            clone.transform.SetPosition2D(HeroController.instance.transform.Find("Attacks/Great Slash").position + Vector3.right);
+            // Setting parent so the fsm handles setting position and scale
             clone.transform.SetParent(HeroController.instance.transform.Find("Attacks"));
 
+            // Keep the shockwave alive for 2.5x the lifetime of the regular GSlash
             PlayMakerFSM controlCollider = clone.LocateMyFSM("Control Collider");
             controlCollider.GetState("Enable").GetActionOfType<IntCompare>().integer2.Value = 45;
+            // Deparent once the spawning is done
+            controlCollider.GetState("Init").AddAction(new ExecuteLambda(() => clone.transform.SetParent(null)));
+            // Destroy once we're done with the object
+            FsmState disable = controlCollider.GetState("Disable");
+            disable.RemoveActionsOfType<FsmStateAction>();
+            disable.AddAction(new ExecuteLambda(() => UObject.Destroy(clone)));
 
+            // Move it horizontally away from the knight at speed equal to cdash speed
             float xVel = -30 * HeroController.instance.transform.localScale.x;
             clone.AddComponent<Mover>().Velocity = new Vector2(xVel, 0);
 
+            // Pause the animation after 10 frames so it looks like a wave
+            tk2dSpriteAnimationClip clip = clone.GetComponent<tk2dSpriteAnimator>().GetClipByName("NA Big Slash Effect");
+            clip.frames = clip.frames.Take(10).ToArray();
+
+            // Add rb2d so collision works
+            Rigidbody2D rb = clone.AddComponent<Rigidbody2D>();
+            rb.isKinematic = true;
+
             clone.SetActive(true);
-            
-            yield return null;
-            clone.transform.SetParent(null);
-
-            tk2dSpriteAnimator anim = clone.GetComponent<tk2dSpriteAnimator>();
-            yield return new WaitUntil(() => anim == null || anim.CurrentFrame >= 10);
-            if (anim == null) yield break;
-            anim.Pause();
-
-            Collider2D col = clone.GetComponent<Collider2D>();
-            yield return new WaitUntil(() => col == null || !col.enabled);
-            if (col == null) yield break;
-            UObject.Destroy(clone);
         }
     }
 }
