@@ -105,6 +105,7 @@ namespace SkillUpgrades.Skills
             if (QuakedTransitions > 6)
             {
                 QuakedTransitions = 0;
+                ResetQuakeAngle();
                 self.exitedQuake = false;
             }
             else if (self.exitedQuake)
