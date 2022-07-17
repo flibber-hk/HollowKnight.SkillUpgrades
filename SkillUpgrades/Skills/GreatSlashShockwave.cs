@@ -61,8 +61,6 @@ namespace SkillUpgrades.Skills
 
         private IEnumerator SpawnShockwave()
         {
-            Log("Spawning");
-
             GameObject clone = UObject.Instantiate(_greatSlashPrefab);
             clone.name = ShockwaveGameObjectName;
             clone.transform.SetPosition2D(HeroController.instance.transform.Find("Attacks/Great Slash").position + Vector3.right);
