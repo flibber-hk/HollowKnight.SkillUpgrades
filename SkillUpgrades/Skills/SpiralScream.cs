@@ -47,8 +47,6 @@ namespace SkillUpgrades.Skills
                 fsm.FsmVariables.GetFsmGameObject("Scr Heads").Value.AddComponent<Circler>();
                 fsm.FsmVariables.GetFsmGameObject("Scr Heads 2").Value.AddComponent<Circler>();
             }
-
-            FsmState screamGet = fsm.GetState("Scream Get?");
         }
 
         public void SetCirclerDirection()
