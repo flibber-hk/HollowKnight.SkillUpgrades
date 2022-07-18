@@ -126,6 +126,8 @@ namespace SkillUpgrades
         public Dictionary<string, float> Floats { get; set; } = new Dictionary<string, float>();
         public Dictionary<string, int> Integers { get; set; } = new Dictionary<string, int>();
 
+        public bool DefaultSkillSetting => EnabledSkills.Where(x => x.Value).Count() >= 4;
+
         public RM.RandoSettings RandoSettings { get; set; } = new();
 
         private IEnumerable<(string, object)> AllSkillData()
