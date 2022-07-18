@@ -57,7 +57,7 @@ namespace SkillUpgrades.RM
         {
             if (!RandomizerInterop.RandoSettings.Any) return;
 
-            switch (RandomizerInterop.RandoSettings.MainSetting)
+            switch (RandomizerInterop.RandoSettings.SkillUpgradeRandomization)
             {
                 case MainSkillUpgradeRandoType.All:
                     foreach (string skillName in SkillUpgrades._skills.Keys)

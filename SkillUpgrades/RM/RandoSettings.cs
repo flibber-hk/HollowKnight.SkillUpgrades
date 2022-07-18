@@ -14,9 +14,9 @@ namespace SkillUpgrades.RM
     public class RandoSettings
     {
         [JsonConverter(typeof(StringEnumConverter))]
-        public MainSkillUpgradeRandoType MainSetting = MainSkillUpgradeRandoType.None;
+        public MainSkillUpgradeRandoType SkillUpgradeRandomization = MainSkillUpgradeRandoType.None;
 
         [JsonIgnore]
-        public bool Any => MainSetting != MainSkillUpgradeRandoType.None;
+        public bool Any => SkillUpgradeRandomization != MainSkillUpgradeRandoType.None;
     }
 }
