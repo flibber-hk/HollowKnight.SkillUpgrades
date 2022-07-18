@@ -409,7 +409,11 @@ namespace SkillUpgrades.Skills
                     x = setVel.x,
                     y = setVel.y,
                     everyFrame = false
-                }
+                },
+                new ExecuteLambda(() =>
+                {
+                    if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
+                })
             };
             #endregion
 
