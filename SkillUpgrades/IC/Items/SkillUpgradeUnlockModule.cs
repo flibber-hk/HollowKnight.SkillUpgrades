@@ -9,7 +9,7 @@ using SkillUpgrades.Skills;
 namespace SkillUpgrades.IC.Items
 {
     /// <summary>
-    /// Module which manages unlocked skill upgrades
+    /// Module which manages unlocked skill upgrades.
     /// </summary>
     public class SkillUpgradeUnlockModule : Module
     {

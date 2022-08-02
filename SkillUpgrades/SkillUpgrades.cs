@@ -16,6 +16,7 @@ namespace SkillUpgrades
     {
         internal static SkillUpgrades instance;
         internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new();
+        public static IEnumerable<string> SkillNames => _skills.Keys;
 
         #region Global Settings
         public static SkillUpgradeSettings GS { get; set; } = new SkillUpgradeSettings();

@@ -23,7 +23,7 @@ namespace SkillUpgrades.RM
         {
             if (!RandomizerInterop.RandoSettings.Any) return;
 
-            foreach (string skillName in SkillUpgrades._skills.Keys)
+            foreach (string skillName in SkillUpgrades.SkillNames)
             {
                 rb.EditItemRequest(skillName, info =>
                 {
@@ -42,7 +42,7 @@ namespace SkillUpgrades.RM
             {
                 if (type == RequestBuilder.ElementType.Item || type == RequestBuilder.ElementType.Unknown)
                 {
-                    if (SkillUpgrades._skills.Keys.Contains(item))
+                    if (SkillUpgrades.SkillNames.Contains(item))
                     {
                         gb = rb.GetItemGroupFor(ItemChanger.ItemNames.Mothwing_Cloak);
                         return true;
@@ -60,19 +60,19 @@ namespace SkillUpgrades.RM
             switch (RandomizerInterop.RandoSettings.SkillUpgradeRandomization)
             {
                 case MainSkillUpgradeRandoType.All:
-                    foreach (string skillName in SkillUpgrades._skills.Keys)
+                    foreach (string skillName in SkillUpgrades.SkillNames)
                     {
                         rb.AddItemByName(skillName);
                     }
                     break;
                 case MainSkillUpgradeRandoType.RandomSelection:
-                    foreach (string skillName in SkillUpgrades._skills.Keys)
+                    foreach (string skillName in SkillUpgrades.SkillNames)
                     {
                         if (rb.rng.NextDouble() < 0.666f) rb.AddItemByName(skillName);
                     }
                     break;
                 case MainSkillUpgradeRandoType.EnabledSkills:
-                    foreach (string skillName in SkillUpgrades._skills.Keys)
+                    foreach (string skillName in SkillUpgrades.SkillNames)
                     {
                         if (SkillUpgrades.GS.EnabledSkills.TryGetValue(skillName, out bool enabled) && enabled)
                         {
