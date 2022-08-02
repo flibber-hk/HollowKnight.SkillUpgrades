@@ -35,9 +35,10 @@ Each of the Skill Upgrades can be randomized in Randomizer 4's Connections page.
 
 There are four options:
 - None - no skill upgrades will be randomized, and they will be active if and only if they are active in the mod menu.
-- All - each skill upgrade will be placed.
-- RandomSelection - a random selection of skill upgrades will be placed.
-- EnabledSkills - the skill upgrades which are currently enabled in the mod menu will be placed. This setting ignores the global toggle.
+- All - all skill upgrades will be placed.
+- RandomSelection - a random selection of skill upgrades will be placed; other skill upgrades will not be usable.
+- EnabledSkills - the skill upgrades which are currently enabled in the mod menu will be placed; other skill upgrades *will* be usable if toggled on. 
+The choice of skills by this setting ignores the global toggle, although unlocked skill upgrades will not be usable if the global toggle is off.
 
 Limitations:
 - Skill upgrades are not progressive (so e.g. it is possible to find a useless extra air dash before finding any dash).
