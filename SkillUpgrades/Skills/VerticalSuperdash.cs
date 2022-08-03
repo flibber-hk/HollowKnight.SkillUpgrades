@@ -5,6 +5,7 @@ using System.Reflection;
 using GlobalEnums;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using Modding.Utils;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
@@ -109,14 +110,14 @@ namespace SkillUpgrades.Skills
         {
             GameObject upwardOneway = scene.name switch
             {
-                ItemChanger.SceneNames.RestingGrounds_02 => scene.GetRootGameObjects().First(x => x.name == "top1"),
-                ItemChanger.SceneNames.Mines_13 => scene.GetRootGameObjects().First(x => x.name == "top1"),
-                ItemChanger.SceneNames.Mines_23 => scene.GetRootGameObjects().First(x => x.name == "top1"),
-                ItemChanger.SceneNames.Town => scene.GetRootGameObjects().First(x => x.name == "_Transition Gates").transform.Find("top1").gameObject,
-                ItemChanger.SceneNames.Tutorial_01 => scene.GetRootGameObjects().First(x => x.name == "_Transition Gates").transform.Find("top1").gameObject,
-                ItemChanger.SceneNames.Fungus2_25 => scene.GetRootGameObjects().First(x => x.name == "top2"),
-                ItemChanger.SceneNames.Deepnest_East_03 => scene.GetRootGameObjects().First(x => x.name == "top2"),
-                ItemChanger.SceneNames.Deepnest_01b => scene.GetRootGameObjects().First(x => x.name == "_Transition Gates").transform.Find("top2").gameObject,
+                ItemChanger.SceneNames.RestingGrounds_02 => scene.FindGameObject("top1"),
+                ItemChanger.SceneNames.Mines_13 => scene.FindGameObject("top1"),
+                ItemChanger.SceneNames.Mines_23 => scene.FindGameObject("top1"),
+                ItemChanger.SceneNames.Town => scene.FindGameObject("_Transition Gates/top1"),
+                ItemChanger.SceneNames.Tutorial_01 => scene.FindGameObject("_Transition Gates/top1"),
+                ItemChanger.SceneNames.Fungus2_25 => scene.FindGameObject("top2"),
+                ItemChanger.SceneNames.Deepnest_East_03 => scene.FindGameObject("top2"),
+                ItemChanger.SceneNames.Deepnest_01b => scene.FindGameObject("_Transition Gates/top2"),
                 _ => null
             };
 
