@@ -89,11 +89,32 @@ namespace SkillUpgrades.Skills
 
             cursor.GotoNext(i => i.MatchLdfld<HeroController>(nameof(HeroController.gatePosition)), i => i.MatchLdcI4(2));
             cursor.GotoNext(MoveType.After, i => i.MatchCallvirt<HeroController>("FindGroundPointY"));
-            cursor.EmitDelegate<Func<float, float>>(x => GameManager.instance.sceneName == ItemChanger.SceneNames.Mines_34 ? 54.4f : x);
+            cursor.EmitDelegate<Func<float, float>>(x => GetHorizontalPosition(x, ItemChanger.SceneNames.Mines_34));
 
             cursor.GotoNext(i => i.MatchLdfld<HeroController>(nameof(HeroController.gatePosition)), i => i.MatchLdcI4(1));
             cursor.GotoNext(MoveType.After, i => i.MatchCallvirt<HeroController>("FindGroundPointY"));
-            cursor.EmitDelegate<Func<float, float>>(x => GameManager.instance.sceneName == ItemChanger.SceneNames.Cliffs_02 ? 28.4f : x);
+            cursor.EmitDelegate<Func<float, float>>(x => GetHorizontalPosition(x, ItemChanger.SceneNames.Cliffs_02));
+        }
+
+        /// <summary>
+        /// Override the horizontal x position when coming into the given scene.
+        /// </summary>
+        private static float GetHorizontalPosition(float orig, string matchedScene)
+        {
+            if (!HeroController.instance.exitedSuperDashing)
+            {
+                return orig;
+            }
+            if (matchedScene != GameManager.instance.sceneName)
+            {
+                return orig;
+            }
+            return matchedScene switch
+            {
+                ItemChanger.SceneNames.Mines_34 => 54.4f,
+                ItemChanger.SceneNames.Cliffs_02 => 28.4f,
+                _ => orig
+            };
         }
 
         private void DontPlaySuperdash(On.HeroAnimationController.orig_PlayFromFrame orig, HeroAnimationController self, string clipName, int frame)
