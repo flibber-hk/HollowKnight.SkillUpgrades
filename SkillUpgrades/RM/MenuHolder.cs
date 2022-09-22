@@ -13,7 +13,7 @@ namespace SkillUpgrades.RM
         internal VerticalItemPanel suVIP;
         internal MenuElementFactory<RandoSettings> suMEF;
 
-        internal SmallButton JumpToDRPage;
+        internal SmallButton JumpToSUPage;
 
         private static MenuHolder _instance = null;
         internal static MenuHolder Instance => _instance ?? (_instance = new MenuHolder());
@@ -31,10 +31,20 @@ namespace SkillUpgrades.RM
 
         private bool HandleButton(MenuPage landingPage, out SmallButton button)
         {
-            JumpToDRPage = new(landingPage, "SkillUpgrades");
-            JumpToDRPage.AddHideAndShowEvent(landingPage, MainPage);
-            button = JumpToDRPage;
+            JumpToSUPage = new(landingPage, "SkillUpgrades");
+            JumpToSUPage.AddHideAndShowEvent(landingPage, MainPage);
+            SetTopLevelButtonColor();
+
+            button = JumpToSUPage;
             return true;
+        }
+
+        private void SetTopLevelButtonColor()
+        {
+            if (JumpToSUPage != null)
+            {
+                JumpToSUPage.Text.color = RandomizerInterop.RandoSettings.Any ? Colors.TRUE_COLOR : Colors.DEFAULT_COLOR;
+            }
         }
 
         private void ConstructMenu(MenuPage landingPage)
@@ -42,6 +52,11 @@ namespace SkillUpgrades.RM
             MainPage = new MenuPage("SkillUpgrades", landingPage);
             suMEF = new(MainPage, RandomizerInterop.RandoSettings);
             suVIP = new(MainPage, new(0, 300), 50f, true, suMEF.Elements);
+            foreach (IValueElement e in suMEF.Elements)
+            {
+                e.SelfChanged += obj => SetTopLevelButtonColor();
+            }
+
             Localize(suMEF);
         }
     }
