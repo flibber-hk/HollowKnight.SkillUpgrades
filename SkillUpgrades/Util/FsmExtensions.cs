@@ -82,6 +82,7 @@ namespace SkillUpgrades.Util
             actions[0] = action;
 
             self.Actions = actions;
+            action.Init(self);
         }
 
         public static void AddAction(this FsmState self, FsmStateAction action)
@@ -91,6 +92,7 @@ namespace SkillUpgrades.Util
             actions[self.Actions.Length] = action;
 
             self.Actions = actions;
+            action.Init(self);
         }
 
         public static void InsertAction(this FsmState self, int position, FsmStateAction action)
@@ -101,6 +103,7 @@ namespace SkillUpgrades.Util
             actions[position] = action;
 
             self.Actions = actions;
+            action.Init(self);
         }
 
         public static void SwapXandY(this GetVelocity2d self)
