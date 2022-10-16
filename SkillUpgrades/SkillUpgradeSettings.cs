@@ -126,7 +126,9 @@ namespace SkillUpgrades
         public Dictionary<string, float> Floats { get; set; } = new Dictionary<string, float>();
         public Dictionary<string, int> Integers { get; set; } = new Dictionary<string, int>();
 
-        public bool DefaultSkillSetting => EnabledSkills.Where(x => x.Value).Count() >= 4;
+        // If at least three skills are turned off, new skills will be disabled by default.
+        // This means that for a new global settings file, skills are *enabled* by default.
+        public bool DefaultSkillSetting => EnabledSkills.Where(x => !x.Value).Count() < 3;
 
         public RM.RandoSettings RandoSettings { get; set; } = new();
 

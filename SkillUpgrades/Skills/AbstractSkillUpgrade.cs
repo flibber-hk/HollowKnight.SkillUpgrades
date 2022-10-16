@@ -51,7 +51,7 @@ namespace SkillUpgrades.Skills
         internal void InitializeSkillUpgrade()
         {
             // Make sure skill is in dictionary. If it is absent, then treat it as true by default
-            // if they've turned on several skill upgrades already.
+            // unless they've turned off several skill upgrades already.
             SkillUpgrades.GS.EnabledSkills.EnsureInDict(Name, SkillUpgrades.GS.DefaultSkillSetting);
 
             Log("Initializing skill");
