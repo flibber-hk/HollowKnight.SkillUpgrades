@@ -74,6 +74,9 @@
     <Reference Include="RandomizerMod" Condition="Exists('$(HollowKnightRefs)\Mods\Randomizer 4')">
       <HintPath>$(HollowKnightRefs)\Mods\Randomizer 4\RandomizerMod.dll</HintPath>
     </Reference>
+    <Reference Include="RandoSettingsManager">
+      <HintPath>$(HollowKnightRefs)\Mods\RandoSettingsManager\RandoSettingsManager.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\UnityEngine.dll</HintPath>
     </Reference>
@@ -108,7 +111,7 @@
   </Target>
   
   <Target Name="CopyMod" AfterTargets="PostBuildEvent">
-	<Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).xml" DestinationFolder="$(HollowKnightRefs)\Mods\$(TargetName)" SkipUnchangedFiles="true" />
+  <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)$(TargetName).xml" DestinationFolder="$(HollowKnightRefs)\Mods\$(TargetName)" SkipUnchangedFiles="true" />
   </Target>
     
   <Target Name="CreateReleaseZip" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">

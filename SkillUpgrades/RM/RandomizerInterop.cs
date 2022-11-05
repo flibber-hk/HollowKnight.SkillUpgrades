@@ -1,4 +1,5 @@
 ﻿using ItemChanger;
+using Modding;
 using Newtonsoft.Json;
 using RandomizerCore;
 using RandomizerMod;
@@ -11,7 +12,11 @@ namespace SkillUpgrades.RM
 {
     public static class RandomizerInterop
     {
-        public static RandoSettings RandoSettings => SkillUpgrades.GS.RandoSettings;
+        public static RandoSettings RandoSettings
+        {
+            get => SkillUpgrades.GS.RandoSettings;
+            set => SkillUpgrades.GS.RandoSettings = value;
+        }
 
         public static void HookRandomizer()
         {
@@ -21,6 +26,8 @@ namespace SkillUpgrades.RM
 
             SettingsLog.AfterLogSettings += AddSettingsToLog;
             RandoController.OnExportCompleted += RemoveUnselectedSkillUpgrades;
+
+            if (ModHooks.GetMod("RandoSettingsManager") is not null) RandoSettingsManagerInterop.Hook();
         }
 
         private static void RemoveUnselectedSkillUpgrades(RandoController rc)

@@ -59,5 +59,10 @@ namespace SkillUpgrades.RM
 
             Localize(suMEF);
         }
+
+        internal void ResetMenu()
+        {
+            suMEF.SetMenuValues(RandomizerInterop.RandoSettings);
+        }
     }
 }
