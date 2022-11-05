@@ -21,8 +21,8 @@ namespace SkillUpgrades.RM
 
         public override void ReceiveSettings(RandoSettings settings)
         {
-            RandomizerInterop.RandoSettings = settings;
-            MenuHolder.Instance.ResetMenu();
+            settings ??= new();
+            MenuHolder.Instance.suMEF.SetMenuValues(settings);
         }
 
         public override bool TryProvideSettings(out RandoSettings settings)
