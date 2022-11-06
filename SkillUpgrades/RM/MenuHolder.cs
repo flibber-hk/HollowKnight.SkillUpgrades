@@ -15,27 +15,22 @@ namespace SkillUpgrades.RM
 
         internal SmallButton JumpToSUPage;
 
-        private static MenuHolder _instance = null;
-        internal static MenuHolder Instance => _instance ?? (_instance = new MenuHolder());
+        internal static MenuHolder Instance { get; private set; }
 
         public static void OnExitMenu()
         {
-            _instance = null;
+            Instance = null;
         }
 
         public static void Hook()
         {
-            RandomizerMenuAPI.AddMenuPage(Instance.ConstructMenu, Instance.HandleButton);
+            RandomizerMenuAPI.AddMenuPage(ConstructMenu, HandleButton);
             MenuChangerMod.OnExitMainMenu += OnExitMenu;
         }
 
-        private bool HandleButton(MenuPage landingPage, out SmallButton button)
+        private static bool HandleButton(MenuPage landingPage, out SmallButton button)
         {
-            JumpToSUPage = new(landingPage, "SkillUpgrades");
-            JumpToSUPage.AddHideAndShowEvent(landingPage, MainPage);
-            SetTopLevelButtonColor();
-
-            button = JumpToSUPage;
+            button = Instance.JumpToSUPage;
             return true;
         }
 
@@ -47,7 +42,9 @@ namespace SkillUpgrades.RM
             }
         }
 
-        private void ConstructMenu(MenuPage landingPage)
+        private static void ConstructMenu(MenuPage landingPage) => Instance = new(landingPage);
+        
+        private MenuHolder(MenuPage landingPage)
         {
             MainPage = new MenuPage("SkillUpgrades", landingPage);
             suMEF = new(MainPage, RandomizerInterop.RandoSettings);
@@ -58,6 +55,10 @@ namespace SkillUpgrades.RM
             }
 
             Localize(suMEF);
+
+            JumpToSUPage = new(landingPage, "SkillUpgrades");
+            JumpToSUPage.AddHideAndShowEvent(landingPage, MainPage);
+            SetTopLevelButtonColor();
         }
 
         internal void ResetMenu()
