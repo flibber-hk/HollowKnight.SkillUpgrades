@@ -300,12 +300,12 @@ namespace SkillUpgrades.Skills
             fsm.GetState("Left").AddAction(new ExecuteLambda(() =>
             {
                 HeroRotator.Instance.Rotate(SuperdashAngle);
-                if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
+                if (BreakDiveFloorsFromBelow && SkillUpgradeActive) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
             }));
             fsm.GetState("Right").AddAction(new ExecuteLambda(() =>
             {
                 HeroRotator.Instance.Rotate(SuperdashAngle);
-                if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
+                if (BreakDiveFloorsFromBelow && SkillUpgradeActive) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
             }));
             #endregion
 
@@ -434,7 +434,7 @@ namespace SkillUpgrades.Skills
                 },
                 new ExecuteLambda(() =>
                 {
-                    if (BreakDiveFloorsFromBelow) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
+                    if (BreakDiveFloorsFromBelow && SkillUpgradeActive) PlayMakerFSM.BroadcastEvent("QUAKE FALL START");
                 })
             };
             #endregion
