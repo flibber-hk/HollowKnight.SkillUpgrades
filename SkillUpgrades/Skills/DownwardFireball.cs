@@ -143,8 +143,13 @@ namespace SkillUpgrades.Skills
             orig(self);
 
             PlayMakerFSM fsm = self.spellControl;
-            FsmState spirit = fsm.GetState("Fireball 1");
-            FsmState soul = fsm.GetState("Fireball 2");
+            // Clone states so that mods that need the fireball prefabs can get them from where they expect them to be
+            FsmState spirit = fsm.CopyState("Fireball 1", "Fireball 1 SU");
+            fsm.RedirectAllTransitionsTo("Fireball 1", "Fireball 1 SU");
+            fsm.GetState("Fireball 1").InsertMethod(0, () => LogError("HC.SC Fireball 1 state entered unexpectedly"));
+            FsmState soul = fsm.CopyState("Fireball 2", "Fireball 2 SU");
+            fsm.RedirectAllTransitionsTo("Fireball 2", "Fireball 2 SU");
+            fsm.GetState("Fireball 2").InsertMethod(0, () => LogError("HC.SC Fireball 2 state entered unexpectedly"));
 
             #region Cache fireball objects
             if (_fireballCast == null)
