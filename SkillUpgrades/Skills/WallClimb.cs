@@ -5,6 +5,7 @@ using MonoMod.Cil;
 using UnityEngine;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
+using Vasi;
 
 namespace SkillUpgrades.Skills
 {

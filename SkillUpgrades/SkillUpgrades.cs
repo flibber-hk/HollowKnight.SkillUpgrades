@@ -172,7 +172,7 @@ namespace SkillUpgrades
 
         public override string GetVersion()
         {
-            return GetType().Assembly.GetName().Version.ToString();
+            return Vasi.VersionUtil.GetVersion<SkillUpgrades>();
         }
     }
 }

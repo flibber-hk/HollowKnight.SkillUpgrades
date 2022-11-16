@@ -14,6 +14,7 @@ using UnityEngine.SceneManagement;
 using SkillUpgrades.Components;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
+using Vasi;
 
 namespace SkillUpgrades.Skills
 {
@@ -246,7 +247,7 @@ namespace SkillUpgrades.Skills
             #endregion
 
             #region Set Direction
-            fsm.GetState("Direction").AddFirstAction(new ExecuteLambda(() =>
+            fsm.GetState("Direction").InsertMethod(0, () =>
             {
                 bool shouldDiagonal = false;
                 bool shouldVertical = false;
@@ -280,9 +281,9 @@ namespace SkillUpgrades.Skills
                 {
                     SuperdashAngle = -90;
                 }
-            }));
+            });
 
-            fsm.GetState("Direction Wall").AddFirstAction(new ExecuteLambda(() =>
+            fsm.GetState("Direction Wall").InsertMethod(0, () =>
             {
                 if (DiagonalSuperdash && SkillUpgradeActive)
                 {
@@ -295,7 +296,7 @@ namespace SkillUpgrades.Skills
                         SuperdashAngle = 45;
                     }
                 }
-            }));
+            });
 
             fsm.GetState("Left").AddAction(new ExecuteLambda(() =>
             {
@@ -381,7 +382,7 @@ namespace SkillUpgrades.Skills
 
             FsmStateAction setVelocityVariablesAction = new ExecuteLambda(setVelocityVariables);
 
-            SetVelocity2d setVel = dashing.GetActionOfType<SetVelocity2d>();
+            SetVelocity2d setVel = dashing.GetAction<SetVelocity2d>();
             setVel.x = hSpeed;
             setVel.y = vSpeed;
 
@@ -440,19 +441,10 @@ namespace SkillUpgrades.Skills
             #endregion
 
             #region Reset Vertical Charge variable
-            fsm.GetState("Air Cancel").AddFirstAction(new ExecuteLambda(() =>
-            {
-                ResetSuperdashAngle();
-            }));
-            fsm.GetState("Cancel").AddFirstAction(new ExecuteLambda(() =>
-            {
-                // Called on scene change
-                ResetSuperdashAngle();
-            }));
-            fsm.GetState("Hit Wall").AddFirstAction(new ExecuteLambda(() =>
-            {
-                ResetSuperdashAngle();
-            }));
+            fsm.GetState("Air Cancel").InsertMethod(0, ResetSuperdashAngle);
+            fsm.GetState("Hit Wall").InsertMethod(0, ResetSuperdashAngle);
+            // Called on scene change
+            fsm.GetState("Cancel").InsertMethod(0, ResetSuperdashAngle);
             #endregion
         }
     }

@@ -11,6 +11,7 @@ using UnityEngine;
 using SkillUpgrades.Components;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
+using Vasi;
 
 namespace SkillUpgrades.Skills
 {
@@ -157,9 +158,9 @@ namespace SkillUpgrades.Skills
             PlayMakerFSM fsm = self.spellControl;
 
             // Clear the failsafe whenever a dive finishes
-            fsm.GetState("Quake Finish").AddFirstAction(new ExecuteLambda(() => { ResetQuakeAngle(); QuakedTransitions = 0; }));
-            fsm.GetState("Reset Cam Zoom").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
-            fsm.GetState("FSM Cancel").AddFirstAction(new ExecuteLambda(ResetQuakeAngle));
+            fsm.GetState("Quake Finish").InsertMethod(0, () => { ResetQuakeAngle(); QuakedTransitions = 0; });
+            fsm.GetState("Reset Cam Zoom").InsertMethod(0, ResetQuakeAngle);
+            fsm.GetState("FSM Cancel").InsertMethod(0, ResetQuakeAngle);
 
             #region Add FSM Variables
             FsmFloat vSpeed = fsm.AddFsmFloat("V Speed HQ");
@@ -167,7 +168,7 @@ namespace SkillUpgrades.Skills
             #endregion
 
             #region Set Direction Value
-            fsm.GetState("Quake Antic").AddFirstAction(new ExecuteLambda(() =>
+            fsm.GetState("Quake Antic").InsertMethod(0, () =>
             {
                 if (SkillUpgradeActive)
                 {
@@ -185,10 +186,10 @@ namespace SkillUpgrades.Skills
 
                 vSpeed.Value = -DiveSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
                 hSpeed.Value = DiveSpeed * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
-            }));
+            });
 
             // Fix horizontal quake into Cliffs_02[right1], Mines_34[left1]
-            fsm.GetState("Enter Quake").AddFirstAction(new ExecuteLambda(() =>
+            fsm.GetState("Enter Quake").InsertMethod(0, () =>
             {
                 vSpeed.Value = -DiveSpeed * Mathf.Cos(QuakeAngle * Mathf.PI / 180);
                 hSpeed.Value = DiveSpeed * Mathf.Sin(QuakeAngle * Mathf.PI / 180);
@@ -200,7 +201,7 @@ namespace SkillUpgrades.Skills
                     vec += 0.081f * Vector3.up;
                     HeroController.instance.transform.position = vec;
                 }
-            }));
+            });
             #endregion
 
             #region Velocity values
@@ -208,7 +209,7 @@ namespace SkillUpgrades.Skills
             {
                 FsmStateAction setCCSevent = new ExecuteLambda(() =>
                 {
-                    CheckCollisionSide ccs = s.GetActionOfType<CheckCollisionSide>();
+                    CheckCollisionSide ccs = s.GetAction<CheckCollisionSide>();
                     FsmEvent heroLanded = FsmEvent.GetFsmEvent("HERO LANDED");
 
                     if (hSpeed.Value < -0.4f)
@@ -236,7 +237,7 @@ namespace SkillUpgrades.Skills
                     }
                 });
 
-                SetVelocity2d setvel = s.GetActionOfType<SetVelocity2d>();
+                SetVelocity2d setvel = s.GetAction<SetVelocity2d>();
                 setvel.x = hSpeed;
                 setvel.y = vSpeed;
 

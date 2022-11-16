@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using UnityEngine;
 using SkillUpgrades.FsmStateActions;
 using SkillUpgrades.Util;
+using Vasi;
 
 namespace SkillUpgrades.Skills
 {
@@ -36,45 +38,45 @@ namespace SkillUpgrades.Skills
 
             if (down)
             {
-                castR.GetActionOfType<SetFsmFloat>().setValue = 270f;
-                castL.GetActionOfType<SetFsmFloat>().setValue = 270f;
-                castR.GetActionOfType<SetVelocityAsAngle>().angle = 270f;
-                castL.GetActionOfType<SetVelocityAsAngle>().angle = 270f;
+                castR.GetAction<SetFsmFloat>().setValue = 270f;
+                castL.GetAction<SetFsmFloat>().setValue = 270f;
+                castR.GetAction<SetVelocityAsAngle>().angle = 270f;
+                castL.GetAction<SetVelocityAsAngle>().angle = 270f;
 
-                flukeL.GetActionsOfType<SetFloatValue>()[0].floatValue = 250f;
-                flukeL.GetActionsOfType<SetFloatValue>()[1].floatValue = 290f;
-                flukeR.GetActionsOfType<SetFloatValue>()[0].floatValue = 250f;
-                flukeR.GetActionsOfType<SetFloatValue>()[1].floatValue = 290f;
+                flukeL.Actions.OfType<SetFloatValue>().ElementAt(0).floatValue = 250f;
+                flukeL.Actions.OfType<SetFloatValue>().ElementAt(1).floatValue = 290f;
+                flukeR.Actions.OfType<SetFloatValue>().ElementAt(0).floatValue = 250f;
+                flukeR.Actions.OfType<SetFloatValue>().ElementAt(1).floatValue = 290f;
 
-                dungL.GetActionOfType<FlingObject>().angleMin = 265f;
-                dungR.GetActionOfType<FlingObject>().angleMin = 265f;
-                dungL.GetActionOfType<FlingObject>().angleMax = 275f;
-                dungR.GetActionOfType<FlingObject>().angleMax = 275f;
-                dungL.GetActionOfType<SetAngularVelocity2d>().angularVelocity = 10f;
-                dungR.GetActionOfType<SetAngularVelocity2d>().angularVelocity = -10f;
-                dungL.GetActionOfType<SetRotation>().zAngle = -296f;
-                dungR.GetActionOfType<SetRotation>().zAngle = 296f;
+                dungL.GetAction<FlingObject>().angleMin = 265f;
+                dungR.GetAction<FlingObject>().angleMin = 265f;
+                dungL.GetAction<FlingObject>().angleMax = 275f;
+                dungR.GetAction<FlingObject>().angleMax = 275f;
+                dungL.GetAction<SetAngularVelocity2d>().angularVelocity = 10f;
+                dungR.GetAction<SetAngularVelocity2d>().angularVelocity = -10f;
+                dungL.GetAction<SetRotation>().zAngle = -296f;
+                dungR.GetAction<SetRotation>().zAngle = 296f;
             }
             else
             {
-                castR.GetActionOfType<SetFsmFloat>().setValue = 0f;
-                castL.GetActionOfType<SetFsmFloat>().setValue = 180f;
-                castR.GetActionOfType<SetVelocityAsAngle>().angle = 0f;
-                castL.GetActionOfType<SetVelocityAsAngle>().angle = 180f;
+                castR.GetAction<SetFsmFloat>().setValue = 0f;
+                castL.GetAction<SetFsmFloat>().setValue = 180f;
+                castR.GetAction<SetVelocityAsAngle>().angle = 0f;
+                castL.GetAction<SetVelocityAsAngle>().angle = 180f;
 
-                flukeL.GetActionsOfType<SetFloatValue>()[0].floatValue = 20f;
-                flukeL.GetActionsOfType<SetFloatValue>()[1].floatValue = 60f;
-                flukeR.GetActionsOfType<SetFloatValue>()[0].floatValue = 120f;
-                flukeR.GetActionsOfType<SetFloatValue>()[1].floatValue = 160f;
+                flukeL.Actions.OfType<SetFloatValue>().ElementAt(0).floatValue = 20f;
+                flukeL.Actions.OfType<SetFloatValue>().ElementAt(1).floatValue = 60f;
+                flukeR.Actions.OfType<SetFloatValue>().ElementAt(0).floatValue = 120f;
+                flukeR.Actions.OfType<SetFloatValue>().ElementAt(1).floatValue = 160f;
 
-                dungL.GetActionOfType<FlingObject>().angleMin = 140;
-                dungR.GetActionOfType<FlingObject>().angleMin = 30;
-                dungL.GetActionOfType<FlingObject>().angleMax = 150;
-                dungR.GetActionOfType<FlingObject>().angleMax = 40;
-                dungL.GetActionOfType<SetAngularVelocity2d>().angularVelocity = 100f;
-                dungR.GetActionOfType<SetAngularVelocity2d>().angularVelocity = -100f;
-                dungL.GetActionOfType<SetRotation>().zAngle = -26f;
-                dungR.GetActionOfType<SetRotation>().zAngle = 26f;
+                dungL.GetAction<FlingObject>().angleMin = 140;
+                dungR.GetAction<FlingObject>().angleMin = 30;
+                dungL.GetAction<FlingObject>().angleMax = 150;
+                dungR.GetAction<FlingObject>().angleMax = 40;
+                dungL.GetAction<SetAngularVelocity2d>().angularVelocity = 100f;
+                dungR.GetAction<SetAngularVelocity2d>().angularVelocity = -100f;
+                dungL.GetAction<SetRotation>().zAngle = -26f;
+                dungR.GetAction<SetRotation>().zAngle = 26f;
             }
             if (!spirit) return;
 
@@ -111,7 +113,7 @@ namespace SkillUpgrades.Skills
         private static void FixSpiritFSM(PlayMakerFSM fsm, bool left)
         {
             FsmState init = fsm.GetState("Init");
-            init.RemoveActionsOfType<FsmStateAction>();
+            init.RemoveAllOfType<FsmStateAction>();
             init.AddAction(new ExecuteLambda(() =>
             {
                 fsm.FsmVariables.GetFsmFloat("Velocity").Value = fsm.GetComponent<Rigidbody2D>().velocity.y;
@@ -126,13 +128,13 @@ namespace SkillUpgrades.Skills
             }));
 
             FsmState idle = fsm.GetState("Idle");
-            idle.GetActionOfType<SetVelocity2d>().SwapXandY();
-            idle.GetActionOfType<GetVelocity2d>().SwapXandY();
+            idle.GetAction<SetVelocity2d>().SwapXandY();
+            idle.GetAction<GetVelocity2d>().SwapXandY();
 
             // We need to modify the state added by QoL
             if (fsm.GetState("Idle (No Collision)") is FsmState idleNoCollision)
             {
-                idleNoCollision.GetActionOfType<SetVelocity2d>().SwapXandY();
+                idleNoCollision.GetAction<SetVelocity2d>().SwapXandY();
             }
         }
 
@@ -147,20 +149,20 @@ namespace SkillUpgrades.Skills
             #region Cache fireball objects
             if (_fireballCast == null)
             {
-                _fireballCast = spirit.GetActionOfType<SpawnObjectFromGlobalPool>().gameObject.Value;
+                _fireballCast = spirit.GetAction<SpawnObjectFromGlobalPool>().gameObject.Value;
             }
             if (_fireballCast2 == null)
             {
-                _fireballCast2 = soul.GetActionOfType<SpawnObjectFromGlobalPool>().gameObject.Value;
+                _fireballCast2 = soul.GetAction<SpawnObjectFromGlobalPool>().gameObject.Value;
             }
             if (_fireballObject == null)
             {
-                _fireballObject = _fireballCast.LocateMyFSM("Fireball Cast").GetState("Cast Right").GetActionOfType<SpawnObjectFromGlobalPool>().gameObject.Value;
+                _fireballObject = _fireballCast.LocateMyFSM("Fireball Cast").GetState("Cast Right").GetAction<SpawnObjectFromGlobalPool>().gameObject.Value;
             }
             #endregion
 
             #region Set/Unset down fireball bool
-            fsm.GetState("Level Check").AddFirstAction(new ExecuteLambda(() =>
+            fsm.GetState("Level Check").InsertMethod(0, () =>
             {
                 if (SkillUpgradeActive && !InputHandler.Instance.inputActions.left.IsPressed && !InputHandler.Instance.inputActions.right.IsPressed)
                 {
@@ -170,7 +172,7 @@ namespace SkillUpgrades.Skills
                 {
                     FireballDown = false;
                 }
-            }));
+            });
             #endregion
 
             #region Rotate fireball on emit
@@ -253,7 +255,7 @@ namespace SkillUpgrades.Skills
 
             FsmFloat yRecoil = fsm.AddFsmFloat("FB Recoil Current Y DF");
 
-            ExecuteLambda setParams = new ExecuteLambda(() =>
+            ExecuteLambda setParams = new(() =>
             {
                 float val = fsm.FsmVariables.GetFsmFloat("Fireball Recoil Distance").Value;
                 val *= HeroController.instance.cState.facingRight ? -1 : 1;
@@ -270,7 +272,7 @@ namespace SkillUpgrades.Skills
                     yRecoil.Value = 0f;
                 }
             });
-            SetVelocity2d setVel = recoil.GetActionsOfType<SetVelocity2d>()[1];
+            SetVelocity2d setVel = recoil.Actions.OfType<SetVelocity2d>().ElementAt(1);
             setVel.y = yRecoil;
 
             recoil.Actions = new FsmStateAction[]
@@ -286,8 +288,6 @@ namespace SkillUpgrades.Skills
             };
             #endregion
 
-
         }
-
     }
 }

@@ -102,6 +102,9 @@
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(HollowKnightRefs)\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="Vasi">
+      <HintPath>$(HollowKnightRefs)\Mods\Vasi\Vasi.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">

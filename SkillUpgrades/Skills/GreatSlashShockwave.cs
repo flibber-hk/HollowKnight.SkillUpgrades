@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
@@ -8,8 +6,8 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using SkillUpgrades.Components;
 using SkillUpgrades.FsmStateActions;
-using SkillUpgrades.Util;
 using UnityEngine;
+using Vasi;
 using UObject = UnityEngine.Object;
 
 namespace SkillUpgrades.Skills
@@ -68,12 +66,12 @@ namespace SkillUpgrades.Skills
 
             // Keep the shockwave alive for 2.5x the lifetime of the regular GSlash
             PlayMakerFSM controlCollider = clone.LocateMyFSM("Control Collider");
-            controlCollider.GetState("Enable").GetActionOfType<IntCompare>().integer2.Value = 45;
+            controlCollider.GetState("Enable").GetAction<IntCompare>().integer2.Value = 45;
             // Deparent once the spawning is done
             controlCollider.GetState("Init").AddAction(new ExecuteLambda(() => clone.transform.SetParent(null)));
             // Destroy once we're done with the object
             FsmState disable = controlCollider.GetState("Disable");
-            disable.RemoveActionsOfType<FsmStateAction>();
+            disable.RemoveAllOfType<FsmStateAction>();
             disable.AddAction(new ExecuteLambda(() => UObject.Destroy(clone)));
 
             // Move it horizontally away from the knight at speed equal to cdash speed
