@@ -3,6 +3,7 @@ using HutongGames.PlayMaker;
 using UnityEngine;
 using SkillUpgrades.FsmStateActions;
 using Vasi;
+using Modding.Utils;
 
 namespace SkillUpgrades.Skills
 {
@@ -20,7 +21,6 @@ namespace SkillUpgrades.Skills
 
         protected override void StartUpInitialize()
         {
-            Circler.SetDirection = SetCirclerDirection;
             On.HeroController.Start += HeroController_Start;
         }
 
@@ -38,40 +38,56 @@ namespace SkillUpgrades.Skills
             FsmState init = fsm.GetState("Init");
             init.AddAction(new ExecuteLambda(() =>
             {
-                fsm.FsmVariables.GetFsmGameObject("Scr Heads").Value.AddComponent<Circler>();
-                fsm.FsmVariables.GetFsmGameObject("Scr Heads 2").Value.AddComponent<Circler>();
+                fsm.FsmVariables.GetFsmGameObject("Scr Heads").Value.GetOrAddComponent<Circler>().OnGetDirection += SetCirclerDirection;
+                fsm.FsmVariables.GetFsmGameObject("Scr Heads 2").Value.GetOrAddComponent<Circler>().OnGetDirection += SetCirclerDirection;
             }));
 
             if (fsm.ActiveStateName != "Init" && fsm.ActiveStateName != "Pause")
             {
-                fsm.FsmVariables.GetFsmGameObject("Scr Heads").Value.AddComponent<Circler>();
-                fsm.FsmVariables.GetFsmGameObject("Scr Heads 2").Value.AddComponent<Circler>();
+                fsm.FsmVariables.GetFsmGameObject("Scr Heads").Value.GetOrAddComponent<Circler>().OnGetDirection += SetCirclerDirection;
+                fsm.FsmVariables.GetFsmGameObject("Scr Heads 2").Value.GetOrAddComponent<Circler>().OnGetDirection += SetCirclerDirection;
             }
         }
 
-        public void SetCirclerDirection()
+        public int SetCirclerDirection()
         {
             if (!SkillUpgradeActive)
             {
-                Circler.direction = 0;
-                return;
+                return 0;
             }
 
             HeroActions ia = InputHandler.Instance.inputActions;
-            if (ia.right.IsPressed && RightSpiralScreamAllowed) Circler.direction = -1;
-            else if (ia.left.IsPressed && LeftSpiralScreamAllowed) Circler.direction = 1;
-            else Circler.direction = 0;
+            if (ia.right.IsPressed && RightSpiralScreamAllowed) return -1;
+            else if (ia.left.IsPressed && LeftSpiralScreamAllowed) return 1;
+            else return 0;
         }
     }
 
     public class Circler : MonoBehaviour
     {
+        private static bool madeWarning = false;
+
         private bool circled;
         private float angle;
 
         // It's kinda bad that we have to do an action like this but I want the code to run in Circler.OnEnable but depend on the
         // particular Spiral Scream instance (without having a static SpiralScream.instance or whatever)
-        public static Action SetDirection;
+        public event Func<int> OnGetDirection;
+
+        private int GetDirection() 
+        {
+            if (OnGetDirection != null)
+            {
+                return OnGetDirection();
+            }
+
+            if (!madeWarning)
+            {
+                SkillUpgrades.skills[nameof(SpiralScream)].LogWarn("No GetDirection subscriber; not rotating...");
+            }
+            
+            return 0;
+        }
 
         public static float cycleTime = 0.45f;
         /// <summary>
@@ -79,17 +95,17 @@ namespace SkillUpgrades.Skills
         /// 0 -> No rotation
         /// -1 -> Clockwise
         /// </summary>
-        public static int direction = 0;
+        public int direction = 0;
 
-        public void OnEnable()
+        void OnEnable()
         {
             ResetRotation();
             angle = 0f;
             circled = false;
-            SetDirection();
+            direction = GetDirection();
         }
 
-        public void Update()
+        void Update()
         {
             if (circled) return;
             float rotateAngle = 360f * (Time.deltaTime / cycleTime) * direction;
@@ -103,7 +119,7 @@ namespace SkillUpgrades.Skills
             }
         }
 
-        public void OnDestroy()
+        void OnDestroy()
         {
             ResetRotation();
             angle = 0f;

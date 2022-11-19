@@ -15,8 +15,8 @@ namespace SkillUpgrades
     public class SkillUpgrades : Mod, IGlobalSettings<SkillUpgradeSettings>, ICustomMenuMod
     {
         internal static SkillUpgrades instance;
-        internal static readonly Dictionary<string, AbstractSkillUpgrade> _skills = new();
-        public static IEnumerable<string> SkillNames => _skills.Keys;
+        internal static readonly Dictionary<string, AbstractSkillUpgrade> skills = new();
+        public static IEnumerable<string> SkillNames => skills.Keys;
 
         #region Global Settings
         public static SkillUpgradeSettings GS { get; set; } = new SkillUpgradeSettings();
@@ -39,7 +39,7 @@ namespace SkillUpgrades
             foreach (Type t in AbstractSkillUpgrade.GetAvailableSkillUpgradeTypes())
             {
                 AbstractSkillUpgrade skill = (AbstractSkillUpgrade)Activator.CreateInstance(t);
-                _skills.Add(skill.Name, skill);
+                skills.Add(skill.Name, skill);
                 skill.InitializeSkillUpgrade();
                 skill.UpdateSkillState();
                 DebugMod.AddActionToKeyBindList(() => Toggle(skill), skill.Name, "SkillUpgrades");
@@ -91,7 +91,7 @@ namespace SkillUpgrades
             });
 
             List<IMenuMod.MenuEntry> skillMenuEntries = new();
-            foreach (AbstractSkillUpgrade skill in _skills.Values)
+            foreach (AbstractSkillUpgrade skill in skills.Values)
             {
                 IMenuMod.MenuEntry entry = new()
                 {
@@ -124,7 +124,7 @@ namespace SkillUpgrades
                 }
             }
 
-            foreach (AbstractSkillUpgrade skill in _skills.Values)
+            foreach (AbstractSkillUpgrade skill in skills.Values)
             {
                 skill.AddToMenuList(skillSettingEntries);
             }
@@ -152,7 +152,7 @@ namespace SkillUpgrades
         {
             GS.GlobalToggle = enable;
 
-            foreach (AbstractSkillUpgrade skill in _skills.Values)
+            foreach (AbstractSkillUpgrade skill in skills.Values)
             {
                 skill.UpdateSkillState();
             }

@@ -79,7 +79,7 @@ namespace SkillUpgrades.Skills
         [PublicAPI]
         public static void OverrideSkillState(string Name, bool? state)
         {
-            if (!SkillUpgrades._skills.TryGetValue(Name, out AbstractSkillUpgrade skill))
+            if (!SkillUpgrades.skills.TryGetValue(Name, out AbstractSkillUpgrade skill))
             {
                 SkillUpgrades.instance.LogWarn($"Could not find skill {Name}");
                 return;
