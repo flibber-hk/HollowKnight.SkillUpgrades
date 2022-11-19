@@ -70,8 +70,6 @@ namespace SkillUpgrades.Skills
         private bool circled;
         private float angle;
 
-        // It's kinda bad that we have to do an action like this but I want the code to run in Circler.OnEnable but depend on the
-        // particular Spiral Scream instance (without having a static SpiralScream.instance or whatever)
         public event Func<int> OnGetDirection;
 
         private int GetDirection() 
