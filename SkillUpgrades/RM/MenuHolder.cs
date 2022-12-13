@@ -34,11 +34,16 @@ namespace SkillUpgrades.RM
             return true;
         }
 
-        private void SetTopLevelButtonColor()
+        private void SetButtonColours()
         {
             if (JumpToSUPage != null)
             {
                 JumpToSUPage.Text.color = RandomizerInterop.RandoSettings.Any ? Colors.TRUE_COLOR : Colors.DEFAULT_COLOR;
+            }
+            if ((suMEF?.ElementLookup.TryGetValue(nameof(RandoSettings.SkillUpgradeRandomization), out IValueElement button) ?? false)
+                && button is MenuEnum<MainSkillUpgradeRandoType> menuEnum)
+            {
+                menuEnum.Text.color = RandomizerInterop.RandoSettings.Any ? Colors.TRUE_COLOR : Colors.FALSE_COLOR;
             }
         }
 
@@ -51,14 +56,14 @@ namespace SkillUpgrades.RM
             suVIP = new(MainPage, new(0, 300), 50f, true, suMEF.Elements);
             foreach (IValueElement e in suMEF.Elements)
             {
-                e.SelfChanged += obj => SetTopLevelButtonColor();
+                e.SelfChanged += obj => SetButtonColours();
             }
 
             Localize(suMEF);
 
             JumpToSUPage = new(landingPage, "SkillUpgrades");
             JumpToSUPage.AddHideAndShowEvent(landingPage, MainPage);
-            SetTopLevelButtonColor();
+            SetButtonColours();
         }
 
         internal void ResetMenu()
