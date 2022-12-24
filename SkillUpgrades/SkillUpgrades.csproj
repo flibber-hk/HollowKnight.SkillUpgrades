@@ -4,7 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>SkillUpgrades</RootNamespace>
     <AssemblyTitle>SkillUpgrades</AssemblyTitle>
-    <AssemblyVersion>0.11.3.3</AssemblyVersion>
+    <AssemblyVersion>0.11.3.4</AssemblyVersion>
     <Deterministic>true</Deterministic>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <LangVersion>latest</LangVersion>
