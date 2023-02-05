@@ -174,6 +174,10 @@ namespace SkillUpgrades.Skills
                 {
                     if (InputHandler.Instance.inputActions.right.IsPressed && RightwardDiveAllowed) QuakeAngle = 90;
                     else if (InputHandler.Instance.inputActions.left.IsPressed && LeftwardDiveAllowed) QuakeAngle = -90;
+                    if (QuakeAngle != 0)
+                    {
+                        InvokeUsedSkillUpgrade();
+                    }
                     HeroRotator.Instance.Rotate(QuakeAngle, respectFacingDirection: false);
                 }
 

@@ -276,10 +276,12 @@ namespace SkillUpgrades.Skills
                 if (shouldDiagonal)
                 {
                     SuperdashAngle = -45;
+                    InvokeUsedSkillUpgrade();
                 }
                 else if (shouldVertical)
                 {
                     SuperdashAngle = -90;
+                    InvokeUsedSkillUpgrade();
                 }
             });
 
@@ -290,10 +292,12 @@ namespace SkillUpgrades.Skills
                     if (GameManager.instance.inputHandler.inputActions.up.IsPressed)
                     {
                         SuperdashAngle = -45;
+                        InvokeUsedSkillUpgrade();
                     }
                     else if (GameManager.instance.inputHandler.inputActions.down.IsPressed)
                     {
                         SuperdashAngle = 45;
+                        InvokeUsedSkillUpgrade();
                     }
                 }
             });

@@ -4,3 +4,4 @@ ItemChanger
 MenuChanger
 RandoSettingsManager
 Vasi
+FStats

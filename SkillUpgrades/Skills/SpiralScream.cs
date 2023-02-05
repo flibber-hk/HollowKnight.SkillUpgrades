@@ -57,8 +57,16 @@ namespace SkillUpgrades.Skills
             }
 
             HeroActions ia = InputHandler.Instance.inputActions;
-            if (ia.right.IsPressed && RightSpiralScreamAllowed) return -1;
-            else if (ia.left.IsPressed && LeftSpiralScreamAllowed) return 1;
+            if (ia.right.IsPressed && RightSpiralScreamAllowed) 
+            {
+                InvokeUsedSkillUpgrade();
+                return -1;
+            }
+            else if (ia.left.IsPressed && LeftSpiralScreamAllowed)
+            {
+                InvokeUsedSkillUpgrade();
+                return 1;
+            }
             else return 0;
         }
     }

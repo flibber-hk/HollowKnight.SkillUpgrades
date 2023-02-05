@@ -119,6 +119,17 @@ namespace SkillUpgrades.Skills
         }
         #endregion
 
+        #region Skill usage events
+        public static event Action<string> OnUsedSkillUpgrade;
+
+        protected void InvokeUsedSkillUpgrade() => InvokeUsedSkillUpgrade(Name);
+
+        protected void InvokeUsedSkillUpgrade(string message)
+        {
+            OnUsedSkillUpgrade?.Invoke(message);
+        }
+        #endregion
+
         #region Logging
         // If they improve the access levels of the loggable class in the mapi then I don't need to do this garbage
         protected virtual string LogPrefix => $"[SkillUpgrades]:[{Name}]";

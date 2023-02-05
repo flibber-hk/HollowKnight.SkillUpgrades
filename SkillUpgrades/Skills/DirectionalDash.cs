@@ -107,6 +107,13 @@ namespace SkillUpgrades.Skills
             }
 
             _dashDirection = direction;
+
+            if (direction.HasFlag(DashDirection.Up)
+                || (direction.HasFlag(DashDirection.Down) && direction != DashDirection.Down))
+            {
+                InvokeUsedSkillUpgrade();
+            }
+
             return false;
         }
 

@@ -172,6 +172,7 @@ namespace SkillUpgrades.Skills
                 if (SkillUpgradeActive && !InputHandler.Instance.inputActions.left.IsPressed && !InputHandler.Instance.inputActions.right.IsPressed)
                 {
                     FireballDown = true;
+                    InvokeUsedSkillUpgrade();
                 }
                 else
                 {

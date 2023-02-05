@@ -87,6 +87,7 @@ namespace SkillUpgrades.Skills
             rb.isKinematic = true;
 
             clone.SetActive(true);
+            InvokeUsedSkillUpgrade();
         }
     }
 }

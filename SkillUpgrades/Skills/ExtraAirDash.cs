@@ -69,10 +69,15 @@ namespace SkillUpgrades.Skills
                 if (airDashCount < AirDashMax || AirDashMax < 0)
                 {
                     GameManager.instance.StartCoroutine(RefreshDashInAir());
+                    if (airDashCount != 1)
+                    {
+                        InvokeUsedSkillUpgrade();
+                    }
                 }
                 else if (LocalExtraDashes > 0)
                 {
                     LocalExtraDashes -= 1;
+                    InvokeUsedSkillUpgrade();
                     GameManager.instance.StartCoroutine(RefreshDashInAir());
                 }
             }

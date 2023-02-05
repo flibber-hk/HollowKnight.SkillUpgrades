@@ -62,6 +62,12 @@ namespace SkillUpgrades
                 RM.RandomizerInterop.HookRandomizer();
             }
 
+            // FStats Interop
+            if (ModHooks.GetMod(nameof(FStats.FStatsMod)) is Mod)
+            {
+                Stats.FStatsInterop.HookFStats();
+            }
+
             Log("Initialization done!");
         }
 
