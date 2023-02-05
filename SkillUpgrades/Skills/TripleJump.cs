@@ -66,20 +66,21 @@ namespace SkillUpgrades.Skills
             }
 
             orig(self);
+
+            if (doubleJumpCount > 0)
+            {
+                InvokeUsedSkillUpgrade();
+            }
+
             doubleJumpCount++;
 
             if (doubleJumpCount < DoubleJumpMax || DoubleJumpMax < 0)
             {
                 GameManager.instance.StartCoroutine(RefreshWingsInAir());
-                if (doubleJumpCount != 1)
-                {
-                    InvokeUsedSkillUpgrade();
-                }
             }
             else if (LocalExtraJumps > 0)
             {
                 LocalExtraJumps -= 1;
-                InvokeUsedSkillUpgrade();
                 GameManager.instance.StartCoroutine(RefreshWingsInAir());
             }
         }

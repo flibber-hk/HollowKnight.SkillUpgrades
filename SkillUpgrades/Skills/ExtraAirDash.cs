@@ -59,25 +59,27 @@ namespace SkillUpgrades.Skills
 
         private void AllowExtraAirDash(On.HeroController.orig_HeroDash orig, HeroController self)
         {
+            // As opposed to ground dash
             bool shouldAirDash = !self.cState.onGround && !self.cState.inAcid;
 
             orig(self);
             if (shouldAirDash)
             {
+                if (airDashCount > 0)
+                {
+                    // Using an extra air dash
+                    InvokeUsedSkillUpgrade();
+                }
+
                 airDashCount++;
 
                 if (airDashCount < AirDashMax || AirDashMax < 0)
                 {
                     GameManager.instance.StartCoroutine(RefreshDashInAir());
-                    if (airDashCount != 1)
-                    {
-                        InvokeUsedSkillUpgrade();
-                    }
                 }
                 else if (LocalExtraDashes > 0)
                 {
                     LocalExtraDashes -= 1;
-                    InvokeUsedSkillUpgrade();
                     GameManager.instance.StartCoroutine(RefreshDashInAir());
                 }
             }
