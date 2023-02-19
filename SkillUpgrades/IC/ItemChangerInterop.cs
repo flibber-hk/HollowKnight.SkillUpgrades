@@ -57,7 +57,7 @@ namespace SkillUpgrades.IC
                     (SceneNames.Cliffs_02, "right1"),
                     (SceneNames.Mines_34, "bot2"),
                     (SceneNames.Mines_34, "left1"),
-                    (SceneNames.Deepnest_East_07, "bot1"),
+                    (SceneNames.Deepnest_East_07, "bot2"),
                     (SceneNames.Fungus2_30, "bot1"),
                     (SceneNames.Deepnest_01, "bot2"),
                     (SceneNames.Mines_28, "bot1"),
