@@ -4,4 +4,4 @@ ItemChanger
 MenuChanger
 RandoSettingsManager
 Vasi
-FStats
+FStats from https://github.com/flibber-hk/HollowKnight.FStats/releases/download/v2.0.0.0/FStats.zip
