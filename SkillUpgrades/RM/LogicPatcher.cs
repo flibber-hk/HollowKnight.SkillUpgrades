@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using RandomizerCore.Json;
 
 namespace SkillUpgrades.RM
 {
@@ -30,6 +31,8 @@ namespace SkillUpgrades.RM
                     List<FileInfo> macros = new();
                     List<FileInfo> logic = new();
 
+                    JsonLogicFormat fmt = new();
+
                     foreach (FileInfo fi in di.EnumerateFiles())
                     {
                         if (!fi.Extension.ToLower().EndsWith("json")) continue;
@@ -39,12 +42,12 @@ namespace SkillUpgrades.RM
                     foreach (FileInfo fi in macros)
                     {
                         using FileStream fs = fi.OpenRead();
-                        lmb.DeserializeJson(LogicManagerBuilder.JsonType.MacroEdit, fs);
+                        lmb.DeserializeFile(LogicFileType.MacroEdit, fmt, fs);
                     }
                     foreach (FileInfo fi in logic)
                     {
                         using FileStream fs = fi.OpenRead();
-                        lmb.DeserializeJson(LogicManagerBuilder.JsonType.LogicEdit, fs);
+                        lmb.DeserializeFile(LogicFileType.LogicEdit, fmt, fs);
                     }
                 }
             }
